@@ -1,0 +1,46 @@
+services:
+  nayapurano-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event 
+    ports:
+      - "9003:9000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - TZ=Asia/Kathmandu
+      - POSTGRES_HOST=nayapurano-postgres
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    depends_on:
+      - nayapurano-postgres
+    networks:
+      - nayapurano-network
+  nayapurano-postgres:
+    image: postgres:15-alpine
+    container_name: nayapurano-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: Asia/Kathmandu
+      PGTZ: Asia/Kathmandu
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - nayapurano-network
+
+volumes:
+  postgres_data:
+  uploads:
+
+networks:
+  nayapurano-network:
+    driver: bridge
