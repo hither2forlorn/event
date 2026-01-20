@@ -1,7 +1,5 @@
-import { Express, Request, Response, NextFunction } from "express";
 import checkAuthentication from "../middlewares/checkAuthentication";
 import routeLoader from "./plugin";
-
 export interface IAuthRequest extends Request {
 	query: any;
 	params: any;
@@ -13,9 +11,7 @@ export interface IAuthRequest extends Request {
 		role: string;
 	};
 }
-
 let routes: any[] = [];
-
 export interface IRoute {
 	method: "get" | "post" | "put" | "delete" | "patch";
 	path: string;
@@ -23,9 +19,13 @@ export interface IRoute {
 	authorization?: boolean;
 	authCheckType?: string[];
 }
-
+//const routeHandlerCache = new Map();
 const createRouteHandler = (controller: Function, path: string) => {
-	const handler = async (req: Request | any, res: Response, next: NextFunction) => {
+	// const cacheKey = `${controller.name}-${path}`;
+	// if (routeHandlerCache.has(cacheKey)) {
+	// 	return routeHandlerCache.get(cacheKey);
+	// }
+	const handler = async (req: Request | any) => {
 		try {
 			const startTime = Date.now();
 			const data = await controller(req);
@@ -33,52 +33,39 @@ const createRouteHandler = (controller: Function, path: string) => {
 			if (duration > 500) {
 				console.warn(`Slow API call: /api/${path} took ${duration}ms`);
 			}
-			res.json({
+			return {
 				data,
 				message: "SUCCESS",
-			});
+			};
 		} catch (err: any) {
 			console.error(err);
-			next(err); // Pass error to Express error handler
+			throw err;
 		}
 	};
 
+	// routeHandlerCache.set(cacheKey, handler);
 	return handler;
 };
-
-const createAuthMiddleware = (authCheckType?: string[]) => {
-	return async (req: Request | any, res: Response, next: NextFunction) => {
-		try {
-			await checkAuthentication(req, authCheckType as string[]);
-			next();
-		} catch (err) {
-			next(err);
-		}
-	};
-};
-
-const routesInit = async (app: Express) => {
+const routesInit = async (app: any) => {
 	try {
 		routes = await routeLoader.loadAllRoutes();
 		for (const route of routes) {
 			const { method, path, controller, authorization, authCheckType } =
 				route as IRoute | any;
-			
 			const routeHandler = createRouteHandler(controller, path);
-			const apiPath = `/api/${path}`;
-
-			if (authorization) {
-				const authMiddleware = createAuthMiddleware(authCheckType);
-				app[method as keyof Express](apiPath, authMiddleware, routeHandler);
-			} else {
-				app[method as keyof Express](apiPath, routeHandler);
-			}
+			const handleAuthenticationMiddleware = !!authorization
+				? {
+					beforeHandle: async (req: any) => {
+						return await checkAuthentication(req, authCheckType);
+					},
+				}
+				: {};
+			app[method](`/api/${path}`, routeHandler, handleAuthenticationMiddleware);
 		}
 	} catch (error) {
 		console.error("❌ Failed to initialize routes:", error);
 		throw error;
 	}
 };
-
 export default routesInit;
 
