@@ -1,22 +1,16 @@
 import {
-	changePasswordValidationSchema,
-	loginValidationSchema,
+	// changePasswordValidationSchema,
+	// loginValidationSchema,
 	validationSchema,
 } from "./validators";
 import Model from "./model";
-import { verify_retailer_status } from "@/modules/retailer/validators"
-import { PASSWORD_LENGTH } from "@/constant"
-import Mail from "@/modules/mails/service"
 import Repository from "./repository";
-import Resource from "./resource.ts";
+import Resource from "./resource";
 import Token from "@/utils/token";
-import RetailerModel from "@/modules/retailer/model";
-import RetailerColumn from "../retailer/resource.ts";
 import bcrypt from "bcryptjs";
 import logger from "@/config/logger";
-import { ErrorLiteral } from "@/utils/helper.ts";
-import { throwNotFoundError } from "@/utils/error.ts";
-import Wallet from "../wallet/model.ts";
+import { ErrorLiteral } from "@/utils/helper";
+import z from "zod";
 
 const list = async (params: any) => {
 	try {
@@ -27,39 +21,9 @@ const list = async (params: any) => {
 		throw err;
 	}
 };
-const verify_retailer = async (params: any, retailerId: number) => {
-	try {
-		const { error } = await verify_retailer_status.validateAsync(params);
-		if (error) {
-			throw error;
-		}
-		const retailerInfo = await RetailerModel.find({ id: retailerId });
-		if (retailerInfo?.verified == true) {
-			console.error("Retailer is already verified");
-			return "Retailer is already verified";
-		}
-		if (retailerInfo?.id != null && retailerInfo?.id != undefined) {
-			const temp_password = Token.tempPasswordGenerator(PASSWORD_LENGTH);
-			const hashedTempPass = await Token.hashPassword(temp_password);
-			const data: any = await RetailerModel.verify_retailer({ commission_rate: params.commission_rate, password: hashedTempPass }, retailerInfo?.id);
-			logger.debug("data ", data);
-			await Mail.sendMail(retailerInfo.email, 'Retailer Account verification ',
-				`You have Been verified by the Admin \nTo start with the application login with the Email :${data.email}\nPassword: ${temp_password} otp will be accepted only by Phone number : ${data.phone.split("+977").pop()}`
-			);
-			await Wallet.create({ retailer_id: retailerId, amount: "0" }); // Making the wallet once the retialer is verified
-			const filtered_data = RetailerColumn.toJson(data);
-			return filtered_data;
-		} else {
-			throwNotFoundError("Retailer with info not found");
-		}
-	} catch (err: any) {
-		throw err;
-	}
-
-}
 const create = async (input: any) => {
 	try {
-		const { error }: any = await validationSchema.validateAsync(input);
+		const { error }: any = await z.parse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
@@ -86,7 +50,7 @@ const create = async (input: any) => {
 };
 const login = async (input: any) => {
 	try {
-		const { error }: any = await loginValidationSchema.validateAsync(input);
+		const { error }: any = await z.parse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
@@ -165,7 +129,7 @@ const find = async (id: number) => {
 };
 const changePassword = async (input: any, id: number) => {
 	try {
-		const { error } = await changePasswordValidationSchema.validateAsync(input);
+		const { error }: any = z.safeParse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
@@ -206,6 +170,6 @@ export default {
 	logout,
 	find,
 	changePassword,
-	verify_retailer,
+	// verify_retailer,
 	remove,
 };

@@ -1,10 +1,10 @@
-import { Express, Request, Response, NextFunction } from "express";
+import {type Express,type Request,type Response,type NextFunction } from "express";
 import logger from "./../config/logger";
 import { HTTP_STATUS } from "../utils/error";
 
 const errorHandler = (app: Express) => {
 	// Express error handling middleware
-	app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+	app.use((err: any, _: Request, res: Response, __: NextFunction) => {
 		logger.error(err);
 		
 		let statusCode = 500;

@@ -11,12 +11,16 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
+    
+    // Output configuration
+    "outDir": "./dist",
+    "declaration": true,
+    "emitDeclarationOnly": false,
 
     // Bundler mode
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
-    "noEmit": true,
 
     // Best practices
     "strict": true,

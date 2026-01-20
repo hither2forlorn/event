@@ -1,3 +1,4 @@
+import { readdirSync, statSync } from "fs";
 import { join } from "path";
 import { ROOT_PATH } from "@/constant";
 import logger from "@/config/logger";
@@ -5,24 +6,6 @@ interface RouteModule {
 	name: string;
 	routes: any[];
 }
-type RouteConfig = string[];
-const routeConfig: RouteConfig = [
-	"db",
-	"seed_retailer",
-	"seed_ops",
-	"report",
-	"transactions",
-	"otp",
-	"price_slab",
-	"addon",
-	"category",
-	"admin",
-	"customer",
-	"ops",
-	"retailer",
-	"warranty",
-	"general-settings",
-];
 class RouteLoader {
 	private loadedRoutes: RouteModule[] = [];
 	private modulesPath: string;
@@ -34,9 +17,12 @@ class RouteLoader {
 	private scanDirectory(dir: string): string[] {
 		const routeFiles: string[] = [];
 		try {
-			for (const config of routeConfig) {
-				const fullPath = join(dir, config);
-				routeFiles.push(fullPath);
+			const entries = readdirSync(dir);
+			for (const entry of entries) {
+				const fullPath = join(dir, entry);
+				if (statSync(fullPath).isDirectory()) {
+					routeFiles.push(fullPath);
+				}
 			}
 		} catch (error) {
 			//@ts-ignore
@@ -89,4 +75,4 @@ class RouteLoader {
 }
 const routeLoader = new RouteLoader();
 export default routeLoader;
-export { RouteLoader, type RouteModule, type RouteConfig };
+export { RouteLoader, type RouteModule };

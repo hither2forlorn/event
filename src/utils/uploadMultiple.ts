@@ -1,4 +1,4 @@
-import removeFile from "./removeFile.ts"
+import removeFile from "./removeFile"
 import uploadImage from "./uploadImage"
 
 const uploadMultipleImage = async (items: any[], dynamicPath: string, oldImages?: any[]) => {

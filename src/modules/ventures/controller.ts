@@ -43,7 +43,8 @@ const update_retailer = async (req: IAuthRequest) => {
 			throwErrorOnValidation("No Id in the params ");
 
 		}
-		const data = await Service.verify_retailer(req.body, Number(id))
+		// const data = await Service.verify_retailer(req.body, Number(id))
+		const data = ""
 		return data;
 	} catch (err) {
 		logger.error(err);

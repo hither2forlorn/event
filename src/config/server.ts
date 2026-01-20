@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, {type Express,type Request,type Response,type NextFunction } from "express";
 import logger from "./logger";
 import corsOptions from "./cors";
 import helmetOptions from "./helmet";
@@ -16,13 +16,13 @@ server.use(express.urlencoded({ limit: "100mb", extended: true }));
 server.use(corsOptions);
 
 // Request logging middleware
-server.use((req: Request, res: Response, next: NextFunction) => {
+server.use((req: Request, _: Response, next: NextFunction) => {
 	logger.debug(`Incoming request: ${req.method} ${req.path}`);
 	next();
 });
 
 // Root health check endpoint
-server.get("/", (req: Request, res: Response) => {
+server.get("/", (_: Request, res: Response) => {
 	res.send("server is running");
 });
 
