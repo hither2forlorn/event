@@ -1,4 +1,4 @@
-import express, {type Express,type Request,type Response,type NextFunction } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import logger from "./logger";
 import corsOptions from "./cors";
 import helmetOptions from "./helmet";
@@ -23,6 +23,7 @@ server.use((req: Request, _: Response, next: NextFunction) => {
 
 // Root health check endpoint
 server.get("/", (_: Request, res: Response) => {
+	console.log('This is the server responce ');
 	res.send("server is running");
 });
 
