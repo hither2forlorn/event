@@ -1,5 +1,5 @@
 services:
-  nayapurano-backend:
+  khumcloud-backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,18 +11,18 @@ services:
     environment:
       - NODE_ENV=production
       - TZ=Asia/Kathmandu
-      - POSTGRES_HOST=nayapurano-postgres
+      - POSTGRES_HOST=khumcloud-postgres
       - POSTGRES_PORT=5432
     volumes:
       - ./uploads:/app/uploads
     restart: unless-stopped
     depends_on:
-      - nayapurano-postgres
+      - khumcloud-postgres
     networks:
-      - nayapurano-network
-  nayapurano-postgres:
+      - khumcloud-network
+  khumcloud-postgres:
     image: postgres:15-alpine
-    container_name: nayapurano-postgres
+    container_name: khumcloud-postgres
     ports:
       - "5432:5432"
     environment:
@@ -35,12 +35,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - nayapurano-network
+      - khumcloud-network
 
 volumes:
   postgres_data:
   uploads:
 
 networks:
-  nayapurano-network:
+  khumcloud-network:
     driver: bridge
