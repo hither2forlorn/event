@@ -1,5 +1,4 @@
 import db from "@/config/db"
-import Decimal from "decimal.js"
 import { readFileSync } from "fs"
 import logger from "@/config/logger"
 export type ValidationReturnType = {
@@ -11,6 +10,18 @@ export const ErrorLiteral = {
 	ALREADY_EXIST: "Error : Data already exists",
 	UNAUTHORIZED: "UNAUTHORIZED:Cannot access the data ",
 
+
+}
+export const HTTP_ERROR_LITERALS = {
+	GOOD:"SUCCESS: ",
+	VALIDATIONERROR:"VALIDATION ERROR: ",
+	BADREQUEST:"BADREQUEST: ",
+	UNAUTHORIZED: "UNAUTHORIZED: ",
+	FORBIDDEN: "FORBIDDEN: ",
+	NOT_FOUND: "NOT FOUND: ",
+	CONFLICT: "CONFLICT: ",
+	VALIDATION_ERROR: "VALIDATION_ERROR: ",
+	INTERNAL_SERVER_ERROR: "SOMETHING WENT WRONG: "	
 
 }
 export const doesExistCheck = async (tableName: any, whereArray: [any]) => {
@@ -35,12 +46,7 @@ export const image_from_link = async (imagelink: string) => {
 		return imagelink;
 	}
 }
-export const commission_calculator = (amount: number, commission_rate: number) => {
-	const decimalamount = new Decimal(amount / 100)
-	const commission = Decimal(commission_rate).mul(decimalamount);
-	console.log('This is the commission of the user in the wallet ', commission);
-	return commission;
-}
+
 export const formatDate = () => {
 	const now = new Date();
 	const year = now.getFullYear();

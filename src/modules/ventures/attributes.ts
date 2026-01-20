@@ -1,5 +1,5 @@
 import {serial , text , json, timestamp} from "drizzle-orm/pg-core"
-const tableName = "admins";
+const tableName = "ventures";
 const attributes = {
 	id: serial("id").primaryKey(),
 	name: text("name").notNull(),

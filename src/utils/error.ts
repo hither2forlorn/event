@@ -1,4 +1,4 @@
-import { type ValidationReturnType } from "./helper";
+import { HTTP_ERROR_LITERALS, type ValidationReturnType } from "./helper";
 export const HTTP_STATUS = {
 	OK: 200,
 	CREATED: 201,
@@ -12,7 +12,7 @@ export const HTTP_STATUS = {
 } as const;
 // Validation Error Thrower
 export const throwErrorOnValidation = (validationstring: string) => {
-	const errorMessage = new Error(`Validation Error: ${validationstring}`);
+	const errorMessage = new Error(`${HTTP_ERROR_LITERALS.VALIDATIONERROR} ${validationstring}`);
 	errorMessage.name = "ValidationError";
 	throw errorMessage;
 }
