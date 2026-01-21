@@ -13,10 +13,8 @@ const get = async (req: IAuthRequest) => {
 };
 const create = async (req: IAuthRequest) => {
 	try {
-		const { body, user } = req;
-		if (user?.id !== 1) throw ("Unauthorized"); // Only super admin can create the new user 
+		const { body } = req;
 		// Logic for the check of the same password
-
 		const data = await Service.create(body);
 		return data;
 	} catch (err: any) {
