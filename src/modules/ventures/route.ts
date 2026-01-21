@@ -3,44 +3,23 @@ const routes = [
 	{
 		method: "get",
 		controller: Controller.get,
-		path: "admin",
-		authorization: true,
+		path: "ventures",
 	},
 	{
 		method: "post",
 		controller: Controller.create,
-		path: "admin",
-		authorization: true,
-	},
-	{
-		method: "post",
-		controller: Controller.update_retailer,
-		path: "admin/venture_retailer",
-		authorization: true,
+		path: "ventures",
 	},
 	{
 		method: "patch",
 		controller: Controller.changePassword,
-		path: "admin/venture_retailer/:id",
-		authorization: true,
+		path: "ventures/:id",
 	},
 	{
 		method: "delete",
 		controller: Controller.deleteModule,
-		path: "admin/:id",
-		authorization: true,
+		path: "ventures/:id",
 	},
-	// {
-	// 	method: "post",
-	// 	controller: Controller.update_retailer,
-	// 	path: "admin/verify-retailer/:id",
-	// 	authorization: true,
-	// },
-	// {
-	// 	method: "post",
-	// 	controller: Controller.login,
-	// 	path: "admin/login",
-	// }
 ];
 export default routes;
 

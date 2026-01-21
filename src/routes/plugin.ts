@@ -1,4 +1,3 @@
-import { statSync } from "fs";
 import { join } from "path";
 import { ROOT_PATH } from "@/constant";
 import logger from "@/config/logger";
@@ -7,7 +6,8 @@ interface RouteModule {
 	routes: any[];
 }
 export const routeConfig = [
-	"admin"
+	"admin",
+	"ventures",
 ]
 class RouteLoader {
 	private loadedRoutes: RouteModule[] = [];
@@ -41,9 +41,7 @@ class RouteLoader {
 				logger.warn(`Invalid route format in ${modulePath}`);
 				return null;
 			}
-			// Use a regular expression to extract the module name from the path
-			const moduleNameMatch = modulePath.match(/modules[\\/]([^\\/]+)$/);
-			const moduleName = moduleNameMatch ? moduleNameMatch[1] : modulePath;
+			const moduleName = modulePath.split("modules/")[1];
 			return {
 				name: moduleName || "",
 				routes: moduleRoutes.default,

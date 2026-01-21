@@ -53,7 +53,7 @@ const routesInit = async (app: any) => {
 			const { method, path, controller, authorization, authCheckType } =
 				route as IRoute | any;
 			const routeHandler = createRouteHandler(controller, path);
-
+			console.log('route handler', routeHandler)
 			if (authorization) {
 				// Create Express middleware wrapper for authentication
 				const authMiddleware = async (req: any, _: any, next: any) => {
@@ -64,6 +64,7 @@ const routesInit = async (app: any) => {
 						next(error);
 					}
 				};
+				console.log('The actual route is ', `/api/${path}`, 'controller', controller)
 				app[method](`/api/${path}`, authMiddleware, routeHandler);
 			} else {
 				app[method](`/api/${path}`, routeHandler);
