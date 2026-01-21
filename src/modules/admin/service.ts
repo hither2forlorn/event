@@ -8,9 +8,10 @@ import {
 import z from "zod";
 import logger from "@/config/logger";
 import Model from "./model";
-import { throwErrorOnValidation } from "@/utils/error";
+import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
 import { comparePassword, hashPassword } from "@/utils/hashPassword";
 import { sign } from "jsonwebtoken";
+import Resource from "./resource";
 const list = async (params: any) => {
   try {
     const data: any = await Model.findAllAndCount(params);
@@ -25,10 +26,8 @@ const verify_retailer = async (params: any, retailerId: number) => {
 };
 const create = async (input: createAdminType) => {
   try {
-    console.log("create - input:", input);
     const { error, success } = await z.safeParseAsync(validationSchema, input);
     if (!success) {
-      console.log("This is the failute");
       throwErrorOnValidation(
         error.issues.map((issue) => issue.message).join(", "),
       );
@@ -39,30 +38,38 @@ const create = async (input: createAdminType) => {
     const duplicateAdmin = await Model.find({ email });
 
     if (duplicateAdmin) {
-      throwErrorOnValidation("Already exists");
+      throwErrorOnValidation("Admin with this email already exists");
     }
 
     const hashedPw = await hashPassword(password);
 
     const admin = await Model.create({ ...input, password: hashedPw });
 
-    console.log("data");
-    return admin;
+    logger.info(`Admin created successfully with email: ${email}`);
+    return Resource.toJson(admin as any);
   } catch (err: any) {
     throw err;
   }
 };
 const login = async (input: loginType) => {
   try {
+    const result = loginValidationSchema.safeParse(input);
+
+    if (!result.success) {
+      throwErrorOnValidation(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
+
     const admin = await Model.find({ email: input.email });
 
     if (!admin || !admin.id) {
-      return throwErrorOnValidation("Invalid credentials");
+      throwErrorOnValidation("Invalid credentials");
     }
 
     const isPasswordValid = await comparePassword(
       input.password,
-      admin.password,
+      admin!.password,
     );
 
     if (!isPasswordValid) {
@@ -70,38 +77,128 @@ const login = async (input: loginType) => {
     }
 
     const tokenPayload = {
-      id: admin.id,
-      email: admin.email,
+      id: admin!.id,
+      email: admin!.email,
     };
 
     const token = sign(tokenPayload, process.env.JWT_SECRET as string, {
       expiresIn: "7d",
     });
 
-    return token;
+    logger.info(`Admin ${admin!.id} logged in successfully`);
+    return { token, admin: Resource.toJson(admin as any) };
   } catch (error) {
     throw error;
   }
 };
 
-const logout = async (input: any, id: number) => {
-  console.log("logout - input:", input, "id:", id);
-};
+// const logout = async (id: number) => {
+//   try {
+//     const admin = await Model.find({ id });
+
+//     if (!admin) {
+//       throwNotFoundError("Admin");
+//     }
+
+//     logger.info(`Admin ${id} logged out successfully`);
+//     return { message: "Logged out successfully" };
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
 const find = async (id: number) => {
-  console.log("find - id:", id);
+  try {
+    const admin = await Model.find({ id });
+
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
+
+    return Resource.toJson(admin as any);
+  } catch (error) {
+    throw error;
+  }
 };
+
 const changePassword = async (input: any, id: number) => {
-  console.log("changePassword - input:", input, "id:", id);
+  try {
+    const result = changePasswordValidationSchema.safeParse(input);
+
+    if (!result.success) {
+      throwErrorOnValidation(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = input;
+
+    // Check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      throwErrorOnValidation("New password and confirm password do not match");
+    }
+
+    // Find admin
+    const admin = await Model.find({ id });
+
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await comparePassword(
+      currentPassword,
+      admin!.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throwErrorOnValidation("Current password is incorrect");
+    }
+
+    // Hash new password
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    // Update password
+    const updatedAdmin = await Model.update(
+      { password: hashedNewPassword },
+      id,
+    );
+
+    logger.info(`Password changed successfully for admin ${id}`);
+    return Resource.toJson(updatedAdmin as any);
+  } catch (error) {
+    throw error;
+  }
 };
 
 const remove = async (id: number) => {
-  console.log("remove - id:", id);
+  try {
+    // Check if admin exists
+    const admin = await Model.find({ id });
+
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
+
+    // Prevent deletion of super admin (id: 1)
+    if (id === 1) {
+      throwErrorOnValidation("Cannot delete super admin");
+    }
+
+    // Delete admin
+    await Model.destroy(id);
+
+    logger.info(`Admin ${id} deleted successfully`);
+    return { message: "Admin deleted successfully" };
+  } catch (error) {
+    throw error;
+  }
 };
 export default {
   list,
   create,
   login,
-  logout,
+  // logout,
   find,
   changePassword,
   verify_retailer,
