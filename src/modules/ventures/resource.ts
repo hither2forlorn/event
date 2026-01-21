@@ -1,39 +1,26 @@
-import type { ImageInput } from "../../interface/index";
-export interface AdminColumn {
+export interface VenturesColumn {
 	id: number;
 	name: string;
-	username: string;
 	email: string;
-	avatar: string | ImageInput | null;
+	password: string;
 	createdAt: Date;
-	token?: string;
 	deviceTokens?: Array<string>;
-	role: string;
 	infos: any;
 }
 class Resource {
-	static toJson(admin: AdminColumn): Partial<AdminColumn> | null {
-		if (!admin) return null;
-		const data: AdminColumn = {
-			id: admin.id,
-			name: admin.name,
-			username: admin.username,
-			email: admin.email,
-			role: "admin",
-			avatar: admin?.avatar || null,
-			infos: admin?.infos || null,
-			createdAt: admin.createdAt,
+	static toJson(ventures: VenturesColumn): Partial<VenturesColumn> | null {
+		if (!ventures) return null;
+		const data: Partial<VenturesColumn> = {
+			id: ventures.id,
+			name: ventures.name,
+			email: ventures.email,
+			infos: ventures?.infos || null,
+			createdAt: ventures.createdAt,
 		};
-
-		if (!!admin.token) {
-			data.token = admin.token;
-		}
-
 		return data;
 	}
-	static collection(admins: AdminColumn[]) {
-		return admins.map(this.toJson);
+	static collection(ventures: VenturesColumn[]) {
+		return ventures.map(this.toJson);
 	}
 }
-
 export default Resource;
