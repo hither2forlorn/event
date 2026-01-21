@@ -6,7 +6,9 @@
     "dev": "nodemon --exec tsx src/index.ts",
     "dev:static":"node dist/index.js",
     "build": "tsc && tsc-alias",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+	"db:generate": "drizzle-kit generate",
+	"db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@handlebars/allow-prototype-access": "^1.0.5",
