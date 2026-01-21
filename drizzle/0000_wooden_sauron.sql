@@ -1,7 +1,7 @@
 CREATE TABLE "admins" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
-	"password" text,
+	"password" text NOT NULL,
 	"info" json,
 	"createdAt" timestamp DEFAULT now(),
 	"updatedAt" timestamp DEFAULT now(),
