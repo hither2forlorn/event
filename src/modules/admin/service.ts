@@ -1,10 +1,12 @@
-// import {
-// 	changePasswordValidationSchema,
-// 	loginValidationSchema,
-// 	validationSchema,
-// } from "./validators";
+import {
+	changePasswordValidationSchema,
+	loginValidationSchema,
+	validationSchema,
+} from "./validators";
+import z from "zod"
 import logger from "@/config/logger";
 import Model from "./model";
+import { throwErrorOnValidation, throwValidationError } from "@/utils/error";
 const list = async (params: any) => {
 	try {
 		const data: any = await Model.findAllAndCount(params);
@@ -20,6 +22,13 @@ const verify_retailer = async (params: any, retailerId: number) => {
 const create = async (input: any) => {
 	try {
 		console.log("create - input:", input);
+		const { error, data, success } = await z.safeParseAsync(validationSchema, input);
+		if (!success) {
+			console.log('This is the failute');
+			throwErrorOnValidation(error.message); // style this for the better formatting of the text 
+		}
+		console.log('data');
+		return data;
 	} catch (err: any) {
 		throw err;
 	}

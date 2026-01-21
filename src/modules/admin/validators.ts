@@ -17,9 +17,7 @@ const updateRetailerInfo = z.object({
 	verify: z.boolean(),
 });
 const validationSchema = z.object({
-	name: z.string().nonempty(),
-	username: z.string().nonempty(),
-	email: z.string().email().nonempty(),
+	email: z.string().nonempty(),
 	password: z.string().min(8).nonempty(),
 
 });
