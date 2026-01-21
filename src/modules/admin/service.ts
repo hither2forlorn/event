@@ -8,7 +8,7 @@ import {
 import z from "zod";
 import logger from "@/config/logger";
 import Model from "./model";
-import { throwErrorOnValidation, throwValidationError } from "@/utils/error";
+import { throwErrorOnValidation } from "@/utils/error";
 import { comparePassword, hashPassword } from "@/utils/hashPassword";
 import { sign } from "jsonwebtoken";
 const list = async (params: any) => {
