@@ -45,10 +45,14 @@ class Admin {
       conditions.push(eq(admins.email, email));
     }
 
+    if (conditions.length === 0) {
+      return null;
+    }
+
     const result = await db
       .select()
       .from(admins)
-      .where(or(...conditions));
+      .where(conditions.length === 1 ? conditions[0] : or(...conditions));
     return result[0] || null;
   }
   static async update(
