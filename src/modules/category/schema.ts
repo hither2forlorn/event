@@ -1,5 +1,4 @@
-import { tableName, attributes } from "./attributes";
 import { pgTable } from "drizzle-orm/pg-core";
-const categorySchema = pgTable(
-	tableName, attributes
-); export default categorySchema; 
+import { attributes, tableName } from "./attributes";
+const schema = pgTable(tableName, attributes);
+export default schema;

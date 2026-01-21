@@ -1,41 +1,68 @@
+import { type IAuthRequest } from "@/routes/index";
+import Service from "./service";
 import { throwErrorOnValidation } from "@/utils/error";
-import type { IAuthRequest } from "@/routes/index";
-import logger from "@/config/logger";
-import Service from "./service"
+
 const get = async (req: IAuthRequest) => {
 	try {
 		const data = await Service.list(req?.query);
 		return data;
 	} catch (err: any) {
-		throw (err);
+		throw err;
 	}
 };
+
 const create = async (req: IAuthRequest) => {
 	try {
-		const { body } = req;
-		const data = await Service.create(body);
+		const data = await Service.create(req.body);
 		return data;
 	} catch (err: any) {
-		throw (err);
+		throw err;
 	}
 };
-const changePassword = async (req: IAuthRequest) => {
-	try {
-		const { user, body } = req;
-		const data = await Service.changePassword(body, user?.id);
-		return data;
-	} catch (err: any) {
-		throw (err);
-	}
-};
-const remove = async (req: IAuthRequest) => {
+
+const findOne = async (req: IAuthRequest) => {
 	try {
 		const { id } = req.params;
-		const { body } = req;
-		const data = await Service.remove(body, id);
+		if (!id || isNaN(Number(id))) {
+			throwErrorOnValidation("Invalid ID");
+		}
+		const data = await Service.find(Number(id));
 		return data;
 	} catch (err: any) {
-		throw (err);
+		throw err;
 	}
-}
-export default { create, get, changePassword, remove }
+};
+
+const update = async (req: IAuthRequest) => {
+	try {
+		const { id } = req.params;
+		if (!id || isNaN(Number(id))) {
+			throwErrorOnValidation("Invalid ID");
+		}
+		const data = await Service.update(Number(id), req.body);
+		return data;
+	} catch (err: any) {
+		throw err;
+	}
+};
+
+const deleteModule = async (req: IAuthRequest) => {
+	try {
+		const { id } = req.params;
+		if (!id || isNaN(Number(id))) {
+			throwErrorOnValidation("Invalid ID");
+		}
+		const data = await Service.remove(Number(id));
+		return data;
+	} catch (err: any) {
+		throw err;
+	}
+};
+
+export default {
+	get,
+	create,
+	findOne,
+	update,
+	deleteModule,
+};

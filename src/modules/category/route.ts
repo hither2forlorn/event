@@ -1,8 +1,34 @@
-import Controller from "./controller"
+import Controller from "./controller";
+
 const routes = [
 	{
-		path: "/category",
-		controller: Controller.get
-	}
-]
-export default routes; 
+		method: "get",
+		controller: Controller.get,
+		path: "category",
+	},
+	{
+		method: "get",
+		controller: Controller.findOne,
+		path: "category/:id",
+	},
+	{
+		method: "post",
+		controller: Controller.create,
+		path: "category",
+		authorization: true,
+	},
+	{
+		method: "patch",
+		controller: Controller.update,
+		path: "category/:id",
+		authorization: true,
+	},
+	{
+		method: "delete",
+		controller: Controller.deleteModule,
+		path: "category/:id",
+		authorization: true,
+	},
+];
+
+export default routes;
