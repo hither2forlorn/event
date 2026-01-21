@@ -16,18 +16,6 @@ export const throwErrorOnValidation = (validationstring: string) => {
 	errorMessage.name = "ValidationError";
 	throw errorMessage;
 }
-export const throwValidationError = (validation_result: ValidationReturnType) => {
-	if (validation_result.errors && validation_result.errors.length > 0) {
-		const errormessage = `validation error: ${validation_result.errors.join(', ')}`;
-		const error = new Error(errormessage);
-		error.name = "ValidationError";
-		(error as any).details = validation_result.errors; // Add details for server error handler
-		throw error;
-	}
-	const error = new Error("VALIDATION: Unexpected validation failure");
-	error.name = "VALIDATION";
-	throw error;
-};
 export const throwNotFoundError = (resource: string): never => {
 	const error = new Error(`NOT_FOUND: ${resource} not found`);
 	error.name = "NOT_FOUND";
