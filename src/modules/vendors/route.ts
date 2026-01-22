@@ -3,22 +3,22 @@ const routes = [
 	{
 		method: "get",
 		controller: Controller.get,
-		path: "ventures",
+		path: "vendors",
 	},
 	{
 		method: "post",
 		controller: Controller.create,
-		path: "ventures",
+		path: "vendors",
 	},
 	{
 		method: "patch",
 		controller: Controller.changePassword,
-		path: "ventures/:id",
+		path: "vendors/:id",
 	},
 	{
 		method: "delete",
-		controller: Controller.deleteModule,
-		path: "ventures/:id",
+		controller: Controller.get,
+		path: "vendors/:id",
 	},
 ];
 export default routes;

@@ -1,4 +1,4 @@
-export interface VenturesColumn {
+export interface VendorColumn {
 	id: number;
 	name: string;
 	email: string;
@@ -8,9 +8,9 @@ export interface VenturesColumn {
 	infos: any;
 }
 class Resource {
-	static toJson(ventures: VenturesColumn): Partial<VenturesColumn> | null {
+	static toJson(ventures: VendorColumn): Partial<VendorColumn> | null {
 		if (!ventures) return null;
-		const data: Partial<VenturesColumn> = {
+		const data: Partial<VendorColumn> = {
 			id: ventures.id,
 			name: ventures.name,
 			email: ventures.email,
@@ -19,7 +19,7 @@ class Resource {
 		};
 		return data;
 	}
-	static collection(ventures: VenturesColumn[]) {
+	static collection(ventures: VendorColumn[]) {
 		return ventures.map(this.toJson);
 	}
 }
