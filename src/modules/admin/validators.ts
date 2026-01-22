@@ -2,7 +2,7 @@ import z from "zod";
 const loginValidationSchema = z.object({
   email: z.string().nonempty(),
   password: z.string().nonempty(),
-  deviceToken: z.string().nonempty(),
+  // deviceToken: z.string().nonempty(),
 });
 const changePasswordValidationSchema = z.object({
   currentPassword: z.string().min(8).nonempty(),
