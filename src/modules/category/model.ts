@@ -10,7 +10,7 @@ class Category {
         const offset = (page - 1) * limit;
 
         const result = await db
-            .select(Repository.selectQuery as any)
+            .select(Repository.selectQuery)
             .from(category)
             .limit(limit)
             .offset(offset);
@@ -42,7 +42,7 @@ class Category {
             conditions.push(eq(category.id, id));
         }
         if (title !== undefined) {
-            conditions.push(eq(category.title, title));
+            conditions.push(eq(category.title, title as string));
         }
 
         if (conditions.length === 0) return null;

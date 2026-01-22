@@ -9,5 +9,5 @@ const selectQuery = {
 };
 
 export default {
-    selectQuery,
+    selectQuery
 };

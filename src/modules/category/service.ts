@@ -20,6 +20,9 @@ const create = async (input: any) => {
 	try {
 		categoryValidationSchema.parse(input);
 		const data = await Model.create(input);
+		if(data==undefined){
+			throw new Error("Something went wrong ")
+		}
 		return Resource.toJson(data);
 	} catch (err: any) {
 		logger.error("Error in Category creation:", err);
