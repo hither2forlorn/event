@@ -1,10 +1,10 @@
-import { text, json, timestamp, uuid, pgEnum } from "drizzle-orm/pg-core";
+import { serial, text, json, timestamp, pgEnum } from "drizzle-orm/pg-core";
 
 const roleEnum = pgEnum("role", ["client", "vendor"]);
 
 const tableName = "users";
 const attributes = {
-  id: uuid("id").primaryKey(),
+  id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   info: json("info"),

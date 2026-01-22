@@ -67,7 +67,7 @@ const login = async (input: loginType) => {
 
     const isPasswordValid = await comparePassword(
       input.password,
-      user!.password,
+      user!.password as string,
     );
 
     if (!isPasswordValid) {
@@ -103,7 +103,7 @@ const login = async (input: loginType) => {
 //   }
 // };
 
-const find = async (id: string) => {
+const find = async (id: number) => {
   try {
     const user = await Model.find({ id });
 
@@ -117,7 +117,7 @@ const find = async (id: string) => {
   }
 };
 
-const changePassword = async (input: any, id: string) => {
+const changePassword = async (input: any, id: number) => {
   try {
     const result = changePasswordValidationSchema.safeParse(input);
 
@@ -144,7 +144,7 @@ const changePassword = async (input: any, id: string) => {
     // Verify current password
     const isCurrentPasswordValid = await comparePassword(
       currentPassword,
-      user!.password,
+      user!.password as string,
     );
 
     if (!isCurrentPasswordValid) {
@@ -167,7 +167,7 @@ const changePassword = async (input: any, id: string) => {
   }
 };
 
-const remove = async (id: string) => {
+const remove = async (id: number) => {
   try {
     // Check if admin exists
     const admin = await Model.find({ id });

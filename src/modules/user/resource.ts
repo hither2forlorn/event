@@ -1,7 +1,7 @@
 import { roleEnum } from "./attributes";
 
 export interface UserColumn {
-  id: string;
+  id: number;
   info: any;
   password: string;
   email: string;

@@ -5,7 +5,7 @@ export interface IAuthRequest extends Request {
   params: any;
   body: any;
   user: {
-    id: string;
+    id: number;
     name: string;
     email: string;
     role: string;
