@@ -10,8 +10,8 @@ import logger from "@/config/logger";
 import Model from "./model";
 import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
 import { comparePassword, hashPassword } from "@/utils/hashPassword";
-import { sign } from "jsonwebtoken";
 import Resource from "./resource";
+import Token from "@/utils/token";
 const list = async (params: any) => {
   try {
     const data: any = await Model.findAllAndCount(params);
@@ -81,9 +81,7 @@ const login = async (input: loginType) => {
       email: admin!.email,
     };
 
-    const token = sign(tokenPayload, process.env.JWT_SECRET as string, {
-      expiresIn: "7d",
-    });
+    const token = await Token.sign(tokenPayload, "7d");
 
     logger.info(`Admin ${admin!.id} logged in successfully`);
     return { token, admin: Resource.toJson(admin as any) };
