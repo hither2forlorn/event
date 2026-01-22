@@ -1,17 +1,13 @@
 import Model from "./model";
-import type { AdminColumn } from "./resource";
-import admins from "./schema";
+import type { VendorColumn } from "./resource";
+import vendors from "./schema";
 const selectQuery = {
-	id: admins.id,
-	name: admins.name,
-	email: admins.email,
-	username: admins.username,
-	avatar: admins.avatar,
-	deviceTokens: admins.deviceTokens,
-	info: admins.info,
-	createdAt: admins.createdAt,
+	id: vendors.id,
+	space: vendors.space,
+	info: vendors.infos,
+	createdAt: vendors.createdAt,
 };
-const updateDeviceToken = async (data: AdminColumn, deviceToken: string) => { // in the new login you would want to also update the admin information 
+const updateDeviceToken = async (data: VendorColumn, deviceToken: string) => { // in the new login you would want to also update the admin information 
 	try {
 		const params: any = {
 			deviceTokens: [],
