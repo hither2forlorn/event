@@ -1,4 +1,4 @@
-import { HTTP_ERROR_LITERALS, type ValidationReturnType } from "./helper";
+import { HTTP_ERROR_LITERALS } from "./helper";
 export const HTTP_STATUS = {
 	OK: 200,
 	CREATED: 201,

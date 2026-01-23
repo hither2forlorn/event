@@ -1,7 +1,7 @@
-import { throwErrorOnValidation } from "@/utils/error";
+//import { throwErrorOnValidation } from "@/utils/error";
 import type { IAuthRequest } from "@/routes/index";
 import Service from "./service";
-import logger from "@/config/logger";
+//import logger from "@/config/logger";
 
 const get = async (req: IAuthRequest) => {
 	try {
