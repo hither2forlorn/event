@@ -53,7 +53,6 @@ class VendorModel {
 			.set(params as any)
 			.where(eq(admins.id, id))
 			.returning();
-		// await redisService.del(`admin-${id}`);
 		return result[0] || null;
 	}
 	static async destroy(id: number) {
@@ -61,5 +60,4 @@ class VendorModel {
 		return result;
 	}
 }
-
 export default VendorModel;
