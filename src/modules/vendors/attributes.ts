@@ -18,7 +18,7 @@ const attributes = {
 	nation: text("nation"),
 	culture: text("culture"),
 	theme: text("theme"),
-	infos: json("infos").$type<Description>, // Dumping Site info:{metadata:{} , permissions:{}}
+	infos: json("infos").$type<Description>(), // Dumping Site info:{metadata:{} , permissions:{}}
 	// modules:,
 	createdAt: timestamp("createdAt").defaultNow(),
 	space: text("space"),
