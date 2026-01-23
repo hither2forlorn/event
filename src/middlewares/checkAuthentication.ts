@@ -1,3 +1,4 @@
+import logger from "@/config/logger";
 import Token from "../utils/token";
 const checkSpecificRole = async (user: any, allowTo: string[]) => {
 	if (!allowTo.includes(user?.role)) {
@@ -14,14 +15,13 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
 			const host = request.headers["host"];
 			const userAgent = request.headers["user-agent"];
 			if (!token) {
-				console.log("No token was found in the header");
+				logger.error("User is trying to hit the route that need the token withour the token in the header ");
 				throw new Error("Unauthorized: No token was found in the header");
 			}
 			const tokenWithoutBearer = token.startsWith("Bearer")
 				? token.replace(/^Bearer\s+/i, '')
 				: token;
 			const decoded = await Token.verify(tokenWithoutBearer);
-			console.log(decoded);
 
 			if (!decoded) {
 				throw new Error("UNAUTHORIZED");
@@ -44,6 +44,7 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
 			}
 		}
 	} catch (err: any) {
+		logger.error(err);
 		throw new Error(err.message || "Unauthorized");
 	}
 };

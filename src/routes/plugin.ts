@@ -8,6 +8,7 @@ interface RouteModule {
 export const routeConfig = [
 	"admin",
 	"ventures",
+	"category",
 ]
 class RouteLoader {
 	private loadedRoutes: RouteModule[] = [];
