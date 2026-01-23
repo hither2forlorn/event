@@ -7,7 +7,7 @@ interface RouteModule {
 }
 export const routeConfig = [
 	"admin",
-	"ventures",
+	"vendors",
 	"category",
 ]
 class RouteLoader {
