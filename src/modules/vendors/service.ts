@@ -23,7 +23,7 @@ const list = async (params: any) => {
 };
 const create = async (input: any) => {
 	try {
-		const { error }: any = await z.parse(validationSchema, input);
+		const { error }: any = z.parse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
@@ -50,15 +50,13 @@ const create = async (input: any) => {
 };
 const login = async (input: any) => {
 	try {
-		const { error }: any = await z.parse(validationSchema, input);
+		const { error }: any = z.parse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
 		const data: any = await Model.find({
-			username: input?.username,
+			email: input?.email,
 		});
-		console.log('The informarion of the user is ', data);
-
 		if (!data?.id) {
 			throw new Error("Invalid Credential");
 		} else {
@@ -69,10 +67,7 @@ const login = async (input: any) => {
 						id: data.id,
 						name: data.name,
 						email: data.email,
-						role: "admin",
-						permissions: data.permissions || [],
-						host: input?.host,
-						userAgent: input?.userAgent,
+						role: "vendors",
 					},
 					"7d"
 				);
