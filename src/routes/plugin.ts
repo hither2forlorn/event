@@ -9,6 +9,7 @@ export const routeConfig = [
 	"admin",
 	"vendors",
 	"category",
+	"user"
 ]
 class RouteLoader {
 	private loadedRoutes: RouteModule[] = [];
