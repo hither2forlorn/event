@@ -1,7 +1,6 @@
-import { throwErrorOnValidation } from "@/utils/error";
+
 import type { IAuthRequest } from "@/routes/index";
 import Service from "./service";
-import logger from "@/config/logger";
 
 const get = async (req: IAuthRequest) => {
 	try {
@@ -34,46 +33,6 @@ const login = async (req: Request) => {
 		throw (err);
 	}
 };
-const update_retailer = async (req: IAuthRequest) => {
-	try {
-		const { id } = req.params;
-		if (!id || isNaN(Number(id))) {
-			throwErrorOnValidation("No Id in the params ");
 
-		}
-		const data = await Service.verify_retailer(req.body, Number(id))
-		return data;
-	} catch (err) {
-		logger.error(err);
-		throw err;
-	}
-}
-// const update = async (req: IAuthRequest) => {
-// 	try {
-// 		const { user, body } = req;
-// 		const data = await Service.changePassword(user?.id, body);
-// 		return data;
-// 	} catch (err: any) {
-// 		throw (err);
-// 	}
-// };
-const changePassword = async (req: IAuthRequest) => {
-	try {
-		const { user, body } = req;
-		const data = await Service.changePassword(body, user?.id);
-		return data;
-	} catch (err: any) {
-		throw (err);
-	}
-};
-const deleteModule = async (req: Request) => {
-	try {
 
-		logger.info("This is the deletemodule")
-		logger.info("Deleting module %s", req);
-	} catch (err) {
-		throw ("Validation error ");
-	}
-
-}
-export default { update_retailer, login, create, get, changePassword, deleteModule }
+export default { login, create, get }
