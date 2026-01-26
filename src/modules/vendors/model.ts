@@ -14,7 +14,6 @@ class VendorModel {
 			.leftJoin(user, eq(user.id, vendors.owner))
 			.limit(limit)
 			.offset(offset);
-
 		const [{ count }]: any = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(vendors)
