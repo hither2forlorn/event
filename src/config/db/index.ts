@@ -16,6 +16,9 @@ export const pool = new Pool({
 	keepAliveInitialDelayMillis: 10000,
 	statement_timeout: 30000,
 	query_timeout: 60000,
+	ssl: {
+		rejectUnauthorized: false,
+	},
 });
 pool.on("error", (err: any) => {
 	logger.error("❌ Database pool error:", err);
@@ -38,7 +41,7 @@ const gracefulShutdown = async (signal: string) => {
 		logger.info("✅ Database connections closed");
 		process.exit(0);
 	} catch (error) {
-		logger.error("❌ Error during database shutdown:%s",error );
+		logger.error("❌ Error during database shutdown:%s", error);
 		process.exit(1);
 	}
 };

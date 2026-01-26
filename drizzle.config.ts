@@ -5,6 +5,7 @@ type PgConfig = {
   dialect: "postgresql";
   dbCredentials: {
     url: string;
+    ssl?: boolean | object;
   };
 };
 
@@ -13,7 +14,10 @@ const config: PgConfig = {
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: env.DATABASE_URL as string,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   },
 };
 
