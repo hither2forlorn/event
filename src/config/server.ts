@@ -1,5 +1,6 @@
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import logger from "./logger";
+import seedAdmin from "@/seeds";
 import corsOptions from "./cors";
 import helmetOptions from "./helmet";
 
@@ -19,6 +20,12 @@ server.use((req: Request, _: Response, next: NextFunction) => {
 server.get("/", (_: Request, res: Response) => {
 	console.log('This is the server responce ');
 	res.send("server is running");
+});
+server.post("/seed/admin", async (_: Request, res: Response) => {
+	const data = await seedAdmin();
+	res.json({
+		data: data
+	})
 });
 
 // Root POST health check endpoint
