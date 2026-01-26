@@ -2,6 +2,7 @@ import db from "@/config/db";
 import vendors from "./schema";
 import type { VendorColumn } from "./resource";
 import Repository from "./repository";
+import user from "@/modules/user/schema";
 import { sql, eq, or } from "drizzle-orm";
 class VendorModel {
 	static async findAllAndCount(params: any) {
@@ -10,6 +11,7 @@ class VendorModel {
 		const result = await db
 			.select(Repository.selectQuery as any)
 			.from(vendors)
+			.leftJoin(user, eq(user.id, vendors.owner))
 			.limit(limit)
 			.offset(offset);
 
