@@ -12,7 +12,7 @@ const routes = [
 	},
 	{
 		method: "patch",
-		controller: Controller.changePassword,
+		controller: Controller.update,
 		path: "vendors/:id",
 	},
 	{

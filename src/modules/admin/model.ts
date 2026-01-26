@@ -1,4 +1,4 @@
-import db from "@/config/db";
+import db from "@/config/db/index";
 import admins from "./schema";
 import type { AdminColumn } from "./resource";
 import Repository from "./repository";

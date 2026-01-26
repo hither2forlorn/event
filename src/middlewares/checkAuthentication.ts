@@ -1,7 +1,7 @@
 import logger from "@/config/logger";
 import Token from "../utils/token";
 const checkSpecificRole = async (user: any, allowTo: string[]) => {
-	if (!allowTo.includes(user?.role)) {
+	if (!allowTo.includes(user?.role)) { //Or Admin bypass 
 		throw new Error("Unauthorized");
 	}
 	return user;

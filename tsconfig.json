@@ -7,7 +7,7 @@
     // Environment setup & latest features
     "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "Preserve",
+    "module": "CommonJS",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -15,12 +15,14 @@
     // Output configuration
     "outDir": "./dist",
     "declaration": true,
+    "declarationDir": "dist/types",
     "emitDeclarationOnly": false,
 
     // Bundler mode
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": false,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
 
     // Best practices
     "strict": true,
@@ -32,6 +34,8 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noPropertyAccessFromIndexSignature": false
-  }
+    "noPropertyAccessFromIndexSignature": false,
+    "rootDir": "src"
+  },
+  "exclude": ["node_modules", "drizzle.config.ts", "dist", "drizzle.config.js"]
 }

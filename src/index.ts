@@ -3,7 +3,7 @@ import server from "./config/server";
 import { type Request, type Response } from "express";
 
 import env from "./config/env";
-import routeInit from "./routes";
+import routeInit from "./routes/index";
 import logger from "./config/logger";
 import errorHandler from "./middlewares/errorHandler";
 

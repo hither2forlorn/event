@@ -1,4 +1,4 @@
-import db from "@/config/db"
+import db from "@/config/db/index"
 import { readFileSync } from "fs"
 import logger from "@/config/logger"
 export type ValidationReturnType = {
@@ -13,15 +13,15 @@ export const ErrorLiteral = {
 
 }
 export const HTTP_ERROR_LITERALS = {
-	GOOD:"SUCCESS: ",
-	VALIDATIONERROR:"VALIDATION ERROR: ",
-	BADREQUEST:"BADREQUEST: ",
+	GOOD: "SUCCESS: ",
+	VALIDATIONERROR: "VALIDATION ERROR: ",
+	BADREQUEST: "BADREQUEST: ",
 	UNAUTHORIZED: "UNAUTHORIZED: ",
 	FORBIDDEN: "FORBIDDEN: ",
 	NOT_FOUND: "NOT FOUND: ",
 	CONFLICT: "CONFLICT: ",
 	VALIDATION_ERROR: "VALIDATION_ERROR: ",
-	INTERNAL_SERVER_ERROR: "SOMETHING WENT WRONG: "	
+	INTERNAL_SERVER_ERROR: "SOMETHING WENT WRONG: "
 
 }
 export const doesExistCheck = async (tableName: any, whereArray: [any]) => {

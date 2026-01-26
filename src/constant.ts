@@ -9,5 +9,6 @@ export const imageValidationExtensions = [
 	"heif",
 	"webp",
 ];
+
 const ROOT_PATH = path.join(__dirname);
 export { ROOT_PATH };

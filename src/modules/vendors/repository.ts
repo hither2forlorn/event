@@ -1,8 +1,13 @@
+import owner from "@/modules/user/schema";
 import Model from "./model";
 import type { VendorColumn } from "./resource";
 import vendors from "./schema";
 const selectQuery = {
 	id: vendors.id,
+	ownerName: owner.name,
+	vendorBuisnessname: vendors.vendorName,
+	ownerId: owner.id,
+	owner_email: owner.email,
 	space: vendors.space,
 	info: vendors.infos,
 	createdAt: vendors.createdAt,

@@ -4,6 +4,7 @@ import {
 	validationSchema,
 } from "./validators";
 import Model from "./model";
+import UserService from "@/modules/user/service"
 import Repository from "./repository";
 import Resource from "./resource";
 import Token from "@/utils/token";
@@ -28,9 +29,9 @@ const create = async (input: any) => {
 			throw new Error(error?.details[0].message);
 		}
 		const { password, ...restInput } = input;// This input is obtain after passing through the controller so consider that before moving forward to the topic
-		const existingUser = await Model.find({ email: restInput.email })
+		const existingUser = await UserService.find({ email: restInput.email })
 		if (!!existingUser) {
-			logger.warn("admin with such information  already exist ");
+			logger.warn("admin with such information already exist ");
 			throw new Error(ErrorLiteral.ALREADY_EXIST);
 		}
 		if (!!input.permissions) {
@@ -40,7 +41,7 @@ const create = async (input: any) => {
 		}
 		const data: any = await Model.create({
 			...restInput,
-			password: bcrypt.hashSync(password, 10), //hash password with the salting function of the module 
+			password: Token.hashPassword(input.password), //hash password with the salting function of the module 
 		});
 		const response = Resource.toJson(data);
 		return response;
@@ -67,12 +68,12 @@ const login = async (input: any) => {
 						id: data.id,
 						name: data.name,
 						email: data.email,
-						role: "vendors",
+						role: data.role,
 					},
-					"7d"
+					"28d"
 				);
 				if (!!input?.deviceToken) {
-					await Repository.updateDeviceToken(data, input?.deviceToken);
+					await Repository.updateDeviceToken(data, input?.deviceToken); // For each login make the login token different in this moule
 				}
 				data.token = token;
 
@@ -86,6 +87,16 @@ const login = async (input: any) => {
 		throw err;
 	}
 };
+const update = async (id: number, input: any) => {
+	try {
+		const result = await Model.update(input, id);
+		return result;
+	}
+	catch (err) {
+		throw err;
+
+	}
+}
 const logout = async (input: any, id: number) => {
 	try {
 		const data: any = await Model.find({
@@ -165,6 +176,7 @@ export default {
 	logout,
 	find,
 	changePassword,
+	update,
 	// verify_retailer,
 	remove,
 };

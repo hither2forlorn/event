@@ -24,5 +24,4 @@ const attributes = {
 	space: text("space"),
 	updatedAt: timestamp("updatedAt").defaultNow(),
 };
-
 export { tableName, attributes };
