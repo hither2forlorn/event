@@ -279,7 +279,7 @@
  *         description: Vendor not found
  *
  *   delete:
- *     summary: Delete vendor (Note: Route currently mapped to GET - needs fixing)
+ *     summary: Delete vendor (Note Route currently mapped to GET - needs fixing)
  *     tags: [Vendors]
  *     parameters:
  *       - in: path
