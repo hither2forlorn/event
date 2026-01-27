@@ -1,9 +1,9 @@
 import {
-	changePasswordValidationSchema,
-	loginValidationSchema,
-	validationSchema,
-	type createAdminType,
-	type loginType,
+  changePasswordValidationSchema,
+  loginValidationSchema,
+  validationSchema,
+  type createAdminType,
+  type loginType,
 } from "./validators";
 import z from "zod";
 import logger from "@/config/logger";
@@ -13,81 +13,82 @@ import { comparePassword, hashPassword } from "@/utils/hashPassword";
 import Resource from "./resource";
 import Token from "@/utils/token";
 const list = async (params: any) => {
-	try {
-		const data: any = await Model.findAllAndCount(params);
-		logger.debug("data ", data);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const data: any = await Model.findAllAndCount(params);
+    logger.debug("data ", data);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 const verify_retailer = async (params: any, retailerId: number) => {
-	console.log("verify_retailer - params:", params, "retailerId:", retailerId);
+  console.log("verify_retailer - params:", params, "retailerId:", retailerId);
 };
 const create = async (input: createAdminType) => {
-	try {
-		const { error, success } = await z.safeParseAsync(validationSchema, input);
-		if (!success) {
-			throwErrorOnValidation(
-				error.issues.map((issue) => issue.message).join(", "),
-			);
-		}
+  try {
+    const { error, success } = await z.safeParseAsync(validationSchema, input);
+    if (!success) {
+      throwErrorOnValidation(
+        error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
 
-		const { email, password } = input;
+    const { email, password } = input;
 
-		const duplicateAdmin = await Model.find({ email });
+    const duplicateAdmin = await Model.find({ email });
 
-		if (duplicateAdmin) {
-			throwErrorOnValidation("Admin with this email already exists");
-		}
+    if (duplicateAdmin) {
+      throwErrorOnValidation("Admin with this email already exists");
+    }
 
-		const hashedPw = await hashPassword(password);
+    const hashedPw = await hashPassword(password);
 
-		const admin = await Model.create({ ...input, password: hashedPw });
+    const admin = await Model.create({ ...input, password: hashedPw });
 
-		logger.info(`Admin created successfully with email: ${email}`);
-		return Resource.toJson(admin as any);
-	} catch (err: any) {
-		throw err;
-	}
+    logger.info(`Admin created successfully with email: ${email}`);
+    return Resource.toJson(admin as any);
+  } catch (err: any) {
+    throw err;
+  }
 };
 const login = async (input: loginType) => {
-	try {
-		const result = loginValidationSchema.safeParse(input);
+  try {
+    const result = loginValidationSchema.safeParse(input);
 
-		if (!result.success) {
-			throwErrorOnValidation(
-				result.error.issues.map((issue) => issue.message).join(", "),
-			);
-		}
+    if (!result.success) {
+      throwErrorOnValidation(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
 
-		const admin = await Model.find({ email: input.email });
+    const admin = await Model.find({ email: input.email });
 
-		if (!admin || !admin.id) {
-			throwErrorOnValidation("Invalid credentials");
-		}
+    if (!admin || !admin.id) {
+      throwErrorOnValidation("Invalid credentials");
+    }
 
-		const isPasswordValid = await comparePassword(
-			input.password,
-			admin!.password,
-		);
+    const isPasswordValid = await comparePassword(
+      input.password,
+      admin!.password,
+    );
 
-		if (!isPasswordValid) {
-			throwErrorOnValidation("Invalid credentials");
-		}
+    if (!isPasswordValid) {
+      throwErrorOnValidation("Invalid credentials");
+    }
 
-		const tokenPayload = {
-			id: admin!.id,
-			email: admin!.email,
-		};
+    const tokenPayload = {
+      id: admin!.id,
+      email: admin!.email,
+      role: "admin",
+    };
 
-		const token = await Token.sign(tokenPayload, "7d");
+    const token = await Token.sign(tokenPayload, "7d");
 
-		logger.info(`Admin ${admin!.id} logged in successfully`);
-		return { token, admin: Resource.toJson(admin as any) };
-	} catch (error) {
-		throw error;
-	}
+    logger.info(`Admin ${admin!.id} logged in successfully`);
+    return { token, admin: Resource.toJson(admin as any) };
+  } catch (error) {
+    throw error;
+  }
 };
 
 // const logout = async (id: number) => {
@@ -106,99 +107,99 @@ const login = async (input: loginType) => {
 // };
 
 const find = async (id: number) => {
-	try {
-		const admin = await Model.find({ id });
+  try {
+    const admin = await Model.find({ id });
 
-		if (!admin) {
-			throwNotFoundError("Admin");
-		}
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
 
-		return Resource.toJson(admin as any);
-	} catch (error) {
-		throw error;
-	}
+    return Resource.toJson(admin as any);
+  } catch (error) {
+    throw error;
+  }
 };
 
 const changePassword = async (input: any, id: number) => {
-	try {
-		const result = changePasswordValidationSchema.safeParse(input);
+  try {
+    const result = changePasswordValidationSchema.safeParse(input);
 
-		if (!result.success) {
-			throwErrorOnValidation(
-				result.error.issues.map((issue) => issue.message).join(", "),
-			);
-		}
+    if (!result.success) {
+      throwErrorOnValidation(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
 
-		const { currentPassword, newPassword, confirmPassword } = input;
+    const { currentPassword, newPassword, confirmPassword } = input;
 
-		// Check if new password and confirm password match
-		if (newPassword !== confirmPassword) {
-			throwErrorOnValidation("New password and confirm password do not match");
-		}
+    // Check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      throwErrorOnValidation("New password and confirm password do not match");
+    }
 
-		// Find admin
-		const admin = await Model.find({ id });
+    // Find admin
+    const admin = await Model.find({ id });
 
-		if (!admin) {
-			throwNotFoundError("Admin");
-		}
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
 
-		// Verify current password
-		const isCurrentPasswordValid = await comparePassword(
-			currentPassword,
-			admin!.password,
-		);
+    // Verify current password
+    const isCurrentPasswordValid = await comparePassword(
+      currentPassword,
+      admin!.password,
+    );
 
-		if (!isCurrentPasswordValid) {
-			throwErrorOnValidation("Current password is incorrect");
-		}
+    if (!isCurrentPasswordValid) {
+      throwErrorOnValidation("Current password is incorrect");
+    }
 
-		// Hash new password
-		const hashedNewPassword = await hashPassword(newPassword);
+    // Hash new password
+    const hashedNewPassword = await hashPassword(newPassword);
 
-		// Update password
-		const updatedAdmin = await Model.update(
-			{ password: hashedNewPassword },
-			id,
-		);
+    // Update password
+    const updatedAdmin = await Model.update(
+      { password: hashedNewPassword },
+      id,
+    );
 
-		logger.info(`Password changed successfully for admin ${id}`);
-		return Resource.toJson(updatedAdmin as any);
-	} catch (error) {
-		throw error;
-	}
+    logger.info(`Password changed successfully for admin ${id}`);
+    return Resource.toJson(updatedAdmin as any);
+  } catch (error) {
+    throw error;
+  }
 };
 
 const remove = async (id: number) => {
-	try {
-		// Check if admin exists
-		const admin = await Model.find({ id });
+  try {
+    // Check if admin exists
+    const admin = await Model.find({ id });
 
-		if (!admin) {
-			throwNotFoundError("Admin");
-		}
+    if (!admin) {
+      throwNotFoundError("Admin");
+    }
 
-		// Prevent deletion of super admin (id: 1)
-		if (id === 1) {
-			throwErrorOnValidation("Cannot delete super admin");
-		}
+    // Prevent deletion of super admin (id: 1)
+    if (id === 1) {
+      throwErrorOnValidation("Cannot delete super admin");
+    }
 
-		// Delete admin
-		await Model.destroy(id);
+    // Delete admin
+    await Model.destroy(id);
 
-		logger.info(`Admin ${id} deleted successfully`);
-		return { message: "Admin deleted successfully" };
-	} catch (error) {
-		throw error;
-	}
+    logger.info(`Admin ${id} deleted successfully`);
+    return { message: "Admin deleted successfully" };
+  } catch (error) {
+    throw error;
+  }
 };
 export default {
-	list,
-	create,
-	login,
-	// logout,
-	find,
-	changePassword,
-	verify_retailer,
-	remove,
+  list,
+  create,
+  login,
+  // logout,
+  find,
+  changePassword,
+  verify_retailer,
+  remove,
 };
