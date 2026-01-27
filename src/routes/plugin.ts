@@ -11,7 +11,8 @@ export const routeConfig = [
 	"vendors",
 	"category",
 	"user",
-	"guests"
+	"guests",
+	"event"
 ]
 class RouteLoader {
 	private loadedRoutes: RouteModule[] = [];

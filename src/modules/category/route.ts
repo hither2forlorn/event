@@ -23,12 +23,14 @@ const routes = [
     controller: Controller.update,
     path: "category/:id",
     authorization: true,
+    authCheckType: ["admin"]
   },
   {
     method: "delete",
     controller: Controller.deleteModule,
     path: "category/:id",
     authorization: true,
+    authCheckType: ["admin"]
   },
 ];
 
