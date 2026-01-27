@@ -1,6 +1,7 @@
 import { join } from "path";
 import { ROOT_PATH } from "@/constant";
 import logger from "@/config/logger";
+import { pathToFileURL } from "url";
 interface RouteModule {
 	name: string;
 	routes: any[];
@@ -38,7 +39,10 @@ class RouteLoader {
 	): Promise<RouteModule | null> {
 		try {
 			const routeFilePath = join(modulePath, "route.ts");
-			const moduleRoutes = await import(routeFilePath);
+const moduleRoutes = await import(
+  pathToFileURL(routeFilePath).href
+);
+
 
 			if (!moduleRoutes.default || !Array.isArray(moduleRoutes.default)) {
 				logger.warn(`Invalid route format in ${modulePath}`);
