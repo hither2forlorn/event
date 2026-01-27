@@ -23,18 +23,21 @@ const routes = [
     controller: Controller.update,
     path: "event/:id",
     authorization: true,
+    authCheckType: ["admin"]
   },
   {
     method: "delete",
     controller: Controller.deleteModule,
     path: "event/:id",
     authorization: true,
+    authCheckType: ["admin"]
   },
   {
     method: "get",
     controller: Controller.listMyEvents,
     path: "event/my-events",
     authorization: true,
+    authCheckType: ["admin"]
   },
 ];
 

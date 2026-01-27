@@ -30,6 +30,7 @@ const routes = [
     controller: Controller.deleteModule,
     path: "category/:id",
     authorization: true,
+    authCheckType: ["admin"]
   },
 ];
 
