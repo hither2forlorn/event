@@ -24,7 +24,7 @@ const login = async (req: Request) => {
   try {
     const { body, headers }: any = req;
     const data = await Service.login({
-      ...body,
+      ...body,   
       host: headers?.host,
       userAgent: headers["user-agent"],
     });
