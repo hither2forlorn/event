@@ -2,24 +2,45 @@ import { roleEnum } from "./attributes";
 
 export interface UserColumn {
 	id: number;
+	name: string;
 	info: any;
 	password: string;
 	email: string;
+	foodPreference: string;
+	city: string;
+	zip: string;
+	address: string;
+	coverPhoto: string;
+	photo: string;
+	country: string;
+	bio: string,
+	location: string;
 	phone: string;
 	role: typeof roleEnum;
 	createdAt: Date;
-	infos: any;
+	updatedAt: Date;
 }
 class Resource {
 	static toJson(user: UserColumn): Partial<UserColumn> | null {
 		if (!user) return null;
 		const data: Partial<UserColumn> = {
 			id: user.id,
+			name: user.name,
 			phone: user.phone,
-			info: user.info,
 			email: user.email,
+			location: user.location,
+			foodPreference: user.foodPreference,
+			bio: user.bio,
+			photo: user.photo,
+			country: user.country,
+			city: user.city,
+			address: user.address,
+			zip: user.zip,
+			coverPhoto: user.coverPhoto,
+			info: user.info,
 			role: user.role,
 			createdAt: user.createdAt,
+			updatedAt: user.updatedAt,
 		};
 		return data;
 	}

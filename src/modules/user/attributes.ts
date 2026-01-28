@@ -4,16 +4,25 @@ const roleEnum = pgEnum("role", ["client", "vendor"]);
 
 const tableName = "users";
 const attributes = {
-	id: serial("id").primaryKey(),
-	email: text("email").notNull().unique(),
-	name: text("name").notNull(),
-	phone: text("phone").notNull(),
-	password: text("password").notNull(),
-	info: json("info"),
-	role: roleEnum("role").notNull().default("client"),
-	// modules:,
-	createdAt: timestamp("createdAt").defaultNow(),
-	updatedAt: timestamp("updatedAt").defaultNow(),
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  password: text("password"),
+  name: text("name"),
+  phone: text("phone"),
+  location: text("location"),
+  foodPreference: text("foodPreference"),
+  bio: text("bio"),
+  photo: text("photo"),
+  country: text("country"),
+  city: text("city"),
+  address: text("address"),
+  zip: text("zip"),
+  coverPhoto: text("coverPhoto"),
+  info: json("info"),
+  role: roleEnum("role").notNull().default("client"),
+  // modules:,
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 };
 
 export { tableName, attributes, roleEnum };
