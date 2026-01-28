@@ -16,6 +16,7 @@ const routes = [
     controller: Controller.create,
     path: "event",
     authorization: true,
+    authCheckType: ["client"],
   },
   {
     method: "patch",
@@ -31,8 +32,8 @@ const routes = [
   },
   {
     method: "get",
-    controller: Controller.getByUser,
-    path: "user/event",
+    controller: Controller.listMyEvents,
+    path: "event/my-events",
     authorization: true,
   },
 ];

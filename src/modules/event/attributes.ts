@@ -1,6 +1,8 @@
 import { integer, pgEnum, serial, text, timestamp } from "drizzle-orm/pg-core";
 import user from "@/modules/user/schema";
+import event from "./schema";
 const tableName = "event";
+const userEventTableName = "user_event";
 
 const eventType = pgEnum("event_type", ["wedding"]);
 
@@ -9,15 +11,29 @@ const attributes = {
   title: text("title"),
   description: text("description"),
   type: eventType("type").notNull(),
-  date: timestamp("date").notNull(),
-  duration: text("duration"),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate").notNull(),
   parentid: integer("parentid"),
   location: text("location"),
   organizer: integer("organizer").references(() => user.id, {
     onDelete: "cascade",
   }),
+  budget: integer("budget"),
+  theme: text("theme"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 };
 
-export { tableName, attributes, eventType };
+const userEventAttributes = {
+  userId: integer("user_id").references(() => user.id),
+  eventId: integer("event_id").references(() => event.id),
+  role: text("role"),
+};
+
+export {
+  tableName,
+  attributes,
+  eventType,
+  userEventAttributes,
+  userEventTableName,
+};

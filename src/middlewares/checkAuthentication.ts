@@ -4,6 +4,7 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
   if (user.role === "admin") {
     return user;
   }
+  console.log(allowTo);
   if (!allowTo.includes(user?.role)) {
     //Or Admin bypass
     throw new Error("Unauthorized");

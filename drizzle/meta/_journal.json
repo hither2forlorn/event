@@ -8,6 +8,13 @@
       "when": 1769494402329,
       "tag": "0000_parched_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769581800436,
+      "tag": "0001_magenta_vindicator",
+      "breakpoints": true
     }
   ]
 }
