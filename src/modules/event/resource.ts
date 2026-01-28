@@ -3,7 +3,10 @@ export interface EventColumn {
   title: string;
   description: string;
   type: string;
-  date: Date;
+  startDate: Date;
+  endDate: Date;
+  budget: number | null;
+  theme: string | null;
   duration: number;
   parentid: number | null;
   location: string;
@@ -20,8 +23,10 @@ class Resource {
       title: category.title,
       description: category.description,
       type: category.type,
-      date: category.date,
-      duration: category.duration,
+      startDate: category.startDate,
+      endDate: category.endDate,
+      budget: category.budget,
+      theme: category.theme,
       parentid: category.parentid,
       location: category.location,
       organizer: category.organizer,

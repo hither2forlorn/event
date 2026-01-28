@@ -13,6 +13,7 @@ const changePasswordValidationSchema = z.object({
 const validationSchema = z.object({
   email: z.string().nonempty(),
   password: z.string().min(8).nonempty(),
+  name: z.string().nonempty(),
   role: z.enum(["client", "vendor"]).optional(),
 });
 

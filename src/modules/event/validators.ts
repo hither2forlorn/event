@@ -4,10 +4,14 @@ const EventValidationSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   type: z.string(),
-  date: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: "Invalid date format",
   }),
-  duration: z.string().optional(),
+  endDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Invalid date format",
+  }),
+  budget: z.number().int().min(0).optional(),
+  theme: z.string().optional(),
   parentid: z.number().int().optional(),
   location: z.string().optional(),
   organizer: z.number().int().optional(),

@@ -28,7 +28,15 @@ const create = async (input: any) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-    const data = await Model.create(input);
+
+    // Convert date strings to Date objects
+    const eventData = {
+      ...input,
+      startDate: new Date(input.startDate),
+      endDate: new Date(input.endDate),
+    };
+
+    const data = await Model.create(eventData);
     if (data == undefined) {
       throw new Error("Something went wrong ");
     }
@@ -60,7 +68,15 @@ const update = async (id: number, input: any) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-    const data = await Model.update(input, id);
+
+    // Convert date strings to Date objects if present
+    const eventData = {
+      ...input,
+      ...(input.startDate && { startDate: new Date(input.startDate) }),
+      ...(input.endDate && { endDate: new Date(input.endDate) }),
+    };
+
+    const data = await Model.update(eventData, id);
     if (!data) throw new Error("event not found");
     return Resource.toJson(data as any);
   } catch (err: any) {
@@ -79,13 +95,16 @@ const remove = async (id: number) => {
   }
 };
 
-const listByUser = async (userId: number, params: any) => {
+const listMyEvents = async (userId: number, params: any) => {
   try {
     const allParams = { ...params, organizer: userId };
     const data = await Model.findByUser(userId, allParams);
     return {
       ...data,
-      items: Resource.collection(data.items as any),
+      items: data.items.map((item: any) => ({
+        ...Resource.toJson(item.event as any),
+        role: item.user_event?.role,
+      })),
     };
   } catch (err: any) {
     logger.error("Error in Event listing by user:", err);
@@ -99,5 +118,5 @@ export default {
   find,
   update,
   remove,
-  listByUser,
+  listMyEvents,
 };

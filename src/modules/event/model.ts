@@ -1,6 +1,7 @@
 import db from "@/config/db";
 import { sql, eq, or } from "drizzle-orm";
-import event from "./schema"
+import event from "./schema";
+import { eventUserSchema } from "./schema";
 import repository from "./repository";
 
 import { EventColumn } from "./resource";
@@ -75,15 +76,16 @@ class Event {
 
     const result = await db
       .select(repository.selectQuery)
-      .from(event)
-      .where(eq(event.organizer, userId))
+      .from(eventUserSchema)
+      .where(eq(eventUserSchema.userId, userId))
+      .leftJoin(event, eq(event.id, eventUserSchema.eventId))
       .limit(limit)
       .offset(offset);
 
     const [{ count }]: any = await db
       .select({ count: sql<number>`count(*)` })
-      .from(event)
-      .where(eq(event.organizer, userId));
+      .from(eventUserSchema)
+      .where(eq(eventUserSchema.userId, userId));
 
     return {
       items: result,

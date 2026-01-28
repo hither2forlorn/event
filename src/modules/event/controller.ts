@@ -59,13 +59,13 @@ const deleteModule = async (req: IAuthRequest) => {
   }
 };
 
-const getByUser = async (req: IAuthRequest) => {
+const listMyEvents = async (req: IAuthRequest) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
       throwErrorOnValidation("User not authenticated");
     }
-    const data = await Service.listByUser(userId, req.query);
+    const data = await Service.listMyEvents(userId, req.query);
     return data;
   } catch (err: any) {
     throw err;
@@ -78,5 +78,5 @@ export default {
   findOne,
   update,
   deleteModule,
-  getByUser,
+  listMyEvents,
 };

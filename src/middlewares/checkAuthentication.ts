@@ -4,6 +4,7 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
   if (user.role === "admin") {
     return user;
   }
+  console.log(allowTo);
   if (!allowTo.includes(user?.role)) {
     //Or Admin bypass
     throw new Error("Unauthorized");
@@ -13,38 +14,36 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
 const checkAuthentication = async (request: any, allowTo: string[]) => {
   try {
     const token = request.headers["authorization"];
-    if (!token && allowTo.includes("public")) {
-      console.log(
-        "This dont include the token but should ve allowed to do things in the module",
-      );
-    } else {
-      // const host = request.headers["host"];
-      // const userAgent = request.headers["user-agent"];
-      if (!token) {
-        logger.error(
-          "User is trying to hit the route that need the token withour the token in the header ",
-        );
-        throw new Error("Unauthorized: No token was found in the header");
-      }
-      const tokenWithoutBearer = token.startsWith("Bearer")
-        ? token.replace(/^Bearer\s+/i, "")
-        : token;
-      const decoded = await Token.verify(tokenWithoutBearer);
-      console.log(decoded);
 
-      if (!decoded) {
-        throw new Error("UNAUTHORIZED");
+    if (!token) {
+      throw new Error("UNAUTHORIZED");
+    }
+
+    const tokenWithoutBearer = token.startsWith("Bearer")
+      ? token.replace(/^Bearer\s+/i, "")
+      : token;
+
+    const decoded = await Token.verify(tokenWithoutBearer);
+    console.log(decoded);
+
+    if (!decoded) {
+      throw new Error("UNAUTHORIZED");
+    } else {
+      if (!Array.isArray(allowTo) || !allowTo?.length) {
+        throw new Error("Unauthorized");
       } else {
-        if (!Array.isArray(allowTo) || !allowTo?.length) {
-          throw new Error("Unauthorized");
-        } else {
-          await checkSpecificRole(decoded, allowTo); // For the authorization
-          try {
-            let user = decoded;
-            request.user = user;
-          } catch (err: any) {
-            throw new Error(err.message || "Unauthorized");
-          }
+        if (allowTo.includes("public")) {
+          // Public route but with token
+          let user = decoded;
+          request.user = user;
+          return;
+        }
+        await checkSpecificRole(decoded, allowTo); // For the authorization
+        try {
+          let user = decoded;
+          request.user = user;
+        } catch (err: any) {
+          throw new Error(err.message || "Unauthorized");
         }
       }
     }
