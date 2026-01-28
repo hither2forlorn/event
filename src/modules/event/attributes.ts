@@ -13,7 +13,7 @@ const attributes = {
   type: eventType("type").notNull(),
   startDate: timestamp("startDate").notNull(),
   endDate: timestamp("endDate").notNull(),
-  parentid: integer("parentid"),
+  parentId: integer("parentid"),
   location: text("location"),
   organizer: integer("organizer").references(() => user.id, {
     onDelete: "cascade",
