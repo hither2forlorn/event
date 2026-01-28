@@ -1,7 +1,8 @@
 import db from "@/config/db";
 import { sql, eq, or } from "drizzle-orm";
-import event from "./schema";
+import event from "./schema"
 import repository from "./repository";
+
 import { EventColumn } from "./resource";
 
 class Event {
