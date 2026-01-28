@@ -135,9 +135,10 @@ dist
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
+*drizzle*
+drizzle/meta
 drizzle/*
-drizzle*
+
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

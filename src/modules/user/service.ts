@@ -25,6 +25,7 @@ const list = async (params: any) => {
 
 const create = async (input: createUserType) => {
 	try {
+		logger.info(`Creating user with input: ${JSON.stringify(input)}`);
 		const { error, success } = await z.safeParseAsync(validationSchema, input);
 		if (!success) {
 			throwErrorOnValidation(
