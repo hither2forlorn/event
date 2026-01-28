@@ -23,6 +23,7 @@ const routes = [
     controller: Controller.update,
     path: "category/:id",
     authorization: true,
+    authCheckType: ["admin"],
   },
   {
     method: "delete",
