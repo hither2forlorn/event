@@ -15,6 +15,15 @@ const validationSchema = z.object({
   email: z.string().nonempty(),
   password: z.string().min(8).nonempty(),
   phone: z.string().nonempty(),
+  location: z.string().nonempty(),
+  foodPreference: z.string().nonempty(),
+  bio: z.string().optional(),
+  photo: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  address: z.string().optional(),
+  zip: z.string().optional(),
+  coverPhoto: z.string().optional(),
   role: z.enum(["client", "vendor"]).optional(),
 });
 

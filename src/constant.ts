@@ -9,6 +9,11 @@ export const imageValidationExtensions = [
 	"heif",
 	"webp",
 ];
+const foodPreference = {
+	veg: "veg",
+	nonVeg: "nonVeg",
+	vegan: "vegan",
+}
 
 const ROOT_PATH = path.join(__dirname);
-export { ROOT_PATH };
+export { ROOT_PATH, foodPreference };

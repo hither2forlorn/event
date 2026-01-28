@@ -115,7 +115,7 @@ const find = async (data: Partial<UserColumn>) => {
 			return Resource.toJson(user as any);
 		}
 		if (!!data.id) {
-			const user = await Model.find({ email: data.email });
+			const user = await Model.find({ id: data.id });
 			if (!user) {
 				throwNotFoundError("User");
 			}
