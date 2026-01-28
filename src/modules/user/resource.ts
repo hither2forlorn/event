@@ -2,6 +2,7 @@ import { roleEnum } from "./attributes";
 
 export interface UserColumn {
 	id: number;
+	name: string;
 	info: any;
 	password: string;
 	email: string;
@@ -15,6 +16,7 @@ class Resource {
 		if (!user) return null;
 		const data: Partial<UserColumn> = {
 			id: user.id,
+			name: user.name,
 			phone: user.phone,
 			info: user.info,
 			email: user.email,
