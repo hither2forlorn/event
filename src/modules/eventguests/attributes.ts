@@ -1,7 +1,6 @@
-import { integer, serial, timestamp } from "drizzle-orm/pg-core";
+import { integer, serial, timestamp, boolean } from "drizzle-orm/pg-core";
 import guests from "@/modules/guests/schema";
 import events from "@/modules/event/schema";
-
 
 const tableName = "guestsEvent";
 //This is the table of the transition between the guests and the events

@@ -1,9 +1,10 @@
 import db from "@/config/db/index";
 import guestEvent from "./schema";
 import guests from "@/modules/guests/schema"
+import user from "@/modules/user/schema"
 import type { EventGuests } from "./resource"
 import Repository from "./repository";
-import { sql, eq, or } from "drizzle-orm";
+import { sql, eq, or, and } from "drizzle-orm";
 class GuestColumn {
 	static async findAllAndCount(params: any) {
 		const { page, limit, eventId, guestId } = params;
@@ -16,11 +17,14 @@ class GuestColumn {
 		if (!!eventId) {
 			conditions.push(eq(guestEvent.eventId, eventId))
 		}
-		let selectQuery = db.select(Repository.selectQuery).from(guests);
-		let countQuery = db.select({ count: sql<number>`count(*)` }).from(guests);
+		let selectQuery = db.select(Repository.selectWithGuestuser as any).from(guestEvent)
+			.leftJoin(guests, eq(guestEvent.guestId, guests.id))
+			.leftJoin(user, eq(guests.userId, user.id))
+		let countQuery = db.select({ count: sql<number>`count(*)` }).from(guestEvent);
 		if (conditions.length > 0) {
-			selectQuery = selectQuery.where(conditions.length === 1 ? conditions[0] : or(...conditions)) as any;
-			countQuery = countQuery.where(conditions.length === 1 ? conditions[0] : or(...conditions)) as any;
+			const filter = conditions.length === 1 ? conditions[0] : or(...conditions);
+			selectQuery = selectQuery.where(filter) as any;
+			countQuery = countQuery.where(filter) as any;
 		}
 		const result = await selectQuery.limit(limit).offset(offset);
 		const [{ count }]: any = await countQuery;
@@ -33,12 +37,28 @@ class GuestColumn {
 	}
 
 	static async create(params: Partial<EventGuests>) {
-		//TODO:Asuming there is the event and the guest make the eventgeust in this field 
+		//Asuming there is the event and the guest make the eventgeust in this field 
+		const result = await db.insert(guestEvent).values(params as any).returning();
+		return result[0];
 	}
 
 	static async find(params: Partial<EventGuests>) {
-		//
-		//TODO:Using the diferent parameter like the guest id ot the event id search the event and provide the info 
+		const { id, eventId, guestId, email } = params;
+		const conditions = [];
+		if (id) conditions.push(eq(guestEvent.id, id));
+		if (eventId) conditions.push(eq(guestEvent.eventId, eventId));
+		if (guestId) conditions.push(eq(guestEvent.guestId, guestId));
+		if (email) conditions.push(eq(user.email, email));
+
+		if (conditions.length === 0) return null;
+
+		const result = await db.select(Repository.selectWithGuestuser as any).from(guestEvent)
+			.leftJoin(guests, eq(guestEvent.guestId, guests.id))
+			.leftJoin(user, eq(guests.userId, user.id))
+			.where(and(...conditions))
+			.limit(1);
+
+		return result[0] || null;
 	}
 	static async update(
 		params: Partial<EventGuests>,
@@ -50,13 +70,16 @@ class GuestColumn {
 			.returning();
 		return result[0] || null;
 	}
-	//TODO: Optional can make the simpler low speed tassk while making the rsvp in the system work in the filwe 
-	static rsvpUpdare() {
-
+	static async rsvpUpdate(id: number, attending: boolean) {
+		const result = await db.update(guestEvent)
+			.set({ attending })
+			.where(eq(guestEvent.id, id))
+			.returning();
+		return result[0] || null;
 	}
 	static async destroy(id: number) {
 		//remove the guest from this service 
-		const result = await db.delete(guests).where(eq(guestEvent.id, id)).returning();
+		const result = await db.delete(guestEvent).where(eq(guestEvent.id, id)).returning();
 		return result;
 	}
 }
