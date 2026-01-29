@@ -12,7 +12,7 @@ import bcrypt from "bcryptjs";
 import logger from "@/config/logger";
 import { ErrorLiteral } from "@/utils/helper";
 import z from "zod";
-
+//TODO: When the vendor is created make the user also in the single dlow 
 const list = async (params: any) => {
 	try {
 		const data: any = await Model.findAllAndCount(params);
@@ -34,6 +34,7 @@ const create = async (input: any) => {
 			logger.warn("admin with such information already exist ");
 			throw new Error(ErrorLiteral.ALREADY_EXIST);
 		}
+		const password_hashed = await Token.hashPassword(input.password);
 		if (!!input.permissions) {
 			input.infos = {
 				permissions: input.permissions
