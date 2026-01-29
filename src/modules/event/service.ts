@@ -29,7 +29,6 @@ const create = async (input: any) => {
       );
     }
 
-    // Convert date strings to Date objects
     const eventData = {
       ...input,
       startDate: new Date(input.startDate),
@@ -37,6 +36,16 @@ const create = async (input: any) => {
     };
 
     const data = await Model.create(eventData);
+    if (!data || !data.organizer) {
+      throw new Error("Event creation failed");
+    }
+
+    await Model.createEventUserRelation({
+      eventId: data.id,
+      userId: data.organizer,
+      role: "organizer",
+    });
+
     if (data == undefined) {
       throw new Error("Something went wrong ");
     }
@@ -58,9 +67,24 @@ const find = async (id: number) => {
   }
 };
 
-const update = async (id: number, input: any) => {
+const checkAuthorized = async (id: number, userId?: number) => {
+  if (!userId) {
+    throw new Error("Unauthorized: User not authenticated");
+  }
+
+  const event = await find(id);
+  if (!event) throw new Error("Event not found");
+
+  if (event.organizer !== userId) {
+    throw new Error("Unauthorized: You are not the organizer of this event");
+  }
+
+  return event;
+};
+
+const update = async (id: number, input: any, userId?: number) => {
   try {
-    // Partial validation for update
+    await checkAuthorized(id, userId);
     const result = EventUpdateValidationSchema.safeParse(input);
 
     if (!result.success) {
@@ -69,7 +93,6 @@ const update = async (id: number, input: any) => {
       );
     }
 
-    // Convert date strings to Date objects if present
     const eventData = {
       ...input,
       ...(input.startDate && { startDate: new Date(input.startDate) }),
@@ -77,7 +100,7 @@ const update = async (id: number, input: any) => {
     };
 
     const data = await Model.update(eventData, id);
-    if (!data) throw new Error("event not found");
+    if (!data) throw new Error("Event not found or update failed");
     return Resource.toJson(data as any);
   } catch (err: any) {
     logger.error("Error in event update:", err);
@@ -85,10 +108,20 @@ const update = async (id: number, input: any) => {
   }
 };
 
-const remove = async (id: number) => {
+const remove = async (id: number, userId?: number) => {
   try {
+    await checkAuthorized(id, userId);
     const data = await Model.destroy(id);
-    return data;
+
+    if (!data || data.length === 0) {
+      throw new Error("Event not found or already deleted");
+    }
+
+    return {
+      success: true,
+      message: "Event deleted successfully",
+      deletedEvent: Resource.toJson(data[0] as any),
+    };
   } catch (err: any) {
     logger.error("Error in event deletion:", err);
     throw err;
@@ -112,6 +145,22 @@ const listMyEvents = async (userId: number, params: any) => {
   }
 };
 
+const getUserRelatedToEvent = async (eventId: number, userId: number) => {
+  try {
+    await checkAuthorized(eventId, userId);
+
+    const data = await Model.getUserRelatedToEvent(eventId);
+    return {
+      eventId,
+      users: data,
+      totalUsers: data.length,
+    };
+  } catch (error: any) {
+    logger.error("Error in getting users related to event:", error);
+    throw error;
+  }
+};
+
 export default {
   list,
   create,
@@ -119,4 +168,5 @@ export default {
   update,
   remove,
   listMyEvents,
+  getUserRelatedToEvent,
 };

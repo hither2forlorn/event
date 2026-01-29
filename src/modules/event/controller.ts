@@ -13,7 +13,7 @@ const get = async (req: IAuthRequest) => {
 
 const create = async (req: IAuthRequest) => {
   try {
-    const data = await Service.create(req.body);
+    const data = await Service.create({ ...req.body, organizer: req.user?.id });
     return data;
   } catch (err: any) {
     throw err;
@@ -36,10 +36,15 @@ const findOne = async (req: IAuthRequest) => {
 const update = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
     if (!id || isNaN(Number(id))) {
       throwErrorOnValidation("Invalid ID");
     }
-    const data = await Service.update(Number(id), req.body);
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    const data = await Service.update(Number(id), req.body, userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -49,10 +54,14 @@ const update = async (req: IAuthRequest) => {
 const deleteModule = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
     if (!id || isNaN(Number(id))) {
       throwErrorOnValidation("Invalid ID");
     }
-    const data = await Service.remove(Number(id));
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const data = await Service.remove(Number(id), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -72,6 +81,25 @@ const listMyEvents = async (req: IAuthRequest) => {
   }
 };
 
+const getUserRelatedToEvent = async (req: IAuthRequest) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user?.id;
+
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid Event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    const data = await Service.getUserRelatedToEvent(Number(eventId), userId);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export default {
   get,
   create,
@@ -79,4 +107,5 @@ export default {
   update,
   deleteModule,
   listMyEvents,
+  getUserRelatedToEvent,
 };

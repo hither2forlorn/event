@@ -14,5 +14,6 @@ const eventUserSchema = pgTable(
   userEventAttributes,
   (table) => [primaryKey({ columns: [table.userId, table.eventId] })],
 );
+
 export { eventType, eventUserSchema };
 export default schema;
