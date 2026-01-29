@@ -1,16 +1,20 @@
 import db from "@/config/db/index";
-import guests from "./schema";
-import type { GuestColumn } from "./resource"
+import guestEvent from "./schema";
+import guests from "@/modules/guests/schema"
+import type { EventGuests } from "./resource"
 import Repository from "./repository";
 import { sql, eq, or } from "drizzle-orm";
-class Guests {
+class GuestColumn {
 	static async findAllAndCount(params: any) {
-		const { page, limit, guestsId } = params;
+		const { page, limit, eventId, guestId } = params;
 		const offset = (page - 1) * limit;
-
 		const conditions = [];
-		if (!!guestsId) {
-			conditions.push(eq(guests.eventId, guestsId));
+		// Specific guest or the event in the system 
+		if (!!guestId) {
+			conditions.push(eq(guestEvent.guestId, guestId));
+		}
+		if (!!eventId) {
+			conditions.push(eq(guestEvent.eventId, eventId))
 		}
 		let selectQuery = db.select(Repository.selectQuery).from(guests);
 		let countQuery = db.select({ count: sql<number>`count(*)` }).from(guests);
@@ -28,52 +32,33 @@ class Guests {
 		};
 	}
 
-	static async create(params: Partial<GuestColumn>) {
-		const result = await db
-			.insert(guests)
-			.values(params as any)
-			.returning();
-		return result[0];
+	static async create(params: Partial<EventGuests>) {
+		//TODO:Asuming there is the event and the guest make the eventgeust in this field 
 	}
 
-	static async find(params: Partial<GuestColumn>) {
-		const { id, email, relation } = params;
-		const conditions = [];
-		if (id !== undefined) {
-			conditions.push(eq(guests.id, id));
-		}
-		if (email !== undefined) {
-			conditions.push(eq(guests.email, email));
-		}
-		if (relation !== undefined) {
-			conditions.push(eq(guests.relation, relation));
-		}
-		if (conditions.length === 0) {
-			return null; // This is the conditions where there is nothing to look in the data bse 
-		}
-
-		const result = await db
-			.select()
-			.from(guests)
-			.where(conditions.length === 1 ? conditions[0] : or(...conditions));
-		return result[0] || null;
+	static async find(params: Partial<EventGuests>) {
+		//
+		//TODO:Using the diferent parameter like the guest id ot the event id search the event and provide the info 
 	}
 	static async update(
-		params: Partial<GuestColumn>,
+		params: Partial<EventGuests>,
 		id: number,
 	) {
 		const result: any = await db
-			.update(guests)
-			.set(params as any).where(eq(guests.id, id))
+			.update(guestEvent)
+			.set(params as any).where(eq(guestEvent.id, id))
 			.returning();
-		// await redisService.dl(`admin-${id}`);
 		return result[0] || null;
 	}
+	//TODO: Optional can make the simpler low speed tassk while making the rsvp in the system work in the filwe 
+	static rsvpUpdare() {
+
+	}
 	static async destroy(id: number) {
-		const result = await db.delete(guests).where(eq(guests.id, id)).returning();
-		// await redisService.del(`guest-${id}`);
+		//remove the guest from this service 
+		const result = await db.delete(guests).where(eq(guestEvent.id, id)).returning();
 		return result;
 	}
 }
 
-export default Guests;
+export default GuestColumn;

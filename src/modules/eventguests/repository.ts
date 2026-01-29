@@ -1,33 +1,47 @@
-import user from "@/modules/user/schema";
-import guests from "./schema";
-import event from "@/modules/event/schema"
+import user from "../user/schema";
+import eventguest from "./schema";
+import guest from "../guests/schema";
+import event from "@/modules/event/schema";
 const selectQuery = {
-	id: guests.id,
-	email: user.email,
-	name: user.name,
-	address: user.address,
-	relation: guests.relation,
-	foodPreference: user.foodPreference,
-	location: {
-		country: user.country,
-		zip_code: user.zip,
-		address: user.address
-	},
-	role: user.role,
-	phone: user.phone,
-	createdAt: guests.createdAt,
-	updatedAt: guests.updatedAt,
+	id: eventguest.id,
+	guestId: eventguest.guestId,
+	eventId: eventguest.eventId,
+	updatedAt: eventguest.updatedAt,
 };
+const selectWithGuestuser = {
+	...selectQuery,
+	Guest: {
+		id: guest.id,
+		email: user.email,
+		name: user.name,
+		address: user.address,
+		relation: guest.relation,
+		foodPreference: user.foodPreference,
+		location: {
+			country: user.country,
+			zip_code: user.zip,
+			address: user.address
+		},
+		role: user.role,
+		phone: user.phone,
+		createdAt: guest.createdAt,
+		updatedAt: guest.updatedAt,
+	}
+}
 const selectWithEvent = {
 	...selectQuery,
-	event_detail: {
-		eventTitle: event.title,
-		event_venue: event.location,
-		event_start: event.startDate,
-		event_end: event.endDate
+	Event: {
+		id: event.id,
+		title: event.title,
+		location: event.location,
+		startDate: event.startDate,
+		endDate: event.endDate,
+		createdAt: event.createdAt,
+		updatedAt: event.updatedAt,
 	}
 }
 export default {
 	selectQuery,
+	selectWithGuestuser,
 	selectWithEvent
 };

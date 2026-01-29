@@ -1,4 +1,4 @@
-export interface GuestColumn {
+export interface EventGuests {
 	id: number;
 	eventId: number;
 	name: string;
@@ -11,9 +11,9 @@ export interface GuestColumn {
 	updatedAt: any,
 }
 class Resource {
-	static toJson(guests: GuestColumn): Partial<GuestColumn> | null {
+	static toJson(guests: EventGuests): Partial<EventGuests> | null {
 		if (!guests) return null;
-		const data: Partial<GuestColumn> = {
+		const data: Partial<EventGuests> = {
 			id: guests.id,
 			eventId: guests.eventId,
 			email: guests.email,
@@ -26,7 +26,7 @@ class Resource {
 		};
 		return data;
 	}
-	static collection(guests: GuestColumn[]) {
+	static collection(guests: EventGuests[]) {
 		return guests.map(this.toJson);
 	}
 }

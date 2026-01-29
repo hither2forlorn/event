@@ -1,52 +1,18 @@
-import {
-	validationSchema,
-} from "./validators";
-import z from "zod";
 import logger from "@/config/logger";
 import Model from "./model";
-import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
-import Resource, { GuestColumn } from "./resource";
-const list = async (params: any) => {
-	try {
-		const data: any = await Model.findAllAndCount(params);
-		logger.debug("data ", data);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
-};
-const listByEventId = async (eventId: number, params: any) => {
-	try {
-		const data: any = await Model.findAllAndCount({ ...params, eventId });
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
-};
-const findById = async (id: number) => {
-	try {
-		const guest = await Model.find({ id });
-		if (!guest) {
-			throwNotFoundError("Guest");
-		}
-		return Resource.toJson(guest as any);
-	} catch (err: any) {
-		throw err;
-	}
-};
+import { throwErrorOnValidation } from "@/utils/error";
+import Resource, { EventGuests } from "./resource";
 
-const create = async (input: Partial<GuestColumn>) => {
+const create = async (input: Partial<EventGuests>) => {
 	try {
-		const { error, success } = await z.safeParseAsync(validationSchema, input);
-		if (!success) {
-			throwErrorOnValidation(
-				error.issues.map((issue) => issue.message).join(", "),
-			);
-		}
-
 		const { email } = input;
+		//should have the event and should have the guest with the uset id 
 
 		const duplicateAdmin = await Model.find({ email });
+
+		//Check if the guest is in the db or not 
+		// if not then create the guest in the db
+		// if yes then just add the guest to the event
 
 		if (duplicateAdmin) {
 			throwErrorOnValidation("Guest with this email already exists");
@@ -62,56 +28,6 @@ const create = async (input: Partial<GuestColumn>) => {
 	}
 };
 
-const update = async (input: Partial<GuestColumn>, id: number) => {
-	try {
-		const guest = await Model.update(input, id);
-		if (!guest || guest == undefined) {
-			return throwNotFoundError("Guest");
-		}
-		return Resource.toJson(guest);
-	} catch (error) {
-		throw error;
-	}
-}
-
-
-const find = async (id: number) => {
-	try {
-		const guest = await Model.find({ id });
-		if (!guest) {
-			throwNotFoundError("Guest");
-		}
-		return Resource.toJson(guest as any);
-	} catch (error) {
-		throw error;
-	}
-};
-
-
-
-const remove = async (id: number) => {
-	try {
-		const admin = await Model.find({ id });
-		if (!admin) {
-			throwNotFoundError("Admin");
-		}
-		if (id === 1) {
-			throwErrorOnValidation("Cannot delete super admin");
-		}
-		await Model.destroy(id);
-		logger.info(`Admin ${id} deleted successfully`);
-		return { message: "Admin deleted successfully" };
-	} catch (error) {
-		throw error;
-	}
-};
-
 export default {
-	list,
-	listByEventId,
-	create,
-	update,
-	find,
-	findById,
-	remove
+	create
 };
