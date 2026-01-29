@@ -14,6 +14,10 @@ const foodPreference = {
 	nonVeg: "nonVeg",
 	vegan: "vegan",
 }
+const attendingstate = {
+	pending: 'pending',
+	completed: 'completed'
 
+}
 const ROOT_PATH = path.join(__dirname);
-export { ROOT_PATH, foodPreference };
+export { ROOT_PATH, foodPreference, attendingstate };
