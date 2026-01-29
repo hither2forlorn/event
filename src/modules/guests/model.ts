@@ -1,8 +1,9 @@
 import db from "@/config/db/index";
 import guests from "./schema";
+import user from "@/modules/user/schema"
 import type { GuestColumn } from "./resource"
 import Repository from "./repository";
-import { sql, eq, or } from "drizzle-orm";
+import { sql, eq, or, and } from "drizzle-orm";
 class Guests {
 	static async findAllAndCount(params: any) {
 		const { page, limit, guestsId } = params;
@@ -36,27 +37,32 @@ class Guests {
 		return result[0];
 	}
 
-	static async find(params: Partial<GuestColumn>) {
+	static async find(params: Partial<GuestColumn> & { email?: string }) {
 		const { id, email, relation } = params;
 		const conditions = [];
 		if (id !== undefined) {
 			conditions.push(eq(guests.id, id));
 		}
 		if (email !== undefined) {
-			conditions.push(eq(guests.email, email));
+			conditions.push(eq(user.email, email));
 		}
 		if (relation !== undefined) {
 			conditions.push(eq(guests.relation, relation));
 		}
 		if (conditions.length === 0) {
-			return null; // This is the conditions where there is nothing to look in the data bse 
+			return null;
 		}
 
 		const result = await db
 			.select()
 			.from(guests)
-			.where(conditions.length === 1 ? conditions[0] : or(...conditions));
-		return result[0] || null;
+			.leftJoin(user, eq(guests.userId, user.id))
+			.where(conditions.length === 1 ? conditions[0] : and(...conditions));
+
+		if (!result[0]) return null;
+
+		// Return flattened object if needed, but for now just fix the query
+		return { ...result[0].guests, user: result[0].users } as any;
 	}
 	static async update(
 		params: Partial<GuestColumn>,

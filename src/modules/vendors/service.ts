@@ -42,7 +42,7 @@ const create = async (input: any) => {
 		}
 		const data: any = await Model.create({
 			...restInput,
-			password: Token.hashPassword(input.password), //hash password with the salting function of the module 
+			password: password_hashed, //hash password with the salting function of the module 
 		});
 		const response = Resource.toJson(data);
 		return response;

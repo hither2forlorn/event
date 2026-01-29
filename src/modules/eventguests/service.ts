@@ -2,23 +2,69 @@ import logger from "@/config/logger";
 import Model from "./model";
 import { throwErrorOnValidation } from "@/utils/error";
 import Resource, { EventGuests } from "./resource";
+import UserModel from "@/modules/user/model";
+import GuestModel from "@/modules/guests/model";
 
 const create = async (input: Partial<EventGuests>) => {
 	try {
-		const { email } = input;
-		//should have the event and should have the guest with the uset id 
-		const duplicateEventGuest = await Model.find({ email });
-		if (!!duplicateEventGuest) {
-			throwErrorOnValidation("Guest with this email already exists");
+		const { email, eventId, name, phone, relation } = input;
+
+		if (!email || !eventId) {
+			throwErrorOnValidation("Email and Event ID are required");
 		}
-		//Check if the guest is in the db or not 
-		// if not then create the guest in the db
-		// if yes then just add the guest to the event
 
-		const admin = await Model.create({ ...input });
+		// 1. Check if EventGuest entry already exists for this event and email
+		const existingEventGuest = await Model.find({ email, eventId });
+		if (existingEventGuest) {
+			throwErrorOnValidation("Guest with this email is already registered for this event");
+		}
 
-		logger.info(`Admin created successfully with email: ${email}`);
-		return Resource.toJson(admin as any);
+		// 2. Find or Create User
+		let user: any = await UserModel.find({ email });
+		if (!user) {
+			user = await UserModel.create({
+				email,
+				name,
+				phone,
+				role: "client" as any
+			});
+		}
+
+		if (!user) {
+			throw new Error("Failed to find or create user");
+		}
+
+		// 3. Find or Create Guest record for this event/user
+		let guest = await GuestModel.find({ userId: user.id, eventId });
+		if (!guest) {
+			guest = await GuestModel.create({
+				userId: user.id,
+				eventId,
+				relation,
+				phone
+			} as any);
+		}
+
+		if (!guest) {
+			throw new Error("Failed to find or create guest");
+		}
+
+		// 4. Create EventGuest relation
+		const eventGuestRecord = await Model.create({
+			eventId,
+			guestId: guest.id,
+			attending: input.attending ?? true
+		});
+
+		if (!eventGuestRecord) {
+			throw new Error("Failed to create event guest relation");
+		}
+
+		// Fetch the full information to return
+		const result = await Model.find({ id: eventGuestRecord.id });
+
+		logger.info(`Event guest created successfully for email: ${email}`);
+		return Resource.toJson(result as any);
 	} catch (err: any) {
 		throw err;
 	}

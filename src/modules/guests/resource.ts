@@ -1,5 +1,6 @@
 export interface GuestColumn {
 	id: number;
+	userId: number;
 	eventId: number;
 	name: string;
 	email: string;
@@ -15,6 +16,7 @@ class Resource {
 		if (!guests) return null;
 		const data: Partial<GuestColumn> = {
 			id: guests.id,
+			userId: guests.userId,
 			eventId: guests.eventId,
 			email: guests.email,
 			name: guests.name,

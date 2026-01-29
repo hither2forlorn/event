@@ -2,7 +2,9 @@ import cors from "cors";
 
 export const availableCors = [
 	"http://localhost:3000",
-	"http://localhost:9000"
+	"http://localhost:9000",
+	"https://events.khumbaya.com",
+	"http://localhost:8000"
 ];
 
 const corsOptions = cors({

@@ -1,6 +1,6 @@
 import { serial, text, json, timestamp, integer } from "drizzle-orm/pg-core";
 import user from "@/modules/user/schema";
-import event from "@/modules/event/schema";
+
 
 const tableName = "vendors";
 type Question = {
