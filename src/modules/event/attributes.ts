@@ -25,8 +25,12 @@ const attributes = {
 };
 
 const userEventAttributes = {
-  userId: integer("user_id").references(() => user.id),
-  eventId: integer("event_id").references(() => event.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id),
+  eventId: integer("event_id")
+    .notNull()
+    .references(() => event.id),
   role: text("role"),
 };
 

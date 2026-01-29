@@ -5,6 +5,7 @@ import { eventUserSchema } from "./schema";
 import repository from "./repository";
 
 import { EventColumn } from "./resource";
+import { user } from "@/config/db/schema";
 
 class Event {
   static async findAllAndCount(params: any) {
@@ -93,6 +94,24 @@ class Event {
       totalItems: parseInt(count.toString(), 10),
       totalPages: Math.ceil(count / limit),
     };
+  }
+
+  static async getUserRelatedToEvent(eventId: number) {
+    const result = await db
+      .select(repository.selectQueryForUserRelatedToEvent)
+      .from(eventUserSchema)
+      .where(eq(eventUserSchema.eventId, eventId))
+      .leftJoin(user, eq(user.id, eventUserSchema.userId));
+    return result;
+  }
+
+  static async createEventUserRelation(params: {
+    eventId: number;
+    userId: number;
+    role: string;
+  }) {
+    const result = await db.insert(eventUserSchema).values(params).returning();
+    return result[0];
   }
 }
 

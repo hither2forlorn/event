@@ -1,4 +1,5 @@
-import event from "./schema";
+import { user } from "@/config/db/schema";
+import event, { eventUserSchema } from "./schema";
 
 const selectQuery = {
   id: event.id,
@@ -16,6 +17,15 @@ const selectQuery = {
   updatedAt: event.updatedAt,
 };
 
+const selectQueryForUserRelatedToEvent = {
+  userId: eventUserSchema.userId,
+  role: eventUserSchema.role,
+  userName: user.name,
+  userEmail: user.email,
+  userPhone: user.phone,
+};
+
 export default {
   selectQuery,
+  selectQueryForUserRelatedToEvent,
 };

@@ -7,36 +7,36 @@ export interface EventColumn {
   endDate: Date;
   budget: number | null;
   theme: string | null;
-  duration: number;
-  parentid: number | null;
+  duration?: number;
+  parentId: number | null;
   location: string;
-  organizer: any;
-  createdAt: any;
-  updatedAt: any;
+  organizer: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 class Resource {
-  static toJson(category: Partial<EventColumn>): Partial<EventColumn> | null {
-    if (!category) return null;
+  static toJson(event: Partial<EventColumn>): Partial<EventColumn> | null {
+    if (!event) return null;
     const data: Partial<EventColumn> = {
-      id: category.id,
-      title: category.title,
-      description: category.description,
-      type: category.type,
-      startDate: category.startDate,
-      endDate: category.endDate,
-      budget: category.budget,
-      theme: category.theme,
-      parentid: category.parentid,
-      location: category.location,
-      organizer: category.organizer,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt,
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      type: event.type,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      budget: event.budget,
+      theme: event.theme,
+      parentId: event.parentId,
+      location: event.location,
+      organizer: event.organizer,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
     };
     return data;
   }
-  static collection(event: Partial<EventColumn>[]) {
-    return event.map(this.toJson);
+  static collection(events: Partial<EventColumn>[]) {
+    return events.map(this.toJson);
   }
 }
 export default Resource;
