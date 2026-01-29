@@ -64,7 +64,7 @@ class User {
 			.set(params as any)
 			.where(eq(users.id, id))
 			.returning();
-		// await redisService.del(`admin-${id}`);
+		console.log("this is the result in the moule", result);
 		return result[0] || null;
 	}
 	static async destroy(id: number) {

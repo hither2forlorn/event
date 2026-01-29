@@ -91,21 +91,6 @@ const login = async (input: loginType) => {
 	}
 };
 
-// const logout = async (id: number) => {
-//   try {
-//     const admin = await Model.find({ id });
-
-//     if (!admin) {
-//       throwNotFoundError("Admin");
-//     }
-
-//     logger.info(`Admin ${id} logged out successfully`);
-//     return { message: "Logged out successfully" };
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
 const find = async (data: Partial<UserColumn>) => {
 	try {
 		if (!!data.email) {
@@ -130,48 +115,34 @@ const find = async (data: Partial<UserColumn>) => {
 const changePassword = async (input: any, id: number) => {
 	try {
 		const result = changePasswordValidationSchema.safeParse(input);
-
 		if (!result.success) {
 			throwErrorOnValidation(
 				result.error.issues.map((issue) => issue.message).join(", "),
 			);
 		}
-
 		const { currentPassword, newPassword, confirmPassword } = input;
-
-		// Check if new password and confirm password match
+		// Check if new password and confirm password match and then return if there is not the match in the password 
 		if (newPassword !== confirmPassword) {
-			throwErrorOnValidation("New password and confirm password do not match");
+			return throwErrorOnValidation("New password and confirm password do not match");
 		}
-
-		// Find user
 		const user = await Model.find({ id });
-
 		if (!user) {
 			throwNotFoundError("User");
 		}
-
-		// Verify current password
 		const isCurrentPasswordValid = await comparePassword(
 			currentPassword,
 			user!.password as string,
 		);
-
 		if (!isCurrentPasswordValid) {
 			throwErrorOnValidation("Current password is incorrect");
 		}
-
-		// Hash new password
 		const hashedNewPassword = await hashPassword(newPassword);
-
-		// Update password
-		const updatedAdmin = await Model.update(
+		const updatePassword = await Model.update(
 			{ password: hashedNewPassword },
 			id,
 		);
+		return Resource.toJson(updatePassword);
 
-		logger.info(`Password changed successfully for admin ${id}`);
-		return Resource.toJson(updatedAdmin as any);
 	} catch (error) {
 		throw error;
 	}
