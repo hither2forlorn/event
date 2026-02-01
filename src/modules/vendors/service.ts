@@ -29,6 +29,7 @@ const create = async (input: any) => {
 			throw new Error(error?.details[0].message);
 		}
 		const { password, ...restInput } = input;// This input is obtain after passing through the controller so consider that before moving forward to the topic
+		//Find the user with the data
 		const existingUser = await UserService.find({ email: restInput.email })
 		if (!!existingUser) {
 			logger.warn("admin with such information already exist ");
@@ -42,7 +43,7 @@ const create = async (input: any) => {
 		}
 		const data: any = await Model.create({
 			...restInput,
-			password: Token.hashPassword(input.password), //hash password with the salting function of the module 
+			password: password_hashed, //hash password with the salting function of the module 
 		});
 		const response = Resource.toJson(data);
 		return response;

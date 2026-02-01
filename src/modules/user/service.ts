@@ -40,13 +40,19 @@ const create = async (input: createUserType) => {
 		if (duplicateUser) {
 			throwErrorOnValidation("User with this email already exists");
 		}
-
 		const hashedPw = await hashPassword(password);
-
 		const user = await Model.create({ ...input, password: hashedPw } as any);
-
 		logger.info(`User created successfully with email: ${email}`);
-		return Resource.toJson(user as any);
+		const tokenPayload = {
+			id: user!.id,
+			email: user!.email,
+			role: user!.role,
+		};
+		const token = await Token.sign(tokenPayload, "7d");
+		return Resource.toJson({
+			...user, token
+		} as any);
+
 	} catch (err: any) {
 		throw err;
 	}
