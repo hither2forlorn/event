@@ -6,8 +6,6 @@ const userEventTableName = "user_event";
 
 const eventType = pgEnum("event_type", ["wedding"]);
 
-const sideEnum = pgEnum("side", ["bride", "groom"]);
-
 const attributes = {
   id: serial("id").primaryKey(),
   title: text("title"),
@@ -25,7 +23,7 @@ const attributes = {
   budget: integer("budget"),
   theme: text("theme"),
   attire: text("attire"),
-  side: sideEnum("side"),
+  side: text("side"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 };
