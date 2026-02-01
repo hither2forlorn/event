@@ -6,7 +6,6 @@ export interface GuestColumn {
 	address: string;
 	relation: string;
 	phone: string,
-	// modules:,
 	createdAt: any,
 	updatedAt: any,
 }

@@ -34,5 +34,4 @@ class Resource {
 		return guests.map(this.toJson);
 	}
 }
-
 export default Resource;

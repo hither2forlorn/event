@@ -2,6 +2,7 @@ import db from "@/config/db/index";
 import guests from "./schema";
 import type { GuestColumn } from "./resource"
 import Repository from "./repository";
+import user from "@/modules/user/schema";
 import { sql, eq, or } from "drizzle-orm";
 class Guests {
 	static async findAllAndCount(params: any) {
@@ -29,6 +30,7 @@ class Guests {
 	}
 
 	static async create(params: Partial<GuestColumn>) {
+		//Assuming there is already the user in the table 
 		const result = await db
 			.insert(guests)
 			.values(params as any)
@@ -43,7 +45,7 @@ class Guests {
 			conditions.push(eq(guests.id, id));
 		}
 		if (email !== undefined) {
-			conditions.push(eq(guests.email, email));
+			conditions.push(eq(user.email, email));
 		}
 		if (relation !== undefined) {
 			conditions.push(eq(guests.relation, relation));
@@ -55,6 +57,7 @@ class Guests {
 		const result = await db
 			.select()
 			.from(guests)
+			.leftJoin(user, eq(guests.userId, user.id))
 			.where(conditions.length === 1 ? conditions[0] : or(...conditions));
 		return result[0] || null;
 	}
