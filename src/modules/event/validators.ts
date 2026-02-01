@@ -18,4 +18,12 @@ const EventValidationSchema = z
 
 const EventUpdateValidationSchema = EventValidationSchema.partial()
 
-export { EventValidationSchema, EventUpdateValidationSchema };
+type createEventType = z.infer<typeof EventValidationSchema>;
+type updateEventType = z.infer<typeof EventUpdateValidationSchema>;
+
+export {
+  EventValidationSchema,
+  EventUpdateValidationSchema,
+  type createEventType,
+  type updateEventType,
+};

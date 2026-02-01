@@ -7,8 +7,11 @@ export interface EventColumn {
   endDate: Date;
   budget: number | null;
   theme: string | null;
-  duration?: number;
   parentId: number | null;
+  startTime: string | null;
+  endTIme: string | null;
+  attire: string | null;
+  side: string | null;
   location: string;
   organizer: number;
   createdAt: Date;

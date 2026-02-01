@@ -4,6 +4,7 @@ import logger from "@/config/logger";
 import {
   EventUpdateValidationSchema,
   EventValidationSchema,
+  type updateEventType,
 } from "./validators";
 
 const list = async (params: any) => {
@@ -82,7 +83,7 @@ const checkAuthorized = async (id: number, userId?: number) => {
   return event;
 };
 
-const update = async (id: number, input: any, userId?: number) => {
+const update = async (id: number, input: updateEventType, userId?: number) => {
   try {
     await checkAuthorized(id, userId);
     const result = EventUpdateValidationSchema.safeParse(input);
@@ -93,7 +94,7 @@ const update = async (id: number, input: any, userId?: number) => {
       );
     }
 
-    const eventData = {
+    const eventData: any = {
       ...input,
       ...(input.startDate && { startDate: new Date(input.startDate) }),
       ...(input.endDate && { endDate: new Date(input.endDate) }),
