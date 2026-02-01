@@ -1,5 +1,4 @@
 import Controller from "./controller";
-
 const routes = [
 	{
 		method: "get",

@@ -3,6 +3,7 @@ import venturesSchema from "../../modules/vendors/schema";
 import category from "../../modules/category/schema";
 import Eventguest from "@/modules/eventguests/schema"
 import user, { roleEnum } from "../../modules/user/schema";
+import guest from "@/modules/guests/schema"
 import eventSchema, {
 	eventType,
 	eventUserSchema,
@@ -10,6 +11,7 @@ import eventSchema, {
 export {
 	adminSchema,
 	Eventguest,
+	guest,
 	venturesSchema,
 	category,
 	user,
