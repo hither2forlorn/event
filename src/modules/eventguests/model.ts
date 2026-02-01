@@ -17,7 +17,7 @@ class GuestColumn {
 		if (!!eventId) {
 			conditions.push(eq(guestEvent.eventId, eventId))
 		}
-		let selectQuery = db.select(Repository.selectWithGuestuser as any).from(guestEvent)
+		let selectQuery = db.select(Repository.selectQuery).from(guestEvent)
 			.leftJoin(guests, eq(guestEvent.guestId, guests.id))
 			.leftJoin(user, eq(guests.userId, user.id))
 		let countQuery = db.select({ count: sql<number>`count(*)` }).from(guestEvent);

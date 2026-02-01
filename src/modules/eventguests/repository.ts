@@ -2,12 +2,15 @@ import user from "../user/schema";
 import eventguest from "./schema";
 import guest from "../guests/schema";
 import event from "@/modules/event/schema";
+import GuestRepository from "@/modules/guests/repository"
+
 const selectQuery = {
 	id: eventguest.id,
 	guestId: eventguest.guestId,
 	eventId: eventguest.eventId,
 	updatedAt: eventguest.updatedAt,
 };
+
 const selectWithGuestuser = {
 	...selectQuery,
 	Guest: {

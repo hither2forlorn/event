@@ -3,19 +3,19 @@ import guests from "./schema";
 import event from "@/modules/event/schema"
 const selectQuery = {
 	id: guests.id,
-	email: user.email,
-	name: user.name,
-	address: user.address,
-	relation: guests.relation,
-	foodPreference: user.foodPreference,
-	location: {
+	guest_email: user.email,
+	guest_name: user.name,
+	guest_address: user.address,
+	guest_relation: guests.relation,
+	guest_foodPreference: user.foodPreference,
+	guest_location: {
 		country: user.country,
 		zip_code: user.zip,
 		address: user.address
 	},
-	role: user.role,
-	phone: user.phone,
-	createdAt: guests.createdAt,
+	guest_role: user.role,
+	guest_phone: user.phone,
+	guest_createdAt: guests.createdAt,
 	updatedAt: guests.updatedAt,
 };
 const selectWithEvent = {

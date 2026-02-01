@@ -7,7 +7,6 @@ export interface EventGuests {
 	address: string;
 	relation: string;
 	phone: string,
-	// modules:,
 	attending: boolean,
 	createdAt: any,
 	updatedAt: any,
