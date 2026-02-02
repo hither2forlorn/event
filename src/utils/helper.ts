@@ -22,7 +22,6 @@ export const HTTP_ERROR_LITERALS = {
 	CONFLICT: "CONFLICT: ",
 	VALIDATION_ERROR: "VALIDATION_ERROR: ",
 	INTERNAL_SERVER_ERROR: "SOMETHING WENT WRONG: "
-
 }
 export const doesExistCheck = async (tableName: any, whereArray: [any]) => {
 	const exist = await db.select().from(tableName).where(...whereArray)
