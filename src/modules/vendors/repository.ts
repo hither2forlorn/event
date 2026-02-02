@@ -5,13 +5,19 @@ import vendors from "./schema";
 const selectQuery = {
 	id: vendors.id,
 	ownerName: owner.name,
-	vendorBuisnessname: vendors.vendorName,
-	ownerId: owner.id,
+	vendorName: vendors.vendorName,
+	owner: owner.id,
+	city: vendors.city,
+	nation: vendors.nation,
+	theme: vendors.theme,
+	infos: vendors.infos,
+	culture: vendors.culture,
 	owner_email: owner.email,
 	space: vendors.space,
-	info: vendors.infos,
 	createdAt: vendors.createdAt,
+	updatedAt: vendors.updatedAt
 };
+
 const updateDeviceToken = async (data: VendorColumn, deviceToken: string) => { // in the new login you would want to also update the admin information 
 	try {
 		const params: any = {

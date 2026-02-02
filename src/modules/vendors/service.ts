@@ -1,8 +1,10 @@
 import {
+
 	// changePasswordValidationSchema,
 	// loginValidationSchema,
 	validationSchema,
 } from "./validators";
+import { HTTP_ERROR_LITERALS } from "@/utils/helper";
 import Model from "./model";
 import UserService from "@/modules/user/service"
 import Repository from "./repository";
@@ -10,7 +12,6 @@ import Resource from "./resource";
 import Token from "@/utils/token";
 import bcrypt from "bcryptjs";
 import logger from "@/config/logger";
-import { ErrorLiteral } from "@/utils/helper";
 import z from "zod";
 //TODO: When the vendor is created make the user also in the single dlow 
 const list = async (params: any) => {
@@ -24,27 +25,18 @@ const list = async (params: any) => {
 };
 const create = async (input: any) => {
 	try {
+		console.log('This is the input from the fronted ', input);
 		const { error }: any = z.parse(validationSchema, input);
 		if (!!error) {
 			throw new Error(error?.details[0].message);
 		}
 		const { password, ...restInput } = input;// This input is obtain after passing through the controller so consider that before moving forward to the topic
-		//Find the user with the data
-		const existingUser = await UserService.find({ email: restInput.email })
-		if (!!existingUser) {
-			logger.warn("admin with such information already exist ");
-			throw new Error(ErrorLiteral.ALREADY_EXIST);
+		const existingUser = await UserService.find({ id: restInput.owner });
+		if (!existingUser) {
+			logger.warn("owner  with such information already doesnot  exist ");
+			throw new Error(HTTP_ERROR_LITERALS.NOT_FOUND);
 		}
-		const password_hashed = await Token.hashPassword(input.password);
-		if (!!input.permissions) {
-			input.infos = {
-				permissions: input.permissions
-			}
-		}
-		const data: any = await Model.create({
-			...restInput,
-			password: password_hashed, //hash password with the salting function of the module 
-		});
+		const data: any = await Model.create(input);
 		const response = Resource.toJson(data);
 		return response;
 	} catch (err: any) {
