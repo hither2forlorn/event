@@ -1,15 +1,11 @@
-import { serial, text, json, timestamp, pgEnum } from "drizzle-orm/pg-core";
-
-const roleEnum = pgEnum("role", ["client", "vendor"]);
-
-const tableName = "users";
+import {  text, json, timestamp, uuid } from "drizzle-orm/pg-core";
+const tableName = "user";
 const attributes = {
-	id: serial("id").primaryKey(),
+	id: uuid("id").primaryKey(),
+	username: text("username"),
 	email: text("email").notNull().unique(),
 	password: text("password"),
-	name: text("name"),
 	phone: text("phone"),
-	foodPreference: text("foodPreference"),
 	location: text("location"),
 	bio: text("bio"),
 	photo: text("photo"),
@@ -19,10 +15,8 @@ const attributes = {
 	zip: text("zip"),
 	coverPhoto: text("coverPhoto"),
 	info: json("info"),
-	role: roleEnum("role").notNull().default("client"),
-	// modules:,
 	createdAt: timestamp("createdAt").defaultNow(),
 	updatedAt: timestamp("updatedAt").defaultNow(),
 };
 
-export { tableName, attributes, roleEnum };
+export { tableName, attributes };

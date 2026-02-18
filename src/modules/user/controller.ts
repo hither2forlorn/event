@@ -13,7 +13,6 @@ const get = async (req: IAuthRequest) => {
 const create = async (req: IAuthRequest) => {
 	try {
 		const { body } = req;
-		// Logic for the check of the same password
 		const data = await Service.create(body);
 		return data;
 	} catch (err: any) {
@@ -34,15 +33,6 @@ const login = async (req: Request) => {
 	}
 };
 
-// const update = async (req: IAuthRequest) => {
-// 	try {
-// 		const { user, body } = req;
-// 		const data = await Service.changePassword(user?.id, body);
-// 		return data;
-// 	} catch (err: any) {
-// 		throw (err);
-// 	}
-// };
 const changePassword = async (req: IAuthRequest) => {
 	try {
 		const { user, body } = req;

@@ -1,13 +1,12 @@
-import { roleEnum } from "./attributes";
+
 
 export interface UserColumn {
-	id: number;
+	id: string;
 	name: string;
 	token: string | "";
 	info: any;
 	password: string;
 	email: string;
-	foodPreference: string;
 	city: string;
 	zip: string;
 	address: string;
@@ -17,7 +16,6 @@ export interface UserColumn {
 	bio: string,
 	location: string;
 	phone: string;
-	role: typeof roleEnum;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -31,7 +29,6 @@ class Resource {
 			token: user.token,
 			email: user.email,
 			location: user.location,
-			foodPreference: user.foodPreference,
 			bio: user.bio,
 			photo: user.photo,
 			country: user.country,
@@ -40,7 +37,6 @@ class Resource {
 			zip: user.zip,
 			coverPhoto: user.coverPhoto,
 			info: user.info,
-			role: user.role,
 			createdAt: user.createdAt,
 			updatedAt: user.updatedAt,
 		};
