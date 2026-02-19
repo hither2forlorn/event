@@ -3,7 +3,6 @@
 export interface UserColumn {
 	id: number;
 	name: string;
-	token: string | "";
 	info: any;
 	password: string;
 	email: string;
@@ -26,7 +25,6 @@ class Resource {
 			id: user.id,
 			name: user.name,
 			phone: user.phone,
-			token: user.token,
 			email: user.email,
 			location: user.location,
 			bio: user.bio,

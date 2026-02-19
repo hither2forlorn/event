@@ -116,7 +116,7 @@ const find = async (data: Partial<UserColumn>) => {
 	}
 };
 
-const changePassword = async (input: any, id: string) => {
+const changePassword = async (input: any, id: number) => {
 	try {
 		const result = changePasswordValidationSchema.safeParse(input);
 		if (!result.success) {
@@ -152,7 +152,7 @@ const changePassword = async (input: any, id: string) => {
 	}
 };
 
-const remove = async (id: string) => {
+const remove = async (id: number) => {
 	try {
 		// Check if admin exists
 		const admin = await Model.find({ id });

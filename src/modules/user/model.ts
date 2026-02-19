@@ -11,14 +11,14 @@ class User {
 		const result = await db
 			.select(Repository.selectQuery as any)
 			.from(users)
-			.where(not(eq(users.id, "1")))
+			.where(not(eq(users.id,1)))
 			.limit(limit)
 			.offset(offset);
 
 		const [{ count }]: any = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(users)
-			.where(not(eq(users.id, "1")));
+			.where(not(eq(users.id, 1)));
 		return {
 			items: result,
 			page,
@@ -57,7 +57,7 @@ class User {
 	}
 	static async update(
 		params: Partial<UserColumn | { password: string }>,
-		id: string,
+		id: number,
 	) {
 		const result: any = await db
 			.update(users)
@@ -66,7 +66,7 @@ class User {
 			.returning();
 		return result[0] || null;
 	}
-	static async destroy(id: string) {
+	static async destroy(id: number) {
 		const result = await db.delete(users).where(eq(users.id, id)).returning();
 		return result;
 	}

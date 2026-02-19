@@ -18,7 +18,7 @@ const updateValidation = z.object({
 })
 
 const validationSchema = z.object({
-	userName: z.string(),
+	username: z.string(),
 	password: z.string(),
 	email: z.string()
 });

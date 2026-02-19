@@ -13,8 +13,7 @@ const selectQuery = {
 	address: users.address,
 	zip: users.zip,
 	coverPhoto: users.coverPhoto,
-	info: users.info,
-	
+	info: users.info,	
 	createdAt: users.createdAt,
 	updatedAt: users.updatedAt,
 };
