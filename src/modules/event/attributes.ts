@@ -51,7 +51,7 @@ const event_member_attribute = {
 };
 
 const event_guest_attribute = {
-	id: serial("id").unique().primaryKey(),
+	id: serial("id").primaryKey(),
 	userId: integer("user_id")
 		.notNull()
 		.references(() => user.id),
