@@ -1,7 +1,7 @@
 import Controller from "./controller";
 const routes = [
 	{
-		method: "get",
+		method: "getzzz",
 		controller: Controller.get,
 		path: "event",
 	},

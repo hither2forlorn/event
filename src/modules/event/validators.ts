@@ -6,10 +6,10 @@ const EventValidationSchema = z
 		type: z.string(),
 		startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
 			message: "Invalid date format",
-		}),
+		}).optional(),
 		endDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
 			message: "Invalid date format",
-		}),
+		}).optional(),
 		budget: z.number().int().min(0).optional(),
 		theme: z.string().optional(),
 		parentId: z.number().int().optional(),
@@ -18,12 +18,14 @@ const EventValidationSchema = z
 
 const EventUpdateValidationSchema = EventValidationSchema.partial()
 
+//Type extraction from the zod 
 type createEventType = z.infer<typeof EventValidationSchema>;
 type updateEventType = z.infer<typeof EventUpdateValidationSchema>;
 
+
 export {
-  EventValidationSchema,
-  EventUpdateValidationSchema,
-  type createEventType,
-  type updateEventType,
+	EventValidationSchema,
+	EventUpdateValidationSchema,
+	type createEventType,
+	type updateEventType,
 };
