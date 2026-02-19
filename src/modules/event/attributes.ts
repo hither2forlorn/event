@@ -15,7 +15,7 @@ const eventGuestTableName = "event_guest";
 const eventVendorTableName = "event_vendor"
 
 const eventAttribute = {
-	id: serial("id").unique().primaryKey(),
+	id: serial("id").primaryKey(),
 	title: text("title"),
 	description: text("description"),
 	type: text("type").notNull(),
@@ -40,7 +40,7 @@ const eventAttribute = {
 };
 
 const event_member_attribute = {
-	id: serial("id").unique().primaryKey(),
+	id: serial("id").primaryKey(),
 	userId: integer("user_id")
 		.notNull()
 		.references(() => user.id),
@@ -64,9 +64,9 @@ const event_guest_attribute = {
 }
 
 const event_vendor_attribute = {
-	id: serial("id").unique().primaryKey(),
-	event_id: integer().notNull().references(() => event.id),
-	vendor_buisness_id: text().notNull(),
+	id: serial("id").primaryKey(),
+	event_id: integer("event_id").notNull().references(() => event.id),
+	vendor_buisness_id: text("vendor_buisness_id").notNull(),
 	acquired_by: integer("acquired_by"),
 	status: text("status"), // Accepted , Enquiring 
 	notes: text("notes"),

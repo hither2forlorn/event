@@ -1,7 +1,7 @@
 import { text, json, timestamp, serial, boolean } from "drizzle-orm/pg-core";
 const tableName = "user";
 const attributes = {
-	id: serial().unique().primaryKey(),
+	id: serial("id").primaryKey(),
 	username: text("username"),
 	email: text("email").notNull().unique(),
 	password: text("password"),
