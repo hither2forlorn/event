@@ -1,7 +1,7 @@
 
 
 export interface UserColumn {
-	id: string;
+	id: number;
 	name: string;
 	token: string | "";
 	info: any;

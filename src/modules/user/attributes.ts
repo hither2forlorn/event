@@ -1,11 +1,12 @@
-import {  text, json, timestamp, uuid } from "drizzle-orm/pg-core";
+import { text, json, timestamp, serial, boolean } from "drizzle-orm/pg-core";
 const tableName = "user";
 const attributes = {
-	id: uuid("id").primaryKey(),
+	id: serial().unique().primaryKey(),
 	username: text("username"),
 	email: text("email").notNull().unique(),
 	password: text("password"),
 	phone: text("phone"),
+	accountStatus: boolean("accountStatus"),
 	location: text("location"),
 	bio: text("bio"),
 	photo: text("photo"),

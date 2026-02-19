@@ -4,7 +4,7 @@ type QuestionType = {
 	question: string
 }[]
 const attributes = {
-	id: serial("id").primaryKey(),
+	id: serial(),
 	parentId: integer("parentId"),
 	title: text("title"),
 	question: json("question").$type<QuestionType>(), // This will be dedkkk

@@ -11,7 +11,7 @@ class User {
 		const result = await db
 			.select(Repository.selectQuery as any)
 			.from(users)
-			.where(not(eq(users.id, "1"))) 
+			.where(not(eq(users.id, "1")))
 			.limit(limit)
 			.offset(offset);
 
@@ -27,10 +27,10 @@ class User {
 		};
 	}
 
-	static async create(params: Partial<UserColumn>) {
+	static async create(params: UserColumn) {
 		const result = await db
 			.insert(users)
-			.values(params as any)
+			.values(params)
 			.returning();
 		return result[0];
 	}
@@ -64,7 +64,6 @@ class User {
 			.set(params as any)
 			.where(eq(users.id, id))
 			.returning();
-		console.log("this is the result in the moule", result);
 		return result[0] || null;
 	}
 	static async destroy(id: string) {

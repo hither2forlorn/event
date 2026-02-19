@@ -1,19 +1,26 @@
-import { pgTable, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable } from "drizzle-orm/pg-core";
 import {
-  attributes,
-  tableName,
-  eventType,
-  userEventAttributes,
-  userEventTableName,
+	eventAttribute,
+	tableName,
+	eventType,
+	eventMemberTableName,
+	eventGuestTableName,
+	eventVendorTableName,
+	event_vendor_attribute,
+	event_member_attribute,
+	event_guest_attribute,
 } from "./attributes";
+const schema = pgTable(tableName, eventAttribute);
 
-const schema = pgTable(tableName, attributes);
-
-const eventUserSchema = pgTable(
-  userEventTableName,
-  userEventAttributes,
-  (table) => [primaryKey({ columns: [table.userId, table.eventId] })],
+const event_member_schema = pgTable(
+	eventMemberTableName, event_member_attribute
 );
+const event_vendor_schema = pgTable(
+	eventVendorTableName, event_vendor_attribute
+)
+const event_guest_schema = pgTable(
+	eventGuestTableName, event_guest_attribute
 
-export { eventType, eventUserSchema };
+)
+export { eventType, event_member_schema, event_guest_schema, event_vendor_schema };
 export default schema;

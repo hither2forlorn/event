@@ -46,7 +46,6 @@ const create = async (input: createUserType) => {
 		const tokenPayload = {
 			id: user!.id,
 			email: user!.email,
-			role: user!.role,
 		};
 		const token = await Token.sign(tokenPayload, "7d");
 		return Resource.toJson({
@@ -85,7 +84,6 @@ const login = async (input: loginType) => {
 		const tokenPayload = {
 			id: user!.id,
 			email: user!.email,
-			role: user!.role,
 		};
 
 		const token = await Token.sign(tokenPayload, "7d");
@@ -118,7 +116,7 @@ const find = async (data: Partial<UserColumn>) => {
 	}
 };
 
-const changePassword = async (input: any, id: number) => {
+const changePassword = async (input: any, id: string) => {
 	try {
 		const result = changePasswordValidationSchema.safeParse(input);
 		if (!result.success) {
@@ -154,7 +152,7 @@ const changePassword = async (input: any, id: number) => {
 	}
 };
 
-const remove = async (id: number) => {
+const remove = async (id: string) => {
 	try {
 		// Check if admin exists
 		const admin = await Model.find({ id });

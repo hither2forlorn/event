@@ -36,8 +36,7 @@ const login = async (req: Request) => {
 const changePassword = async (req: IAuthRequest) => {
 	try {
 		const { user, body } = req;
-		const data = await Service.changePassword(body, user?.id);
-		console.log('This is the user data after the updateion', data);
+		const data = await Service.changePassword(body, user?.id.toString()); // Update this in the token while in the middleware
 		return data;
 	} catch (err: any) {
 		throw err;

@@ -10,21 +10,28 @@ const changePasswordValidationSchema = z.object({
 	confirmPassword: z.string(),
 });
 
+const updateValidation = z.object({
+	userName: z.string(),
+	avatar: z.string(),
+	password: z.string(),
+	email: z.string()
+})
+
 const validationSchema = z.object({
 	userName: z.string(),
-
-
-
-
+	password: z.string(),
+	email: z.string()
 });
 
 type createUserType = z.infer<typeof validationSchema>;
 type loginType = z.infer<typeof loginValidationSchema>;
-
+type updateType = z.infer<typeof updateValidation>;
 export {
 	loginValidationSchema,
 	changePasswordValidationSchema,
 	validationSchema,
+	updateValidation,
 	type createUserType,
 	type loginType,
+	type updateType,
 };
