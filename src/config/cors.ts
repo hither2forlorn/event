@@ -7,7 +7,7 @@ export const availableCors = [
 ];
 
 const corsOptions = cors({
-  origin: availableCors,
+  origin: "*",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization", "Api-Key", "isGuestMode"],
   credentials: true,
