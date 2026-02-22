@@ -1,6 +1,6 @@
 export interface UserColumn {
   id: number;
-  name: string;
+  username: string;
   info: any;
   password: string;
   email: string;
@@ -20,7 +20,7 @@ class Resource {
   static toJson(user: UserColumn): Partial<UserColumn> {
     const data: Partial<UserColumn> = {
       id: user.id,
-      name: user.name,
+      username: user.username,
       phone: user.phone,
       email: user.email,
       location: user.location,
