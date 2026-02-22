@@ -3,109 +3,109 @@ import Service from "./service";
 import { throwErrorOnValidation } from "@/utils/error";
 
 const get = async (req: IAuthRequest) => {
-	try {
-		const data = await Service.list(req?.query);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const data = await Service.list(req?.query);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const create = async (req: IAuthRequest) => {
-	try {
-		const data = await Service.create({ ...req.body, organizer: req.user?.id });
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const data = await Service.create({ ...req.body, organizer: req.user?.id });
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const findOne = async (req: IAuthRequest) => {
-	try {
-		const { id } = req.params;
-		if (!id || isNaN(Number(id))) {
-			throwErrorOnValidation("Invalid ID");
-		}
-		const data = await Service.find(Number(id));
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const { id } = req.params;
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Invalid ID");
+    }
+    const data = await Service.find(Number(id));
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const update = async (req: IAuthRequest) => {
-	try {
-		const { id } = req.params;
-		const userId = req.user?.id;
-		if (!id || isNaN(Number(id))) {
-			throwErrorOnValidation("Invalid ID");
-		}
-		if (!userId) {
-			throwErrorOnValidation("User not authenticated");
-		}
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Invalid ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
 
-		const data = await Service.update(Number(id), req.body, userId);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+    const data = await Service.update(Number(id), req.body, userId);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const deleteModule = async (req: IAuthRequest) => {
-	try {
-		const { id } = req.params;
-		const userId = req.user?.id;
-		if (!id || isNaN(Number(id))) {
-			throwErrorOnValidation("Invalid ID");
-		}
-		if (!userId) {
-			throwErrorOnValidation("User not authenticated");
-		}
-		const data = await Service.remove(Number(id), userId);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Invalid ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const data = await Service.remove(Number(id), userId);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const listMyEvents = async (req: IAuthRequest) => {
-	try {
-		const userId = req.user?.id;
-		if (!userId) {
-			throwErrorOnValidation("User not authenticated");
-		}
-		const data = await Service.listMyEvents(userId, req.query);
-		return data;
-	} catch (err: any) {
-		throw err;
-	}
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const data = await Service.listMyEvents(userId, req.query);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
 };
 
 const getUserRelatedToEvent = async (req: IAuthRequest) => {
-	try {
-		const { eventId } = req.params;
-		const userId = req.user?.id;
+  try {
+    const { eventId } = req.params;
+    const userId = req.user?.id;
 
-		if (!eventId || isNaN(Number(eventId))) {
-			throwErrorOnValidation("Invalid Event ID");
-		}
-		if (!userId) {
-			throwErrorOnValidation("User not authenticated");
-		}
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid Event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
 
-		const data = await Service.getUserRelatedToEvent(Number(eventId), userId);
-		return data;
-	} catch (error: any) {
-		throw error;
-	}
+    const data = await Service.getUserRelatedToEvent(Number(eventId), userId);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
 };
 
 export default {
-	get,
-	create,
-	findOne,
-	update,
-	deleteModule,
-	listMyEvents,
-	getUserRelatedToEvent,
+  get,
+  create,
+  findOne,
+  update,
+  deleteModule,
+  listMyEvents,
+  getUserRelatedToEvent,
 };

@@ -5,6 +5,7 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
     return user;
   }
   console.log(allowTo);
+  console.log(user.role);
   if (!allowTo.includes(user?.role)) {
     //Or Admin bypass
     throw new Error("Unauthorized");
@@ -24,9 +25,9 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
       : token;
 
     const decoded = await Token.verify(tokenWithoutBearer);
-    console.log(decoded);
 
     if (!decoded) {
+      console.log("This is the decoded thing in the user ");
       throw new Error("UNAUTHORIZED");
     } else {
       if (!Array.isArray(allowTo) || !allowTo?.length) {

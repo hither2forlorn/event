@@ -5,6 +5,7 @@ import {
   type createAdminType,
   type loginType,
 } from "./validators";
+import { role } from "@/constant";
 import z from "zod";
 import logger from "@/config/logger";
 import Model from "./model";
@@ -79,7 +80,7 @@ const login = async (input: loginType) => {
     const tokenPayload = {
       id: admin!.id,
       email: admin!.email,
-      role: "admin",
+      role: role.admin,
     };
 
     const token = await Token.sign(tokenPayload, "7d");

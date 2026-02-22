@@ -9,6 +9,7 @@ import {
 
 const list = async (params: any) => {
   try {
+    logger.debug("Hitting the get request to the event");
     const data = await Model.findAllAndCount(params);
     return {
       ...data,
