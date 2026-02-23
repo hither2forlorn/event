@@ -60,6 +60,8 @@ const create = async (input: createUserType) => {
     throw err;
   }
 };
+const getEventguest = async (eventid: number) => {};
+
 const login = async (input: loginType) => {
   try {
     const result = loginValidationSchema.safeParse(input);
@@ -116,6 +118,16 @@ const find = async (data: Partial<UserColumn>) => {
     throw error;
   }
 };
+
+const invite_user = async (input: any) => {
+  try {
+    console.log(input);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const vendor_event = async () => {}; // service to get the event for the vendor
 
 const changePassword = async (input: any, id: number) => {
   try {
@@ -180,4 +192,5 @@ export default {
   find,
   changePassword,
   remove,
+  getEventguest,
 };

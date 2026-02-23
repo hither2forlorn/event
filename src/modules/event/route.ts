@@ -27,6 +27,23 @@ const routes = [
     authorization: true,
     authCheckType: [role.user],
   },
+
+  {
+    method: "get",
+    controller: Controller.get,
+    path: "event/:eventId/subevent",
+    authorization: true,
+    authCheckType: [role.user],
+  },
+
+  {
+    method: "get",
+    controller: Controller.get,
+    path: "event/:eventId/guest", // update this to have the geust in the event
+    authorization: true,
+    authCheckType: [role.user],
+  },
+
   {
     method: "get",
     controller: Controller.findOne,
