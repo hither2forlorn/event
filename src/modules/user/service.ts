@@ -51,7 +51,7 @@ const create = async (input: createUserType) => {
     };
     const token = await Token.sign(tokenPayload, "30d");
     const jsonData = Resource.toJson(user as any);
-    //include the token in the responce while making the user in the system
+    //include the token in the responce whi!evele making the user in the system
     return {
       ...jsonData,
       token,
@@ -60,6 +60,7 @@ const create = async (input: createUserType) => {
     throw err;
   }
 };
+
 const login = async (input: loginType) => {
   try {
     const result = loginValidationSchema.safeParse(input);
@@ -116,6 +117,8 @@ const find = async (data: Partial<UserColumn>) => {
     throw error;
   }
 };
+
+const vendor_event = async () => {}; // service to get the event for the vendor
 
 const changePassword = async (input: any, id: number) => {
   try {

@@ -1,8 +1,8 @@
 export interface EventColumn {
-  id: number;
-  title: string;
-  description: string;
-  type: string;
+  id?: number;
+  title: string | null;
+  description: string | null ;
+  type: any;
   startDate: Date;
   endDate: Date;
   budget: number | null;
@@ -12,10 +12,10 @@ export interface EventColumn {
   endTIme: string | null;
   attire: string | null;
   side: string | null;
-  location: string;
-  organizer: number;
-  createdAt: Date;
-  updatedAt: Date;
+  location: string | null;
+  organizer: number | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 }
 
 class Resource {

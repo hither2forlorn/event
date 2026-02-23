@@ -13,7 +13,11 @@ const get = async (req: IAuthRequest) => {
 
 const create = async (req: IAuthRequest) => {
   try {
-    const data = await Service.create({ ...req.body, organizer: req.user?.id });
+    const userId = req.user?.id;
+    const data = await Service.create(
+      { ...req.body, organizer: userId },
+      userId,
+    );
     return data;
   } catch (err: any) {
     throw err;
