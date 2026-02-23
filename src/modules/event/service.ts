@@ -9,7 +9,6 @@ import {
 
 const list = async (params: any) => {
   try {
-    logger.debug("Hitting the get request to the event");
     const data = await Model.findAllAndCount(params);
     return {
       ...data,
@@ -21,7 +20,33 @@ const list = async (params: any) => {
   }
 };
 
-const create = async (input: any) => {
+const getEventguest = async (eventid: number) => {
+  try {
+    const event_information = find(eventid);
+    if (!event_information) {
+      console.log("There is not any information  ");
+    }
+    const event_guest = Model.getEventGuest(eventid);
+    console.log(event_guest);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getEventVendor = async (eventid: number) => {
+  try {
+     const event_information = find(eventid);
+    if (!event_information) {
+      console.log("There is not any information  ");
+    }
+    const eventVendor = await Model.getEventVendor(eventid);
+    return eventVendor;
+  } catch (err) {
+    throw err ; 
+  }
+};
+
+const create = async (input: any, userId: number) => {
   try {
     // eventValidation.parse(input);
     const result = EventValidationSchema.safeParse(input);
@@ -41,17 +66,11 @@ const create = async (input: any) => {
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
     }
-
-    await Model.createEventUserRelation({
-      eventId: data.id,
-      userId: data.organizer,
-      role: "organizer",
-    });
-
-    if (data == undefined) {
+    const eventMember = await Model.makeEventMember(data.id, data.organizer);
+    if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
-    return Resource.toJson(data as any);
+    return { ...Resource.toJson(data), eventMembershipId: eventMember.id };
   } catch (err: any) {
     logger.error("Error in Event creation:", err);
     throw err;
@@ -62,7 +81,7 @@ const find = async (id: number) => {
   try {
     const data = await Model.find({ id });
     if (!data) throw new Error("Event not found");
-    return Resource.toJson(data as any);
+    return Resource.toJson(data);
   } catch (err: any) {
     logger.error("Error in event finding:", err);
     throw err;
@@ -151,7 +170,7 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
   try {
     await checkAuthorized(eventId, userId);
 
-    const data = await Model.getUserRelatedToEvent(eventId);
+    const data = await Model.getEventMember(eventId);
     return {
       eventId,
       users: data,
@@ -170,5 +189,7 @@ export default {
   update,
   remove,
   listMyEvents,
+  getEventguest,
   getUserRelatedToEvent,
+  getEventVendor,
 };

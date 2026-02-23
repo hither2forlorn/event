@@ -51,7 +51,7 @@ const create = async (input: createUserType) => {
     };
     const token = await Token.sign(tokenPayload, "30d");
     const jsonData = Resource.toJson(user as any);
-    //include the token in the responce while making the user in the system
+    //include the token in the responce whi!evele making the user in the system
     return {
       ...jsonData,
       token,
@@ -60,7 +60,6 @@ const create = async (input: createUserType) => {
     throw err;
   }
 };
-const getEventguest = async (eventid: number) => {};
 
 const login = async (input: loginType) => {
   try {
@@ -116,14 +115,6 @@ const find = async (data: Partial<UserColumn>) => {
     }
   } catch (error) {
     throw error;
-  }
-};
-
-const invite_user = async (input: any) => {
-  try {
-    console.log(input);
-  } catch (err) {
-    throw err;
   }
 };
 
@@ -192,5 +183,4 @@ export default {
   find,
   changePassword,
   remove,
-  getEventguest,
 };
