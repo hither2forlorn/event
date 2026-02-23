@@ -58,7 +58,7 @@ class User {
   ) {
     const result: any = await db
       .update(users)
-      .set(params as any)
+      .set(params)
       .where(eq(users.id, id))
       .returning();
     return result[0] || null;
