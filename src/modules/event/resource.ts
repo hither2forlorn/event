@@ -1,7 +1,7 @@
 export interface EventColumn {
   id?: number;
   title: string | null;
-  description: string | null ;
+  description: string | null; 
   type: any;
   startDate: Date;
   endDate: Date;
@@ -13,9 +13,12 @@ export interface EventColumn {
   attire: string | null;
   side: string | null;
   location: string | null;
+  status?: string | null; // Temp ui 
   organizer: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  role?: string | null; //Temp
+  date: string | null; //Temp
 }
 
 class Resource {
@@ -24,14 +27,19 @@ class Resource {
     const data: Partial<EventColumn> = {
       id: event.id,
       title: event.title,
-      description: event.description,
+      description:
+        event.description ||
+        "Witness the World comming together, Be part of the celebration in wedding of Bishwas and Salena Gomez",
       type: event.type,
       startDate: event.startDate,
+      date:"Nov 12, 2023",
       endDate: event.endDate,
-      budget: event.budget,
-      theme: event.theme,
+      budget: event.budget || 10000,
+      theme: event.theme || "Cozy",
       parentId: event.parentId,
       location: event.location,
+      role: "Organizer",
+      status: "upcoming",
       organizer: event.organizer,
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
