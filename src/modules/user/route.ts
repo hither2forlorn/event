@@ -28,6 +28,7 @@ const routes = [
     method: "delete",
     controller: Controller.deleteModule,
     path: "user/:id",
+    authorization: true,
     authCheckType: ["user"],
   },
   {

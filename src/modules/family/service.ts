@@ -1,4 +1,4 @@
-import { createFamilyValidation, updateFamilyValidation } from "./validators";
+import { createFamilyValidation } from "./validators";
 import Model from "./model";
 import Resource from "./resource";
 import { throwNotFoundError } from "@/utils/error";
@@ -37,14 +37,10 @@ const get = async (id: number) => {
 
 const update = async (id: number, input: any) => {
   try {
-    // Check if family exists first
     const existing = await Model.find(id);
     if (!existing) {
       return throwNotFoundError("Family not found");
     }
-
-    // Partial validation for update
-    updateFamilyValidation.partial().parse(input);
 
     const result = await Model.update(input, id);
     if (!result) {
@@ -60,7 +56,6 @@ const update = async (id: number, input: any) => {
 
 const remove = async (id: number) => {
   try {
-    // Check if family exists first
     const existing = await Model.find(id);
     if (!existing) {
       return throwNotFoundError("Family not found");
