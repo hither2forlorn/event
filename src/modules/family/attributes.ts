@@ -1,5 +1,5 @@
 import user from "@/modules/user/schema";
-import family from "./schema";
+import { family } from "./schema";
 import { integer, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 const tableName = "families";
