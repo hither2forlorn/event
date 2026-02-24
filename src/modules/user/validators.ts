@@ -20,7 +20,8 @@ const updateValidation = z.object({
 const validationSchema = z.object({
 	username: z.string(),
 	password: z.string(),
-	email: z.string()
+	email: z.string(),
+	phone: z.string().optional()
 });
 
 type createUserType = z.infer<typeof validationSchema>;

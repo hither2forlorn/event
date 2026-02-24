@@ -1,20 +1,21 @@
 export interface UserColumn {
   id: number;
-  username: string;
-  info: any;
-  password: string;
+  username: string | null;
+  info: any | null;
+  password: string | null;
   email: string;
-  city: string;
-  zip: string;
-  address: string;
-  coverPhoto: string;
-  photo: string;
-  country: string;
-  bio: string;
-  location: string;
-  phone: string;
-  createdAt: Date;
-  updatedAt: Date;
+  city: string | null;
+  zip: string | null;
+  address: string | null;
+  coverPhoto: string | null;
+  photo: string | null;
+  country: string | null;
+  bio: string | null;
+  location: string | null;
+  phone: string | null;
+  accountStatus: boolean | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 }
 class Resource {
   static toJson(user: UserColumn): Partial<UserColumn> {
@@ -32,6 +33,7 @@ class Resource {
       zip: user.zip,
       coverPhoto: user.coverPhoto,
       info: user.info,
+      accountStatus: user.accountStatus,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

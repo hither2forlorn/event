@@ -43,6 +43,9 @@ const create = async (input: createUserType) => {
     }
     const hashedPw = await hashPassword(password);
     const user = await Model.create({ ...input, password: hashedPw } as any);
+    if (!user) {
+      throw Error("Failed to create user");
+    }
     logger.info(`User created successfully with email: ${email}`);
     const tokenPayload = {
       id: user!.id,
@@ -50,7 +53,7 @@ const create = async (input: createUserType) => {
       role: role.user,
     };
     const token = await Token.sign(tokenPayload, "30d");
-    const jsonData = Resource.toJson(user as any);
+    const jsonData = Resource.toJson(user);
     //include the token in the responce whi!evele making the user in the system
     return {
       ...jsonData,
@@ -101,10 +104,10 @@ const find = async (data: Partial<UserColumn>) => {
   try {
     if (!!data.email) {
       const user = await Model.find({ email: data.email });
-      if (!user) {
-        throwNotFoundError("User with the email was not found ");
+      if (!user || user == null) {
+        return throwNotFoundError("User with the email was not found ");
       }
-      return Resource.toJson(user as any);
+      return Resource.toJson(user);
     }
     if (!!data.id) {
       const user = await Model.find({ id: data.id });
@@ -118,7 +121,6 @@ const find = async (data: Partial<UserColumn>) => {
   }
 };
 
-const vendor_event = async () => {}; // service to get the event for the vendor
 
 const changePassword = async (input: any, id: number) => {
   try {
