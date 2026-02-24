@@ -103,6 +103,18 @@ const getUserRelatedToEvent = async (req: IAuthRequest) => {
     throw error;
   }
 };
+const sendEventinvitaion = async (req: IAuthRequest) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const data = await Service.inviteGuest(req.body, userId);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
 export default {
   get,
@@ -112,4 +124,5 @@ export default {
   deleteModule,
   listMyEvents,
   getUserRelatedToEvent,
+  sendEventinvitaion
 };

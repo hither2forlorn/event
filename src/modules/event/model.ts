@@ -129,6 +129,24 @@ class Event {
       .from(eq(event_vendor_schema.event_id, eventId));
     return event_vendor;
   }
+  static async makeEventGuest(
+    eventId: number,
+    guestId: number,
+    role: string,
+    userId: number,
+  ) {
+    const event_guest = await db
+      .insert(event_guest_schema)
+      .values({
+        joined_at: "",
+        eventId: eventId,
+        userId: guestId,
+        role: role,
+        invited_by: userId,
+      })
+      .returning();
+    return event_guest;
+  }
 }
 
 export default Event;

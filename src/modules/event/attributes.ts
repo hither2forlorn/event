@@ -4,6 +4,7 @@ const tableName = "event";
 //Schema
 import user from "@/modules/user/schema";
 import event from "./schema";
+import { lowercase } from "zod";
 //status
 const eventType = pgEnum("event_type", ["wedding"]); // might have multiple type of event so not including this for now
 const statusEnum = pgEnum("status", [
@@ -56,6 +57,7 @@ const event_member_attribute = {
 
 const event_guest_attribute = {
   id: serial("id").primaryKey(),
+  category: text("category"),
   userId: integer("user_id")
     .notNull()
     .references(() => user.id),
@@ -63,7 +65,7 @@ const event_guest_attribute = {
     .notNull()
     .references(() => event.id),
   role: text("role"),
-  invited_by: text("invited_by"),
+  invited_by: integer("invited_by").references(() => user.id).notNull(),
   joined_at: text("joined_at"),
 };
 

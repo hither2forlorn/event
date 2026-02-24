@@ -2,10 +2,17 @@ import Model from "./model";
 import Resource from "./resource";
 import logger from "@/config/logger";
 import {
+  EventInvitation,
   EventUpdateValidationSchema,
   EventValidationSchema,
+  type EventInvitationType,
   type updateEventType,
 } from "./validators";
+import UserService from "@/modules/user/service";
+import RSVP from "../rsvp/service";
+import crypto from "crypto";
+import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
+import { UserColumn } from "../user/resource";
 
 const list = async (params: any) => {
   try {
@@ -35,14 +42,79 @@ const getEventguest = async (eventid: number) => {
 
 const getEventVendor = async (eventid: number) => {
   try {
-     const event_information = find(eventid);
+    const event_information = find(eventid);
     if (!event_information) {
       console.log("There is not any information  ");
+      throwNotFoundError("Event with the event id was not found in the db ");
     }
     const eventVendor = await Model.getEventVendor(eventid);
     return eventVendor;
   } catch (err) {
-    throw err ; 
+    throw err;
+  }
+};
+
+const inviteGuest = async (input: EventInvitationType, userId: number) => {
+  try {
+    const result = EventInvitation.safeParse(input);
+    if (!result.success) {
+      throw new Error(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
+    const isValid = await checkAuthorized(input.eventId, userId);
+    if (!isValid) {
+      return throwErrorOnValidation("Unauthorized: You are not the organizer of this event");
+    }
+    const { fullName, email, phone, eventId } = input;
+    let guestUser: Partial<UserColumn> | undefined;
+    if (email) { // Find the user with the email 
+      try {
+        guestUser = await UserService.find({ email });
+      } catch (err) {
+        throw err;
+      }
+    }
+    if (!guestUser) { // No user with the email or overall no user found 
+      const randomPassword = crypto.randomBytes(8).toString("hex");
+      const placeholderEmail = email || `guest_${Date.now()}_${Math.floor(Math.random() * 1000)}@khumbaya.com`;
+      const placeholderPhone = phone || `+977${Date.now()}`;
+      guestUser = await UserService.create({
+        username: fullName,
+        email: placeholderEmail,
+        password: randomPassword,
+        phone: placeholderPhone,
+      });
+    }
+    if (!guestUser) throw new Error("Error while making the user ")
+
+    // 2. Make Event Guest
+    const eventGuestReturning = await Model.makeEventGuest(
+      eventId,
+      guestUser.id!,
+      "GUEST",
+      userId,
+    );
+    const eventGuest = eventGuestReturning[0];
+
+    if (!eventGuest) {
+      throw new Error("Failed to create event guest entry");
+    }
+
+    // 3. Create RSVP entry
+    await RSVP.create({
+      event_guest_id: eventGuest.id,
+      status: "pending",
+    });
+
+    return {
+      ...guestUser,
+      eventGuestId: eventGuest.id,
+      role: "GUEST",
+    };
+  } catch (err: any) {
+    logger.error("Error in inviting guest:", err);
+    throw err;
   }
 };
 
@@ -62,11 +134,12 @@ const create = async (input: any, userId: number) => {
       endDate: new Date(input.endDate),
     };
 
+
     const data = await Model.create(eventData);
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
     }
-    const eventMember = await Model.makeEventMember(data.id, data.organizer);
+    const eventMember = await Model.makeEventMember(data.id, userId);
     if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
@@ -94,7 +167,7 @@ const checkAuthorized = async (id: number, userId?: number) => {
   }
 
   const event = await find(id);
-  if (!event) throw new Error("Event not found");
+  if (!event) return throwNotFoundError("Event not found");
 
   if (event.organizer !== userId) {
     throw new Error("Unauthorized: You are not the organizer of this event");
@@ -189,6 +262,7 @@ export default {
   update,
   remove,
   listMyEvents,
+  inviteGuest,
   getEventguest,
   getUserRelatedToEvent,
   getEventVendor,
