@@ -7,10 +7,10 @@ import {
   event_member_schema,
   event_vendor_schema,
 } from "../../modules/event/schema";
-import { family } from "@/modules/family/schema";
+import { family, family_member_schema } from "@/modules/family/schema";
 import { statusEnum } from "@/modules/event/attributes";
-import event from "@/modules/event/schema"
-import rsvp from "@/modules/rsvp/schema"
+import event from "@/modules/event/schema";
+import rsvp from "@/modules/rsvp/schema";
 export {
   admin,
   statusEnum,
@@ -23,4 +23,5 @@ export {
   event_member_schema,
   event_vendor_schema,
   family,
+  family_member_schema,
 };
