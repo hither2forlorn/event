@@ -12,6 +12,12 @@ import userModel from "@/modules/user/model";
 
 const create = async (input: CreateFamilyValidation["body"], user: number) => {
   try {
+    const existedFamily = await Model.findIfUserHasFamily(user);
+
+    if (existedFamily) {
+      throw new Error("User already has a family");
+    }
+
     const { familyName } = input;
 
     const result = await Model.create({ familyName, createdBy: user });
@@ -19,6 +25,18 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
     if (!result) {
       throw new Error("Failed to create family");
     }
+
+    const creator = await userModel.find({ id: user });
+    if (!creator) {
+      throw new Error("Creator user not found");
+    }
+
+    await Model.addMemberIfUser(result.id, user, user, {
+      relation: "self",
+      dob: new Date(),
+      name: creator.username || creator.email,
+      email: creator.email,
+    });
 
     return Resource.toJson(result);
   } catch (err: any) {
@@ -48,6 +66,8 @@ const update = async (id: number, input: UpdateFamilyValidation["body"]) => {
       return throwNotFoundError("Family");
     }
 
+    console.log(input);
+
     const result = await Model.update(input, id);
     if (!result) {
       throw new Error("Failed to update family");
@@ -67,7 +87,7 @@ const remove = async (id: number) => {
       return throwNotFoundError("Family");
     }
 
-    const result = await Model.destroy(id);
+    const result = await Model.destroyWithMembers(id);
     return result;
   } catch (err: any) {
     logger.error("Error in Family deletion:", err);

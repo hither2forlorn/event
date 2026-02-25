@@ -19,7 +19,9 @@ const family_member_tableName = "family_members";
 const family_member_attributes = {
   familyId: integer("family_id")
     .notNull()
-    .references(() => family.id),
+    .references(() => family.id, {
+      onDelete: "cascade",
+    }),
   userId: integer("user_id")
     .notNull()
     .references(() => user.id),

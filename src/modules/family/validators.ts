@@ -28,12 +28,16 @@ const updateFamilyValidation = z.object({
   params: z.object({
     id: z.coerce.number().int().positive("Family ID must be a positive number"),
   }),
-  body: z.object({
-    familyName: z
-      .string()
-      .min(3, "Family name must be at least 3 characters long")
-      .optional(),
-  }),
+  body: z
+    .object({
+      familyName: z
+        .string()
+        .min(3, "Family name must be at least 3 characters long")
+        .optional(),
+    })
+    .refine((body) => Object.keys(body).length > 0, {
+      message: "At least one field is required to update family",
+    }),
 });
 
 const addMemberValidation = z.object({
