@@ -1,6 +1,6 @@
 // import bcrypt from "bcryptjs";
 import db from "@/config/db/index";
-import adminSchema from "@/modules/family/schema";
+import adminSchema from "@/modules/admin/schema";
 import logger from "@/config/logger";
 export async function seedAdmins() {
   db;
