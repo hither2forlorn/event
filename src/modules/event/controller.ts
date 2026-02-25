@@ -118,11 +118,12 @@ const sendEventinvitaion = async (req: IAuthRequest) => {
 const getEventGuest = async (req: IAuthRequest) => {
   try {
     const { eventId } = req.params;
+    const { id } = req.user;
     if (!eventId) {
       throwErrorOnValidation(
         "Event id was not found in the params"
       )
-      const data = await Service.getEventguest(eventId);
+      const data = await Service.getEventguest(eventId, id);
       return data;
     }
   }
