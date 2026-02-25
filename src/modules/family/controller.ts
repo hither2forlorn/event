@@ -51,4 +51,79 @@ const deleteFamily = async (req: IAuthRequest) => {
   }
 };
 
-export default { create, get, update, deleteFamily };
+const addMember = async (req: IAuthRequest) => {
+  try {
+    const { params, body } = req;
+
+    const familyId = Number(params.id);
+
+    const data = await Service.addMember(familyId, req.user.id, body);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getMembers = async (req: IAuthRequest) => {
+  try {
+    const familyId = Number(req.params.id);
+
+    const data = await Service.listMembers(familyId);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getMemberDetails = async (req: IAuthRequest) => {
+  try {
+    const familyId = Number(req.params.id);
+    const memberId = Number(req.params.memberId);
+
+    const data = await Service.getMemberDetails(familyId, memberId);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateMember = async (req: IAuthRequest) => {
+  try {
+    const familyId = Number(req.params.id);
+    const memberId = Number(req.params.memberId);
+
+    const data = await Service.updateMember(familyId, memberId, req.body);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteMember = async (req: IAuthRequest) => {
+  try {
+    const familyId = Number(req.params.id);
+    const memberId = Number(req.params.memberId);
+
+    const data = await Service.removeMember(familyId, memberId);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export default {
+  create,
+  get,
+  update,
+  deleteFamily,
+  addMember,
+  getMembers,
+  getMemberDetails,
+  updateMember,
+  deleteMember,
+};

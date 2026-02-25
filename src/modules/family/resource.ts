@@ -6,6 +6,18 @@ export interface FamilyColumn {
   updatedAt?: Date;
 }
 
+export interface FamilyMemberColumn {
+  familyId: number;
+  userId: number;
+  relation: string;
+  dob: Date | null;
+  name: string;
+  email: string;
+  addedBy: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export type FamilyInsert = Omit<FamilyColumn, "id" | "createdAt" | "updatedAt">;
 
 class Resource {
@@ -20,6 +32,26 @@ class Resource {
   }
   static collection(admins: FamilyColumn[]) {
     return admins.map(this.toJson);
+  }
+
+  static toJsonMember(
+    member: FamilyMemberColumn,
+  ): Partial<FamilyMemberColumn> | null {
+    if (!member) return null;
+    const data: Partial<FamilyMemberColumn> = {
+      familyId: member.familyId,
+      userId: member.userId,
+      relation: member.relation,
+      dob: member.dob,
+      name: member.name,
+      email: member.email,
+      addedBy: member.addedBy,
+    };
+    return data;
+  }
+
+  static collectionMembers(members: FamilyMemberColumn[]) {
+    return members.map(this.toJsonMember);
   }
 }
 

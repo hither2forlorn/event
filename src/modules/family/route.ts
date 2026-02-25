@@ -1,7 +1,14 @@
 import { IRoute } from "@/routes";
 import Controller from "./controller";
 import { validate } from "@/middlewares/zodValidation";
-import { createFamilyValidation, updateFamilyValidation } from "./validators";
+import {
+  addMemberValidation,
+  createFamilyValidation,
+  familyAndMemberIdParamValidation,
+  familyIdParamValidation,
+  updateFamilyValidation,
+  updateMemberValidation,
+} from "./validators";
 const routes: IRoute[] = [
   {
     method: "post",
@@ -22,11 +29,48 @@ const routes: IRoute[] = [
     controller: Controller.deleteFamily,
     path: "family/:id",
     authorization: true,
+    validation: validate(familyIdParamValidation),
   },
   {
     method: "get",
     controller: Controller.get,
     path: "family/:id",
+    validation: validate(familyIdParamValidation),
+  },
+  {
+    method: "post",
+    controller: Controller.addMember,
+    path: "family/:id/member",
+    authorization: true,
+    validation: validate(addMemberValidation),
+  },
+  {
+    method: "get",
+    controller: Controller.getMembers,
+    path: "family/:id/member",
+    authorization: true,
+    validation: validate(familyIdParamValidation),
+  },
+  {
+    method: "get",
+    controller: Controller.getMemberDetails,
+    path: "family/:id/member/:memberId",
+    authorization: true,
+    validation: validate(familyAndMemberIdParamValidation),
+  },
+  {
+    method: "patch",
+    controller: Controller.updateMember,
+    path: "family/:id/member/:memberId",
+    authorization: true,
+    validation: validate(updateMemberValidation),
+  },
+  {
+    method: "delete",
+    controller: Controller.deleteMember,
+    path: "family/:id/member/:memberId",
+    authorization: true,
+    validation: validate(familyAndMemberIdParamValidation),
   },
 ];
 export default routes;
