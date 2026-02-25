@@ -6,9 +6,32 @@ import {
 } from "./validators";
 import Model from "./model";
 import Resource from "./resource";
-import { throwNotFoundError } from "@/utils/error";
+import { throwForbiddenError, throwNotFoundError } from "@/utils/error";
 import logger from "@/config/logger";
 import userModel from "@/modules/user/model";
+
+const checkAuthorization = async (
+  familyId: number,
+  userId: number,
+  onlyCreator: boolean = false,
+): Promise<boolean> => {
+  const family = await Model.find(familyId);
+  if (!family) {
+    return false;
+  }
+
+  if (onlyCreator) {
+    return family.createdBy === userId;
+  }
+
+  const isMemberOfFamily = await Model.findIfMemberOfFamily(familyId, userId);
+
+  if (!isMemberOfFamily) {
+    return false;
+  }
+
+  return true;
+};
 
 const create = async (input: CreateFamilyValidation["body"], user: number) => {
   try {
@@ -59,16 +82,24 @@ const get = async (id: number) => {
   }
 };
 
-const update = async (id: number, input: UpdateFamilyValidation["body"]) => {
+const update = async (
+  familyId: number,
+  input: UpdateFamilyValidation["body"],
+  user: number,
+) => {
   try {
-    const existing = await Model.find(id);
+    const existing = await Model.find(familyId);
     if (!existing) {
       return throwNotFoundError("Family");
     }
 
-    console.log(input);
+    const isAuthorized = await checkAuthorization(familyId, user, true);
 
-    const result = await Model.update(input, id);
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can update family");
+    }
+
+    const result = await Model.update(input, familyId);
     if (!result) {
       throw new Error("Failed to update family");
     }
@@ -80,11 +111,17 @@ const update = async (id: number, input: UpdateFamilyValidation["body"]) => {
   }
 };
 
-const remove = async (id: number) => {
+const remove = async (id: number, user: number) => {
   try {
     const existing = await Model.find(id);
     if (!existing) {
       return throwNotFoundError("Family");
+    }
+
+    const isAuthorized = await checkAuthorization(id, user, true);
+
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can delete family");
     }
 
     const result = await Model.destroyWithMembers(id);

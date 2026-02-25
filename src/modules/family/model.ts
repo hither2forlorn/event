@@ -141,6 +141,20 @@ class Family {
 
     return result[0] || null;
   }
+
+  static async findIfMemberOfFamily(familyId: number, userId: number) {
+    const result = await db
+      .select(Repository.selectMemersQuery)
+      .from(family_member_schema)
+      .where(
+        and(
+          eq(family_member_schema.familyId, familyId),
+          eq(family_member_schema.userId, userId),
+        ),
+      );
+
+    return result[0] || null;
+  }
 }
 
 export default Family;

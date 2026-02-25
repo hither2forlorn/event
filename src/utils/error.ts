@@ -22,8 +22,14 @@ export const throwNotFoundError = (resource: string): never => {
 	throw error;
 }
 export const throwUnauthorizedError = (message: string = "Unauthorized access") => {
-	const error = new Error(`Unauthorized access :${message}`);
-	error.name = "UnauthorizedError";
+	const error = new Error(`UNAUTHORIZED: ${message}`);
+	error.name = "UNAUTHORIZED";
+	throw error;
+};
+
+export const throwForbiddenError = (message: string = "Access denied") => {
+	const error = new Error(`Forbidden: ${message}`);
+	error.name = "Forbidden";
 	throw error;
 };
 
