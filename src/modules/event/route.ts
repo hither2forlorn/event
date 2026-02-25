@@ -22,7 +22,7 @@ const routes = [
   },
   {
     method: "get",
-    controller: Controller.get,
+    controller: Controller.getEventGuest,
     path: "event/:eventId/guest", // update this to have the geust in the event
     authorization: true,
     authCheckType: [role.user],
