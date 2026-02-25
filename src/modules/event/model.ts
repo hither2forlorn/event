@@ -5,7 +5,7 @@ import { event_member_schema } from "./schema";
 import repository from "./repository";
 
 import { EventColumn } from "./resource";
-import { user } from "@/config/db/schema";
+import { rsvp, user } from "@/config/db/schema";
 
 class Event {
   static async findAllAndCount(params: any) {
@@ -106,9 +106,12 @@ class Event {
   }
 
   static async getEventGuest(eventId: number) {
+    console.log("This is the event id of the event geust ", eventId);
     const event_guest = await db
-      .select()
-      .from(event_guest_schema)
+      .select(repository.selectEventGuest)
+      .from(event_guest_schema).leftJoin(
+        user, eq(event_guest_schema.userId, user.id)
+      ).leftJoin(rsvp, eq(rsvp.eventId, eventId))
       .where(eq(event_guest_schema.eventId, eventId));
     return event_guest;
   }
