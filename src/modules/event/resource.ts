@@ -4,8 +4,8 @@ export interface EventColumn {
   title: string | null;
   description: string | null;
   type: any;
-  startDate: Date;
-  endDate: Date;
+  startDate: any;
+  endDate: any;
   budget: number | null;
   theme: string | null;
   parentId: number | null;

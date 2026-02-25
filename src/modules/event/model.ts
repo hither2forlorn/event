@@ -30,10 +30,10 @@ class Event {
     };
   }
 
-  static async create(params: Partial<EventColumn>) {
+  static async create(params: EventColumn) {
     const result = await db
       .insert(event)
-      .values(params as any)
+      .values(params)
       .returning();
     return result[0];
   }
@@ -98,7 +98,7 @@ class Event {
 
   static async getEventMember(eventId: number) {
     const result = await db
-      .select(repository.selectQueryForUserRelatedToEvent)
+      .select(repository.SelectEventOwners)
       .from(event_member_schema)
       .where(eq(event_member_schema.eventId, eventId))
       .leftJoin(user, eq(user.id, event_member_schema.userId));
@@ -113,7 +113,7 @@ class Event {
     return event_guest;
   }
 
-  static async makeEventMember(eventId: number, eventMemberId: number) {
+  static async makeeEventOwner(eventId: number, eventMemberId: number) {
     const event_member_returning = await db
       .insert(event_member_schema)
       .values({
@@ -133,12 +133,17 @@ class Event {
   static async makeEventGuest(
     eventId: number,
     guestId: number,
+    invited_by: number
+    ,
+    familyId: number | null
   ) {
     const event_guest = await db
       .insert(event_guest_schema)
       .values({
+        invited_by: invited_by,
         joined_at: "",
         eventId: eventId,
+        familyId: familyId,
         userId: guestId,
       })
       .returning();
