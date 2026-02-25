@@ -121,7 +121,6 @@ const find = async (data: Partial<UserColumn>) => {
   }
 };
 
-
 const changePassword = async (input: any, id: number) => {
   try {
     const result = changePasswordValidationSchema.safeParse(input);

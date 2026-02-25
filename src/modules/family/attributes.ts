@@ -17,13 +17,15 @@ const attributes = {
 
 const family_member_tableName = "family_members";
 const family_member_attributes = {
-  id: serial("id").primaryKey(),
   familyId: integer("family_id")
     .notNull()
     .references(() => family.id),
   userId: integer("user_id")
     .notNull()
     .references(() => user.id),
+  dob: timestamp("dob").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
   relation: text("relation").notNull(),
   addedBy: integer("added_by")
     .notNull()

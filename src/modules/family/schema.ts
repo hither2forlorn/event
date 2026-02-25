@@ -1,4 +1,4 @@
-import { pgTable } from "drizzle-orm/pg-core";
+import { pgTable, primaryKey } from "drizzle-orm/pg-core";
 import {
   attributes,
   tableName,
@@ -10,6 +10,12 @@ const family = pgTable(tableName, attributes);
 const family_member_schema = pgTable(
   family_member_tableName,
   family_member_attributes,
+  (table) => [
+    primaryKey({
+      columns: [table.familyId, table.userId],
+      name: "family_member_pk",
+    }),
+  ],
 );
 
 export { family, family_member_schema };
