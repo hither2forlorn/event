@@ -11,7 +11,7 @@ import {
 import UserService from "@/modules/user/service";
 import RSVP from "../rsvp/service";
 import crypto from "crypto";
-import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
+import { throwErrorOnValidation, throwNotFoundError, throwUnauthorizedError } from "@/utils/error";
 import { UserColumn } from "../user/resource";
 
 const list = async (params: any) => {
@@ -27,14 +27,15 @@ const list = async (params: any) => {
   }
 };
 
-const getEventguest = async (eventid: number) => {
+const getEventguest = async (eventid: number, userId: number) => {
   try {
-    const event_information = find(eventid);
-    if (!event_information) {
-      console.log("There is not any information  ");
+    const isAllowed = await checkAuthorized(eventid, userId);
+    if (!isAllowed) {
+      return throwUnauthorizedError("User with the details cannot get the information of the guest ");
     }
     const event_guest = Model.getEventGuest(eventid);
     console.log(event_guest);
+    return event_guest;
   } catch (err) {
     throw err;
   }

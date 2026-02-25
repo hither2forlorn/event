@@ -115,11 +115,27 @@ const sendEventinvitaion = async (req: IAuthRequest) => {
     throw error;
   }
 };
+const getEventGuest = async (req: IAuthRequest) => {
+  try {
+    const { eventId } = req.params;
+    if (!eventId) {
+      throwErrorOnValidation(
+        "Event id was not found in the params"
+      )
+      const data = await Service.getEventguest(eventId);
+      return data;
+    }
+  }
+  catch (err) {
+    throw err;
+  }
 
+}
 export default {
   get,
   create,
   findOne,
+  getEventGuest,
   update,
   deleteModule,
   listMyEvents,
