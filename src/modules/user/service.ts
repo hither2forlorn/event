@@ -16,8 +16,7 @@ import Resource from "./resource";
 import Token from "@/utils/token";
 const list = async (params: any) => {
   try {
-    const data: any = await Model.findAllAndCount(params);
-    logger.debug("data ", data);
+    const data = await Model.findAllAndCount(params);
     return data;
   } catch (err: any) {
     throw err;

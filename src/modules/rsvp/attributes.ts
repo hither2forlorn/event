@@ -5,7 +5,7 @@ const attributes = {
   eventId: integer("event_id"),
   userId: integer("user_id"),
   familyId: integer("family_id"),
-  invited_by: integer("invited_by"),
+  invited_by: integer("invited_by").notNull(),
   category: text("category"), //  friend  , colleague , family  
   respondedAt: text("respondedAt"),
   updatedAt: text("updatedAt"),
@@ -13,4 +13,4 @@ const attributes = {
   status: text("status"), // accepted, declined, pending
 };
 
-export { tableName, attributes };
+export { tableName, attributes }; 

@@ -37,10 +37,13 @@ const acceptRSVP = async (rsvpId: number) => {
     if (rsvp.eventId && rsvp.userId) {
       await EventService.makeEventGuest(
         rsvp.eventId,
-        rsvp.userId
+        rsvp.userId,
+        rsvp.invited_by,
+        rsvp.familyId
       );
     }
-
+    // make the service function that will take the user id when there is the family entity checklisted then the user will be able to make the event Guest entry from there 
+    // this will make the user not involving one self to the event possible 
     logger.info(`RSVP with id ${rsvpId} accepted and event guest created.`);
     return rsvp;
   } catch (err: any) {

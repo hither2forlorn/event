@@ -2,16 +2,26 @@ import db from "@/config/db";
 import users from "./schema";
 import type { UserColumn } from "./resource";
 import Repository from "./repository";
-import { sql, not, eq, or } from "drizzle-orm";
+import { sql, not, eq, or, and } from "drizzle-orm";
+import { user } from "@/config/db/schema";
 
 class User {
   static async findAllAndCount(params: any) {
-    const { page, limit } = params;
+    const { page, limit, email, phone } = params;
+    let conditions = []
+    if (email) {
+      conditions.push(eq(user.email, email))
+    }
+    if (phone) {
+      conditions.push(eq(user.phone, phone));
+    }
     const offset = (page - 1) * limit;
-    const result = await db
+    const result = conditions ? await db.select(Repository.selectQuery).from(user).where(or(...conditions)).limit(limit).offset(offset) : await db
       .select(Repository.selectQuery as any)
       .from(users)
-      .where(not(eq(users.id, 1)))
+      .where(
+        not(eq(users.id, 1))
+      )
       .limit(limit)
       .offset(offset);
 
