@@ -7,12 +7,14 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 const tableName = "user";
+
 const attributes = {
   id: serial("id").primaryKey(),
   username: text("username"),
   email: text("email").notNull().unique(),
   password: text("password"),
   phone: text("phone"),
+  userFamilyId: integer("user_family_id").references(() => family_member_schema.id),
   accountStatus: boolean("accountStatus"),
   location: text("location"),
   bio: text("bio"),

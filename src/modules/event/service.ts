@@ -34,7 +34,6 @@ const getEventguest = async (eventid: number, userId: number) => {
       return throwUnauthorizedError("User with the details cannot get the information of the guest ");
     }
     const event_guest = Model.getEventGuest(eventid);
-    console.log(event_guest);
     return event_guest;
   } catch (err) {
     throw err;
@@ -45,8 +44,7 @@ const getEventVendor = async (eventid: number) => {
   try {
     const event_information = find(eventid);
     if (!event_information) {
-      console.log("There is not any information  ");
-      throwNotFoundError("Event with the event id was not found in the db ");
+      return throwNotFoundError("Event with the event id was not found in the db ");
     }
     const eventVendor = await Model.getEventVendor(eventid);
     return eventVendor;
@@ -67,11 +65,12 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
     if (!isValid) {
       return throwErrorOnValidation("Unauthorized: You are not the organizer of this event");
     }
-    const { fullName, email, phone, eventId } = input;
+
+    const { fullName, email, phone, eventId, isFamily } = input;
     let guestUser: Partial<UserColumn> | undefined;
-    if (email) { // Find the user with the email 
+    if (email) {
       try {
-        guestUser = await UserService.find({ email });
+        guestUser = await UserService.find({ email, phone });
       } catch (err) {
         throw err;
       }
@@ -89,28 +88,22 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
     }
     if (!guestUser) throw new Error("Error while making the user ")
 
-    // 2. Make Event Guest
-    const eventGuestReturning = await Model.makeEventGuest(
-      eventId,
-      guestUser.id!,
-      "GUEST",
-      userId,
-    );
-    const eventGuest = eventGuestReturning[0];
-
-    if (!eventGuest) {
-      throw new Error("Failed to create event guest entry");
-    }
-
-    // 3. Create RSVP entry
-    await RSVP.create({
-      event_guest_id: eventGuest.id,
-      status: "pending",
+    // 2. Create RSVP (Invitation) entry
+    const invitation = await RSVP.create({
+      eventId: eventId,
+      userId: guestUser.id!,
+      familyId: input.familyId || 1,
+      invited_by: userId,
+      status: "Pending",
     });
+
+    if (!invitation) {
+      throw new Error("Failed to create invitation");
+    }
 
     return {
       ...guestUser,
-      eventGuestId: eventGuest.id,
+      invitationId: invitation.id,
       role: "GUEST",
     };
   } catch (err: any) {
@@ -169,7 +162,7 @@ const checkAuthorized = async (id: number, userId?: number) => {
 
   const event = await find(id);
   if (!event) return throwNotFoundError("Event not found");
-
+  //if the event organizer is not the person also check the organizer family and then also 
   if (event.organizer !== userId) {
     throw new Error("Unauthorized: You are not the organizer of this event");
   }
@@ -256,6 +249,16 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
   }
 };
 
+const makeEventGuest = async (eventId: number, guestId: number) => {
+  try {
+    const data = await Model.makeEventGuest(eventId, guestId);
+    return data;
+  } catch (error: any) {
+    logger.error("Error in making event guest:", error);
+    throw error;
+  }
+};
+
 export default {
   list,
   create,
@@ -264,6 +267,7 @@ export default {
   remove,
   listMyEvents,
   inviteGuest,
+  makeEventGuest,
   getEventguest,
   getUserRelatedToEvent,
   getEventVendor,

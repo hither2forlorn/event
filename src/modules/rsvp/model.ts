@@ -39,8 +39,8 @@ export default class Rsvp {
       .where(eq(rsvp.id, id))
       .returning();
     return result[0];
-}
-static async find(params: any) {
+  }
+  static async find(params: any) {
     const { id, eventId, userId } = params;
     const conditions = [];
     if (id !== undefined) {
@@ -56,12 +56,12 @@ static async find(params: any) {
     if (conditions.length === 0) return null;
 
     const result = await db
-      .select(rsvpSchema)
+      .select()
       .from(rsvp)
       .where(or(...conditions));
     return result[0] || null;
   }
-  
-}       
+}
+
 
 

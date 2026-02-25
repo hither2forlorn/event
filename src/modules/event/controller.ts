@@ -1,5 +1,6 @@
 import { type IAuthRequest } from "@/routes/index";
 import Service from "./service";
+import logger from "@/config/logger";
 import { throwErrorOnValidation } from "@/utils/error";
 
 const get = async (req: IAuthRequest) => {
@@ -90,6 +91,7 @@ const getUserRelatedToEvent = async (req: IAuthRequest) => {
     const { eventId } = req.params;
     const userId = req.user?.id;
 
+    logger.debug("This is the getEvent guest in the controller")
     if (!eventId || isNaN(Number(eventId))) {
       throwErrorOnValidation("Invalid Event ID");
     }
@@ -115,23 +117,24 @@ const sendEventinvitaion = async (req: IAuthRequest) => {
     throw error;
   }
 };
+
 const getEventGuest = async (req: IAuthRequest) => {
   try {
-    const { eventId } = req.params;
-    const { id } = req.user;
-    if (!eventId) {
+    const { id } = req.params;
+    const userId = req.user.id
+    if (!id) {
       throwErrorOnValidation(
         "Event id was not found in the params"
       )
-      const data = await Service.getEventguest(eventId, id);
-      return data;
     }
+    const data = await Service.getEventguest(Number(id), userId);
+    return data;
   }
   catch (err) {
     throw err;
   }
-
 }
+
 export default {
   get,
   create,

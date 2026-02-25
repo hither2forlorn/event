@@ -105,11 +105,11 @@ class Event {
     return result;
   }
 
-  static async getEventGuest(eventid: number) {
+  static async getEventGuest(eventId: number) {
     const event_guest = await db
-      .select(repository.selectEventGuest)
+      .select()
       .from(event_guest_schema)
-      .where(eq(event_guest_schema.id, eventid));
+      .where(eq(event_guest_schema.eventId, eventId));
     return event_guest;
   }
 
@@ -125,15 +125,14 @@ class Event {
   }
   static async getEventVendor(eventId: number) {
     const event_vendor = await db
-      .select(repository.selectEventGuest)
-      .from(eq(event_vendor_schema.event_id, eventId));
+      .select()
+      .from(event_vendor_schema)
+      .where(eq(event_vendor_schema.event_id, eventId));
     return event_vendor;
   }
   static async makeEventGuest(
     eventId: number,
     guestId: number,
-    role: string,
-    userId: number,
   ) {
     const event_guest = await db
       .insert(event_guest_schema)
@@ -141,8 +140,6 @@ class Event {
         joined_at: "",
         eventId: eventId,
         userId: guestId,
-        role: role,
-        invited_by: userId,
       })
       .returning();
     return event_guest;

@@ -1,7 +1,5 @@
 import { integer, pgEnum, serial, text, timestamp } from "drizzle-orm/pg-core";
-// table name
 const tableName = "event";
-//Schema
 import user from "@/modules/user/schema";
 import event from "./schema";
 
@@ -27,7 +25,7 @@ const eventAttribute = {
   imageUrl: text("imageUrl"),
   endDate: timestamp("endDate").notNull(),
   startTime: text("startTime"),
-  endTIme: text("endTime"),
+  endTime: text("endTime"),
   location: text("location"),
   organizer: integer("organizer").references(() => user.id, {
     onDelete: "cascade",
@@ -57,13 +55,14 @@ const event_member_attribute = {
 
 const event_guest_attribute = {
   id: serial("id").primaryKey(),
-  category: text("category"),
   userId: integer("user_id")
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
+  notes: text("notes"),
   eventId: integer("event_id")
     .notNull()
     .references(() => event.id),
+  familyId: integer("family_id"),
   role: text("role"),
   invited_by: integer("invited_by")
     .references(() => user.id)

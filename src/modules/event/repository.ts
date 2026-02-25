@@ -1,5 +1,6 @@
-import event, { event_member_schema } from "./schema";
-import user from "@/modules/user/schema";
+import event, { event_guest_schema, event_member_schema } from "./schema";
+import RSVP from "@/modules/rsvp/repository"
+import User from "@/modules/user/repository"
 
 const selectQuery = {
   id: event.id,
@@ -17,19 +18,25 @@ const selectQuery = {
   updatedAt: event.updatedAt,
 };
 
-const selectQueryForUserRelatedToEvent = {
+const SelectEventOwners = {
   userId: event_member_schema.userId,
-  role: event_member_schema.role,
-  username: user.username,
-  userEmail: user.email,
-  userPhone: user.phone,
+  username: User.selectQuery.username,
+  userEmail: User.selectQuery.email,
+  userPhone: User.selectQuery.phone,
 };
+
 const selectEventGuest = {
-  evnetId: event.id,
+  user: User,
+  notes: event_guest_schema.notes,
+  rsvp_status: RSVP.select.status,
+  status: RSVP.select.status,
+  familyId: RSVP.select.familyId,
+  category: RSVP.select.category,
+  invited_by: RSVP.select.invited_by
 };
 
 export default {
   selectQuery,
   selectEventGuest,
-  selectQueryForUserRelatedToEvent,
+  SelectEventOwners,
 };

@@ -1,5 +1,6 @@
 import { role } from "@/constant";
 import Controller from "./controller";
+
 const routes = [
   {
     method: "get",
@@ -22,14 +23,21 @@ const routes = [
   },
   {
     method: "get",
-    controller: Controller.getEventGuest,
-    path: "event/:eventId/guest", // update this to have the geust in the event
+    controller: Controller.get, // will update this to have the only the famliy get request 
+    path: "event/my-family",
     authorization: true,
     authCheckType: [role.user],
   },
   {
     method: "get",
-    controller: Controller.getUserRelatedToEvent,
+    controller: Controller.getEventGuest, // get the guest of the event in the id
+    path: "event/guest/:id",
+    authorization: true,
+    authCheckType: [role.user],
+  },
+  {
+    method: "get",
+    controller: Controller.getUserRelatedToEvent, // get the SelectEventOwners[]
     path: "event/:eventId/users",
     authorization: true,
     authCheckType: [role.user],
@@ -41,14 +49,15 @@ const routes = [
     authorization: true,
     authCheckType: [role.user],
   },
-
   {
     method: "post",
-    controller: Controller.sendEventinvitaion,
-    path: "event/:id/invite",
+    controller: Controller.sendEventinvitaion, // send the invitation to the guest in the evnt 
+    path: "event/:eventId/invite",
     authorization: true,
     authCheckType: [role.user],
   },
+
+  // ─── Bare :id routes (always last) ───────────────────────
   {
     method: "get",
     controller: Controller.findOne,

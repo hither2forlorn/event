@@ -1,13 +1,16 @@
 import { serial, text, integer } from "drizzle-orm/pg-core";
-const tableName = "rsvp";
+const tableName = "invitation";
 const attributes = {
   id: serial("id"),
-  event_guest_id: integer("event_guest_id"),
-  responded_by: integer("responded_by"),
-  status: text("status"),
-  notes: text("notes"),
+  eventId: integer("event_id"),
+  userId: integer("user_id"),
+  familyId: integer("family_id"),
+  invited_by: integer("invited_by"),
+  category: text("category"), //  friend  , colleague , family  
   respondedAt: text("respondedAt"),
   updatedAt: text("updatedAt"),
+  responded_by: integer("responded_by"),
+  status: text("status"), // accepted, declined, pending
 };
 
 export { tableName, attributes };

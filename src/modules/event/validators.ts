@@ -31,6 +31,7 @@ const EventInvitation = z.object({
   email: z.string().email("Invalid email").optional(),
   phone: z.string().optional(),
   eventId: z.number().int(),
+  isFamily: z.boolean().default(false)
 });
 
 type EventInvitationType = z.infer<typeof EventInvitation>;
