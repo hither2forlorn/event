@@ -5,7 +5,7 @@ import { event_member_schema } from "./schema";
 import repository from "./repository";
 
 import { EventColumn } from "./resource";
-import { user } from "@/config/db/schema";
+import { rsvp, user } from "@/config/db/schema";
 
 class Event {
   static async findAllAndCount(params: any) {
@@ -30,10 +30,10 @@ class Event {
     };
   }
 
-  static async create(params: Partial<EventColumn>) {
+  static async create(params: EventColumn) {
     const result = await db
       .insert(event)
-      .values(params as any)
+      .values(params)
       .returning();
     return result[0];
   }
@@ -98,7 +98,7 @@ class Event {
 
   static async getEventMember(eventId: number) {
     const result = await db
-      .select(repository.selectQueryForUserRelatedToEvent)
+      .select(repository.SelectEventOwners)
       .from(event_member_schema)
       .where(eq(event_member_schema.eventId, eventId))
       .leftJoin(user, eq(user.id, event_member_schema.userId));
@@ -106,14 +106,17 @@ class Event {
   }
 
   static async getEventGuest(eventId: number) {
+    console.log("This is the event id of the event geust ", eventId);
     const event_guest = await db
-      .select()
-      .from(event_guest_schema)
+      .select(repository.selectEventGuest)
+      .from(event_guest_schema).leftJoin(
+        user, eq(event_guest_schema.userId, user.id)
+      ).leftJoin(rsvp, eq(rsvp.eventId, eventId))
       .where(eq(event_guest_schema.eventId, eventId));
     return event_guest;
   }
 
-  static async makeEventMember(eventId: number, eventMemberId: number) {
+  static async makeeEventOwner(eventId: number, eventMemberId: number) {
     const event_member_returning = await db
       .insert(event_member_schema)
       .values({
@@ -133,12 +136,17 @@ class Event {
   static async makeEventGuest(
     eventId: number,
     guestId: number,
+    invited_by: number
+    ,
+    familyId: number | null
   ) {
     const event_guest = await db
       .insert(event_guest_schema)
       .values({
+        invited_by: invited_by,
         joined_at: "",
         eventId: eventId,
+        familyId: familyId,
         userId: guestId,
       })
       .returning();

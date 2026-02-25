@@ -14,7 +14,7 @@ const attributes = {
   email: text("email").notNull().unique(),
   password: text("password"),
   phone: text("phone"),
-  userFamilyId: integer("user_family_id").references(() => family_member_schema.id),
+  userFamilyId: integer("user_family_id"),
   accountStatus: boolean("accountStatus"),
   location: text("location"),
   bio: text("bio"),

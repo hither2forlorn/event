@@ -26,7 +26,7 @@ const SelectEventOwners = {
 };
 
 const selectEventGuest = {
-  user: User,
+  user: User.selectQuery,
   notes: event_guest_schema.notes,
   rsvp_status: RSVP.select.status,
   status: RSVP.select.status,

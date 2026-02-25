@@ -1,7 +1,6 @@
 import { integer, pgEnum, serial, text, timestamp } from "drizzle-orm/pg-core";
 const tableName = "event";
 import user from "@/modules/user/schema";
-import event from "./schema";
 
 //status
 const eventType = pgEnum("event_type", ["wedding"]); // might have multiple type of event so not including this for now
@@ -42,53 +41,10 @@ const eventAttribute = {
   updatedAt: timestamp("updatedAt").defaultNow(),
 };
 
-const event_member_attribute = {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => user.id),
-  eventId: integer("event_id")
-    .notNull()
-    .references(() => event.id),
-  role: text("role"),
-};
-
-const event_guest_attribute = {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  notes: text("notes"),
-  eventId: integer("event_id")
-    .notNull()
-    .references(() => event.id),
-  familyId: integer("family_id"),
-  role: text("role"),
-  invited_by: integer("invited_by")
-    .references(() => user.id)
-    .notNull(),
-  joined_at: text("joined_at"),
-};
-
-const event_vendor_attribute = {
-  id: serial("id").primaryKey(),
-  event_id: integer("event_id")
-    .notNull()
-    .references(() => event.id),
-  vendor_buisness_id: text("vendor_buisness_id").notNull(),
-  acquired_by: integer("acquired_by"),
-  status: text("status"), // Accepted , Enquiring
-  notes: text("notes"),
-  created_at: timestamp().defaultNow(),
-};
-
 export {
   tableName,
   eventAttribute,
   eventType,
-  event_vendor_attribute,
-  event_member_attribute,
-  event_guest_attribute,
   eventMemberTableName,
   eventGuestTableName,
   statusEnum,

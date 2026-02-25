@@ -1,6 +1,7 @@
 import Model from "./model";
 import Resource from "./resource";
 import logger from "@/config/logger";
+import FamilyModel from "@/modules/family/model"
 import {
   EventInvitation,
   EventUpdateValidationSchema,
@@ -70,7 +71,7 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
     let guestUser: Partial<UserColumn> | undefined;
     if (email) {
       try {
-        guestUser = await UserService.find({ email, phone });
+        guestUser = (await UserService.list({ email, phone })).items[0] // get the user with the email and the phone
       } catch (err) {
         throw err;
       }
@@ -87,12 +88,21 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
       });
     }
     if (!guestUser) throw new Error("Error while making the user ")
+    if (isFamily && !guestUser.familyId) {
+      //Making the family table and then upadaing the guest family id 
+      const userFamily = await FamilyModel.create({
+        createdBy: guestUser.id!,
+        familyName: `${guestUser}'s Family`,
+
+      })
+      guestUser.familyId = userFamily?.id;
+    }
 
     // 2. Create RSVP (Invitation) entry
     const invitation = await RSVP.create({
       eventId: eventId,
       userId: guestUser.id!,
-      familyId: input.familyId || 1,
+      familyId: isFamily ? guestUser.familyId : undefined,
       invited_by: userId,
       status: "Pending",
     });
@@ -133,7 +143,7 @@ const create = async (input: any, userId: number) => {
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
     }
-    const eventMember = await Model.makeEventMember(data.id, userId);
+    const eventMember = await Model.makeeEventOwner(data.id, userId);
     if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
@@ -249,9 +259,9 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
   }
 };
 
-const makeEventGuest = async (eventId: number, guestId: number) => {
+const makeEventGuest = async (eventId: number, guestId: number, inviterId: number, familyId: number | null) => {
   try {
-    const data = await Model.makeEventGuest(eventId, guestId);
+    const data = await Model.makeEventGuest(eventId, guestId, inviterId, familyId);
     return data;
   } catch (error: any) {
     logger.error("Error in making event guest:", error);

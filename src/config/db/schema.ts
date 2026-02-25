@@ -16,11 +16,11 @@ export {
   statusEnum,
   buisness,
   category,
-  rsvp,
   event,
   user,
   event_guest_schema,
   event_member_schema,
   event_vendor_schema,
+  rsvp,
   family,
 };
