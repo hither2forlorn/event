@@ -31,7 +31,7 @@ const update = async (req: IAuthRequest) => {
     if (!params.id || isNaN(Number(params.id))) {
       throwErrorOnValidation("Invalid ID");
     }
-    const data = await Service.update(Number(params.id), body);
+    const data = await Service.update(Number(params.id), body, req.user.id);
     return data;
   } catch (err: any) {
     throw err;
@@ -44,7 +44,7 @@ const deleteFamily = async (req: IAuthRequest) => {
     if (!params.id || isNaN(Number(params.id))) {
       throwErrorOnValidation("Invalid ID");
     }
-    const data = await Service.remove(Number(params.id));
+    const data = await Service.remove(Number(params.id), req.user.id);
     return data;
   } catch (err: any) {
     throw err;

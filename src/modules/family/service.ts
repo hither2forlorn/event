@@ -6,12 +6,41 @@ import {
 } from "./validators";
 import Model from "./model";
 import Resource from "./resource";
-import { throwNotFoundError } from "@/utils/error";
+import { throwForbiddenError, throwNotFoundError } from "@/utils/error";
 import logger from "@/config/logger";
 import userModel from "@/modules/user/model";
 
+const checkAuthorization = async (
+  familyId: number,
+  userId: number,
+  onlyCreator: boolean = false,
+): Promise<boolean> => {
+  const family = await Model.find(familyId);
+  if (!family) {
+    return false;
+  }
+
+  if (onlyCreator) {
+    return family.createdBy === userId;
+  }
+
+  const isMemberOfFamily = await Model.findIfMemberOfFamily(familyId, userId);
+
+  if (!isMemberOfFamily) {
+    return false;
+  }
+
+  return true;
+};
+
 const create = async (input: CreateFamilyValidation["body"], user: number) => {
   try {
+    const existedFamily = await Model.findIfUserHasFamily(user);
+
+    if (existedFamily) {
+      throw new Error("User already has a family");
+    }
+
     const { familyName } = input;
 
     const result = await Model.create({ familyName, createdBy: user });
@@ -19,6 +48,18 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
     if (!result) {
       throw new Error("Failed to create family");
     }
+
+    const creator = await userModel.find({ id: user });
+    if (!creator) {
+      throw new Error("Creator user not found");
+    }
+
+    await Model.addMemberIfUser(result.id, user, user, {
+      relation: "self",
+      dob: new Date(),
+      name: creator.username || creator.email,
+      email: creator.email,
+    });
 
     return Resource.toJson(result);
   } catch (err: any) {
@@ -41,14 +82,24 @@ const get = async (id: number) => {
   }
 };
 
-const update = async (id: number, input: UpdateFamilyValidation["body"]) => {
+const update = async (
+  familyId: number,
+  input: UpdateFamilyValidation["body"],
+  user: number,
+) => {
   try {
-    const existing = await Model.find(id);
+    const existing = await Model.find(familyId);
     if (!existing) {
       return throwNotFoundError("Family");
     }
 
-    const result = await Model.update(input, id);
+    const isAuthorized = await checkAuthorization(familyId, user, true);
+
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can update family");
+    }
+
+    const result = await Model.update(input, familyId);
     if (!result) {
       throw new Error("Failed to update family");
     }
@@ -60,14 +111,20 @@ const update = async (id: number, input: UpdateFamilyValidation["body"]) => {
   }
 };
 
-const remove = async (id: number) => {
+const remove = async (id: number, user: number) => {
   try {
     const existing = await Model.find(id);
     if (!existing) {
       return throwNotFoundError("Family");
     }
 
-    const result = await Model.destroy(id);
+    const isAuthorized = await checkAuthorization(id, user, true);
+
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can delete family");
+    }
+
+    const result = await Model.destroyWithMembers(id);
     return result;
   } catch (err: any) {
     logger.error("Error in Family deletion:", err);

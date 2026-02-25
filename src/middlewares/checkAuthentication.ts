@@ -27,21 +27,17 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
     const decoded = await Token.verify(tokenWithoutBearer);
 
     if (!decoded) {
-      console.log("This is the decoded thing in the user ");
       throw new Error("UNAUTHORIZED");
     } else {
       if (!Array.isArray(allowTo) || !allowTo?.length) {
-        throw new Error("Unauthorized");
+        let user = decoded;
+        request.user = user;
+        return;
       } else {
-        if (allowTo.includes("public")) {
-          // Public route but with token
-          let user = decoded;
-          request.user = user;
-          return;
-        }
         await checkSpecificRole(decoded, allowTo); // For the authorization
         try {
           let user = decoded;
+          console.log("Authenticated user:", user);
           request.user = user;
         } catch (err: any) {
           throw new Error(err.message || "Unauthorized");
