@@ -1,0 +1,195 @@
+import Model from "./model";
+import Resource from "./resource";
+import logger from "@/config/logger";
+import {
+  EventUpdateValidationSchema,
+  EventValidationSchema,
+  type updateEventType,
+} from "./validators";
+
+const list = async (params: any) => {
+  try {
+    const data = await Model.findAllAndCount(params);
+    return {
+      ...data,
+      items: Resource.collection(data.items as any),
+    };
+  } catch (err: any) {
+    logger.error("Error in Category listing:", err);
+    throw err;
+  }
+};
+
+const getEventguest = async (eventid: number) => {
+  try {
+    const event_information = find(eventid);
+    if (!event_information) {
+      console.log("There is not any information  ");
+    }
+    const event_guest = Model.getEventGuest(eventid);
+    console.log(event_guest);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getEventVendor = async (eventid: number) => {
+  try {
+     const event_information = find(eventid);
+    if (!event_information) {
+      console.log("There is not any information  ");
+    }
+    const eventVendor = await Model.getEventVendor(eventid);
+    return eventVendor;
+  } catch (err) {
+    throw err ; 
+  }
+};
+
+const create = async (input: any, userId: number) => {
+  try {
+    // eventValidation.parse(input);
+    const result = EventValidationSchema.safeParse(input);
+    if (!result.success) {
+      throw new Error(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
+
+    const eventData = {
+      ...input,
+      startDate: new Date(input.startDate),
+      endDate: new Date(input.endDate),
+    };
+
+    const data = await Model.create(eventData);
+    if (!data || !data.organizer) {
+      throw new Error("Event creation failed");
+    }
+    const eventMember = await Model.makeEventMember(data.id, data.organizer);
+    if (data == undefined || eventMember == undefined) {
+      throw new Error("Something went wrong ");
+    }
+    return { ...Resource.toJson(data), eventMembershipId: eventMember.id };
+  } catch (err: any) {
+    logger.error("Error in Event creation:", err);
+    throw err;
+  }
+};
+
+const find = async (id: number) => {
+  try {
+    const data = await Model.find({ id });
+    if (!data) throw new Error("Event not found");
+    return Resource.toJson(data);
+  } catch (err: any) {
+    logger.error("Error in event finding:", err);
+    throw err;
+  }
+};
+
+const checkAuthorized = async (id: number, userId?: number) => {
+  if (!userId) {
+    throw new Error("Unauthorized: User not authenticated");
+  }
+
+  const event = await find(id);
+  if (!event) throw new Error("Event not found");
+
+  if (event.organizer !== userId) {
+    throw new Error("Unauthorized: You are not the organizer of this event");
+  }
+
+  return event;
+};
+
+const update = async (id: number, input: updateEventType, userId?: number) => {
+  try {
+    await checkAuthorized(id, userId);
+    const result = EventUpdateValidationSchema.safeParse(input);
+
+    if (!result.success) {
+      throw new Error(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+    }
+
+    const eventData: any = {
+      ...input,
+      ...(input.startDate && { startDate: new Date(input.startDate) }),
+      ...(input.endDate && { endDate: new Date(input.endDate) }),
+    };
+
+    const data = await Model.update(eventData, id);
+    if (!data) throw new Error("Event not found or update failed");
+    return Resource.toJson(data as any);
+  } catch (err: any) {
+    logger.error("Error in event update:", err);
+    throw err;
+  }
+};
+
+const remove = async (id: number, userId?: number) => {
+  try {
+    await checkAuthorized(id, userId);
+    const data = await Model.destroy(id);
+
+    if (!data || data.length === 0) {
+      throw new Error("Event not found or already deleted");
+    }
+
+    return {
+      success: true,
+      message: "Event deleted successfully",
+      deletedEvent: Resource.toJson(data[0] as any),
+    };
+  } catch (err: any) {
+    logger.error("Error in event deletion:", err);
+    throw err;
+  }
+};
+
+const listMyEvents = async (userId: number, params: any) => {
+  try {
+    const allParams = { ...params, organizer: userId };
+    const data = await Model.findByUser(userId, allParams);
+    return {
+      ...data,
+      items: data.items.map((item: any) => ({
+        ...Resource.toJson(item.event as any),
+        role: item.user_event?.role,
+      })),
+    };
+  } catch (err: any) {
+    logger.error("Error in Event listing by user:", err);
+    throw err;
+  }
+};
+
+const getUserRelatedToEvent = async (eventId: number, userId: number) => {
+  try {
+    await checkAuthorized(eventId, userId);
+
+    const data = await Model.getEventMember(eventId);
+    return {
+      eventId,
+      users: data,
+      totalUsers: data.length,
+    };
+  } catch (error: any) {
+    logger.error("Error in getting users related to event:", error);
+    throw error;
+  }
+};
+
+export default {
+  list,
+  create,
+  find,
+  update,
+  remove,
+  listMyEvents,
+  getEventguest,
+  getUserRelatedToEvent,
+  getEventVendor,
+};
