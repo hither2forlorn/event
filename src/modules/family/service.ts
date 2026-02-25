@@ -54,11 +54,11 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
       throw new Error("Creator user not found");
     }
 
-    await Model.addMemberIfUser(result.id, user, user, {
-      relation: "self",
-      dob: new Date(),
+    await Model.addMemberIfUser(result.id, user, {
       name: creator.username || creator.email,
       email: creator.email,
+      relation: null,
+      foodPreference: null,
     });
 
     return Resource.toJson(result);
@@ -140,15 +140,28 @@ const addMember = async (
   try {
     await get(familyId);
 
+    const isAuthorized = await checkAuthorization(familyId, addedBy);
+    if (!isAuthorized) {
+      throwForbiddenError("Only family members can add members");
+    }
+
     const user = await userModel.find({ email: input.email });
 
     let userId;
 
     if (user) {
+      const existedFamily = await Model.findIfUserHasFamily(user.id);
+      if (existedFamily && existedFamily.familyId !== familyId) {
+        throw new Error("User already belongs to another family");
+      }
+
       userId = user.id;
-      input.name = user.username ? user.username : input.name;
+      if (!input.name && user.username) {
+        input.name = user.username;
+      }
     } else {
       const newUser = await userModel.create({
+        username: input.name || null,
         email: input.email,
       } as any);
       if (!newUser) {
@@ -157,12 +170,7 @@ const addMember = async (
       userId = newUser.id;
     }
 
-    const result = await Model.addMemberIfUser(
-      familyId,
-      addedBy,
-      userId,
-      input,
-    );
+    const result = await Model.addMemberIfUser(familyId, userId, input);
 
     if (!result) {
       throw new Error("Failed to add member to family");
@@ -178,7 +186,7 @@ const listMembers = async (familyId: number) => {
   try {
     await get(familyId);
     const members = await Model.getMembers(familyId);
-    return Resource.collectionMembers(members as any);
+    return Resource.collectionMembers(members);
   } catch (error) {
     throw error;
   }
@@ -193,7 +201,7 @@ const getMemberDetails = async (familyId: number, memberId: number) => {
       return throwNotFoundError("Family member");
     }
 
-    return Resource.toJsonMember(member as any);
+    return Resource.toJsonMember(member);
   } catch (error) {
     throw error;
   }
@@ -202,10 +210,16 @@ const getMemberDetails = async (familyId: number, memberId: number) => {
 const updateMember = async (
   familyId: number,
   memberId: number,
+  updatedBy: number,
   input: UpdateMemberValidation["body"],
 ) => {
   try {
     await get(familyId);
+
+    const isAuthorized = await checkAuthorization(familyId, updatedBy, true);
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can update members");
+    }
 
     const existingMember = await Model.getMember(familyId, memberId);
     if (!existingMember) {
@@ -217,15 +231,24 @@ const updateMember = async (
       throw new Error("Failed to update family member");
     }
 
-    return Resource.toJsonMember(result as any);
+    return Resource.toJsonMember(result);
   } catch (error) {
     throw error;
   }
 };
 
-const removeMember = async (familyId: number, memberId: number) => {
+const removeMember = async (
+  familyId: number,
+  memberId: number,
+  removedBy: number,
+) => {
   try {
     await get(familyId);
+
+    const isAuthorized = await checkAuthorization(familyId, removedBy, true);
+    if (!isAuthorized) {
+      throwForbiddenError("Only family creator can remove members");
+    }
 
     const existingMember = await Model.getMember(familyId, memberId);
     if (!existingMember) {

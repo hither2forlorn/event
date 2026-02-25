@@ -1,4 +1,11 @@
-import { text, json, timestamp, serial, boolean } from "drizzle-orm/pg-core";
+import {
+  text,
+  json,
+  timestamp,
+  serial,
+  boolean,
+  integer,
+} from "drizzle-orm/pg-core";
 const tableName = "user";
 const attributes = {
   id: serial("id").primaryKey(),
@@ -14,6 +21,9 @@ const attributes = {
   city: text("city"),
   address: text("address"),
   zip: text("zip"),
+  familyId: integer("family_id"),
+  relation: text("relation"),
+  foodPreference: text("food_preference"),
   coverPhoto: text("coverPhoto"),
   info: json("info"),
   createdAt: timestamp("createdAt").defaultNow(),

@@ -45,10 +45,17 @@ const addMemberValidation = z.object({
     id: z.coerce.number().int().positive("Family ID must be a positive number"),
   }),
   body: z.object({
-    relation: z.string().min(3, "Relation must be at least 3 characters long"),
-    dob: z.coerce.date(),
-    name: z.string().min(3, "Name must be at least 3 characters long"),
     email: z.string().email("Invalid email address"),
+    name: z
+      .string()
+      .min(2, "Name must be at least 2 characters long")
+      .optional(),
+    relation: z
+      .string()
+      .min(2, "Relation must be at least 2 characters long")
+      .nullable()
+      .optional(),
+    foodPreference: z.string().min(2).nullable().optional(),
   }),
 });
 
@@ -64,14 +71,14 @@ const updateMemberValidation = z.object({
     .object({
       relation: z
         .string()
-        .min(3, "Relation must be at least 3 characters long")
+        .min(2, "Relation must be at least 2 characters long")
+        .nullable()
         .optional(),
-      dob: z.coerce.date().optional(),
       name: z
         .string()
-        .min(3, "Name must be at least 3 characters long")
+        .min(2, "Name must be at least 2 characters long")
         .optional(),
-      email: z.string().email("Invalid email address").optional(),
+      foodPreference: z.string().min(2).nullable().optional(),
     })
     .refine((body) => Object.keys(body).length > 0, {
       message: "At least one field is required to update member",
