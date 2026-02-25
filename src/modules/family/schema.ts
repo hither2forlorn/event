@@ -13,3 +13,4 @@ const family_member_schema = pgTable(
 );
 
 export { family, family_member_schema };
+export default family; 
