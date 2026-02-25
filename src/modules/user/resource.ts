@@ -9,6 +9,9 @@ export interface UserColumn {
   address: string | null;
   coverPhoto: string | null;
   photo: string | null;
+  familyId: number | null;
+  relation: string | null;
+  foodPreference: string | null;
   country: string | null;
   bio: string | null;
   location: string | null;
@@ -31,6 +34,9 @@ class Resource {
       city: user.city,
       address: user.address,
       zip: user.zip,
+      familyId: user.familyId,
+      relation: user.relation,
+      foodPreference: user.foodPreference,
       coverPhoto: user.coverPhoto,
       info: user.info,
       accountStatus: user.accountStatus,

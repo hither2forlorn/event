@@ -95,7 +95,12 @@ const updateMember = async (req: IAuthRequest) => {
     const familyId = Number(req.params.id);
     const memberId = Number(req.params.memberId);
 
-    const data = await Service.updateMember(familyId, memberId, req.body);
+    const data = await Service.updateMember(
+      familyId,
+      memberId,
+      req.user.id,
+      req.body,
+    );
 
     return data;
   } catch (error) {
@@ -108,7 +113,7 @@ const deleteMember = async (req: IAuthRequest) => {
     const familyId = Number(req.params.id);
     const memberId = Number(req.params.memberId);
 
-    const data = await Service.removeMember(familyId, memberId);
+    const data = await Service.removeMember(familyId, memberId, req.user.id);
 
     return data;
   } catch (error) {

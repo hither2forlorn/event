@@ -7,15 +7,15 @@ export interface FamilyColumn {
 }
 
 export interface FamilyMemberColumn {
-  familyId: number;
-  userId: number;
-  relation: string;
-  dob: Date | null;
-  name: string;
+  familyId: number | null;
+  id?: number;
+  relation: string | null;
+  username?: string | null;
   email: string;
-  addedBy: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  foodPreference?: string | null;
+  dob?: Date | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }
 
 export type FamilyInsert = Omit<FamilyColumn, "id" | "createdAt" | "updatedAt">;
@@ -39,13 +39,12 @@ class Resource {
   ): Partial<FamilyMemberColumn> | null {
     if (!member) return null;
     const data: Partial<FamilyMemberColumn> = {
-      familyId: member.familyId,
-      userId: member.userId,
+      familyId: member.familyId || null,
       relation: member.relation,
-      dob: member.dob,
-      name: member.name,
+      username: member.username,
       email: member.email,
-      addedBy: member.addedBy,
+      foodPreference: member.foodPreference || null,
+      dob: member.dob || undefined,
     };
     return data;
   }

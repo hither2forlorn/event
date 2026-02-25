@@ -1,8 +1,9 @@
 import db from "@/config/db/index";
-import { family, family_member_schema } from "./schema";
+import users from "@/modules/user/schema";
+import { family } from "./schema";
 import type { FamilyInsert } from "./resource";
 import Repository from "./repository";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import {
   type AddMemberValidation,
   type UpdateMemberValidation,
@@ -11,7 +12,6 @@ import {
 class Family {
   static async create(params: FamilyInsert) {
     const result = await db.insert(family).values(params).returning();
-
     return result[0];
   }
 
@@ -41,8 +41,13 @@ class Family {
   static async destroyWithMembers(familyId: number) {
     return db.transaction(async (tx) => {
       await tx
-        .delete(family_member_schema)
-        .where(eq(family_member_schema.familyId, familyId));
+        .update(users)
+        .set({
+          familyId: null,
+          relation: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.familyId, familyId));
 
       const deletedFamily = await tx
         .delete(family)
@@ -55,41 +60,41 @@ class Family {
 
   static async addMemberIfUser(
     familyId: number,
-    addedBy: number,
     addedMemberId: number,
     params: AddMemberValidation["body"],
   ) {
+    const payload: any = {
+      familyId,
+      relation: params.relation ?? null,
+      foodPreference: params.foodPreference ?? null,
+      updatedAt: new Date(),
+    };
+
+    if (params.name) {
+      payload.username = params.name;
+    }
+
     const result = await db
-      .insert(family_member_schema)
-      .values({
-        familyId,
-        addedBy,
-        userId: addedMemberId,
-        ...params,
-        dob: new Date(params.dob),
-      })
+      .update(users)
+      .set(payload)
+      .where(eq(users.id, addedMemberId))
       .returning();
 
-    return result[0];
+    return result[0] || null;
   }
 
   static async getMembers(familyId: number) {
     return db
       .select(Repository.selectMemersQuery)
-      .from(family_member_schema)
-      .where(eq(family_member_schema.familyId, familyId));
+      .from(users)
+      .where(eq(users.familyId, familyId));
   }
 
   static async getMember(familyId: number, memberId: number) {
     const result = await db
       .select(Repository.selectMemersQuery)
-      .from(family_member_schema)
-      .where(
-        and(
-          eq(family_member_schema.familyId, familyId),
-          eq(family_member_schema.userId, memberId),
-        ),
-      );
+      .from(users)
+      .where(and(eq(users.familyId, familyId), eq(users.id, memberId)));
 
     return result[0] || null;
   }
@@ -99,21 +104,26 @@ class Family {
     memberId: number,
     params: UpdateMemberValidation["body"],
   ) {
-    const payload = {
-      ...params,
-      dob: params.dob ? new Date(params.dob) : undefined,
+    const payload: any = {
       updatedAt: new Date(),
     };
 
+    if (params.relation !== undefined) {
+      payload.relation = params.relation;
+    }
+
+    if (params.foodPreference !== undefined) {
+      payload.foodPreference = params.foodPreference;
+    }
+
+    if (params.name !== undefined) {
+      payload.username = params.name;
+    }
+
     const result = await db
-      .update(family_member_schema)
+      .update(users)
       .set(payload)
-      .where(
-        and(
-          eq(family_member_schema.familyId, familyId),
-          eq(family_member_schema.userId, memberId),
-        ),
-      )
+      .where(and(eq(users.familyId, familyId), eq(users.id, memberId)))
       .returning();
 
     return result[0] || null;
@@ -121,13 +131,13 @@ class Family {
 
   static async removeMember(familyId: number, memberId: number) {
     const result = await db
-      .delete(family_member_schema)
-      .where(
-        and(
-          eq(family_member_schema.familyId, familyId),
-          eq(family_member_schema.userId, memberId),
-        ),
-      )
+      .update(users)
+      .set({
+        familyId: null,
+        relation: null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(users.familyId, familyId), eq(users.id, memberId)))
       .returning();
 
     return result[0] || null;
@@ -136,8 +146,8 @@ class Family {
   static async findIfUserHasFamily(userId: number) {
     const result = await db
       .select(Repository.selectMemersQuery)
-      .from(family_member_schema)
-      .where(eq(family_member_schema.userId, userId));
+      .from(users)
+      .where(and(eq(users.id, userId), isNotNull(users.familyId)));
 
     return result[0] || null;
   }
@@ -145,13 +155,8 @@ class Family {
   static async findIfMemberOfFamily(familyId: number, userId: number) {
     const result = await db
       .select(Repository.selectMemersQuery)
-      .from(family_member_schema)
-      .where(
-        and(
-          eq(family_member_schema.familyId, familyId),
-          eq(family_member_schema.userId, userId),
-        ),
-      );
+      .from(users)
+      .where(and(eq(users.familyId, familyId), eq(users.id, userId)));
 
     return result[0] || null;
   }
