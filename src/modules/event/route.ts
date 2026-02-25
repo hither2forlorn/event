@@ -22,6 +22,13 @@ const routes = [
   },
   {
     method: "get",
+    controller: Controller.get,
+    path: "event/:eventId/guest", // update this to have the geust in the event
+    authorization: true,
+    authCheckType: [role.user],
+  },
+  {
+    method: "get",
     controller: Controller.getUserRelatedToEvent,
     path: "event/:eventId/users",
     authorization: true,
@@ -35,13 +42,6 @@ const routes = [
     authCheckType: [role.user],
   },
 
-  {
-    method: "get",
-    controller: Controller.get,
-    path: "event/:eventId/guest", // update this to have the geust in the event
-    authorization: true,
-    authCheckType: [role.user],
-  },
   {
     method: "post",
     controller: Controller.sendEventinvitaion,
