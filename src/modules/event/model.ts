@@ -9,18 +9,27 @@ import { rsvp, user } from "@/config/db/schema";
 
 class Event {
   static async findAllAndCount(params: any) {
-    const { page = 1, limit = 10 } = params;
+    const { page = 1, limit = 10, userId } = params;
     const offset = (page - 1) * limit;
+
+    const whereClause = or(
+      eq(event.organizer, userId),
+      sql`${rsvp.userId} = ${userId} AND ${rsvp.status} != 'Pending'`
+    );
 
     const result = await db
       .select(repository.selectQuery)
       .from(event)
+      .leftJoin(rsvp, eq(rsvp.eventId, event.id))
+      .where(whereClause)
       .limit(limit)
       .offset(offset);
 
     const [{ count }]: any = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(event);
+      .select({ count: sql<number>`count(DISTINCT ${event.id})` })
+      .from(event)
+      .leftJoin(rsvp, eq(rsvp.eventId, event.id))
+      .where(whereClause);
 
     return {
       items: result,
@@ -29,11 +38,10 @@ class Event {
       totalPages: Math.ceil(count / limit),
     };
   }
-
   static async create(params: EventColumn) {
     const result = await db
       .insert(event)
-      .values(params)
+      .values(params as any)
       .returning();
     return result[0];
   }

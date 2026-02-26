@@ -1,4 +1,5 @@
 import User from "@/modules/user/resource";
+import { RsvpColumn } from "../rsvp/resource";
 export interface EventColumn {
   id?: number;
   title: string | null;
@@ -48,7 +49,7 @@ class Resource {
       theme: event.theme || "Cozy",
       parentId: event.parentId,
       location: event.location,
-      role: "Organizer",
+      role: event.id == event.organizer ? "Organizer" : "Guest",
       status: "upcoming",
       organizer: event.organizer,
       createdAt: event.createdAt,

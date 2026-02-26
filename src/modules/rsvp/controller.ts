@@ -20,15 +20,24 @@ const create = async (req: IAuthRequest) => {
 const accept = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
-    const accept_responce = await Service.acceptRSVP(id);
-    return accept_responce;
+    const acceptResponse = await Service.acceptRSVP(id);
+    return acceptResponse;
 
   } catch (err) {
     throw err
 
   }
 }
+const getInvitations = async (req: IAuthRequest) => {
+  try {
+    const invitations = await Service.getInvitedEvent(req.query, req.user.id);
+    return invitations;
+  } catch (err) {
+    throw err;
+  }
+};
 export default {
   create,
-  accept
+  accept,
+  getInvitations,
 };

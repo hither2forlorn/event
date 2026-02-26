@@ -25,6 +25,7 @@ const create = async (input: any) => {
     throw err;
   }
 };
+
 const acceptRSVP = async (rsvpId: number) => {
   try {
     logger.info(`Accepting RSVP with id: ${rsvpId}`);
@@ -50,7 +51,17 @@ const acceptRSVP = async (rsvpId: number) => {
     throw err;
   }
 }
+const getInvitedEvent = async (params: any, userId: number) => {
+  try {
+    const invited_event = await Model.findAllInvitation({ ...params, userId });
+    return invited_event;
+  } catch (err: any) {
+    logger.error(`Error fetching invitations for user ${userId}: ${err.message}`);
+    throw err;
+  }
+}
 export default {
   create,
   acceptRSVP,
+  getInvitedEvent
 };

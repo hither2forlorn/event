@@ -6,6 +6,8 @@ const routes = [
     method: "get",
     controller: Controller.get,
     path: "event",
+    authorization: true,
+    authCheckType: [role.user],
   },
   {
     method: "post",

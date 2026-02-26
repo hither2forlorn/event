@@ -1,4 +1,4 @@
-
+import event from "@/modules/event/schema"
 import { eq, or, sql } from "drizzle-orm";
 import rsvp from "./schema";
 import db from "@/config/db";
@@ -15,6 +15,31 @@ export default class Rsvp {
     const [{ count }]: any = await db
       .select({ count: sql<number>`count(*)` })
       .from(rsvp);
+
+    return {
+      items: result,
+      page,
+      totalItems: parseInt(count.toString(), 10),
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  static async findAllInvitation(params: any) {
+    const { page = 1, limit = 10, userId } = params;
+    const offset = (page - 1) * limit;
+
+    const result = await db
+      .select()
+      .from(rsvp)
+      .innerJoin(event, eq(rsvp.eventId, event.id))
+      .where(eq(rsvp.userId, userId))
+      .limit(limit)
+      .offset(offset);
+
+    const [{ count }]: any = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(rsvp)
+      .where(eq(rsvp.userId, userId));
 
     return {
       items: result,
