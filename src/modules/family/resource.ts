@@ -16,6 +16,7 @@ export interface FamilyMemberColumn {
   dob?: Date | null;
   createdAt?: Date | null;
   updatedAt?: Date | null;
+  phone?: string | null;
 }
 
 export type FamilyInsert = Omit<FamilyColumn, "id" | "createdAt" | "updatedAt">;
@@ -45,6 +46,7 @@ class Resource {
       email: member.email,
       foodPreference: member.foodPreference || null,
       dob: member.dob || undefined,
+      phone: member.phone || null,
     };
     return data;
   }

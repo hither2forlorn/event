@@ -96,6 +96,8 @@ class Family {
       .from(users)
       .where(and(eq(users.familyId, familyId), eq(users.id, memberId)));
 
+    console.log(result);
+
     return result[0] || null;
   }
 
@@ -104,25 +106,9 @@ class Family {
     memberId: number,
     params: UpdateMemberValidation["body"],
   ) {
-    const payload: any = {
-      updatedAt: new Date(),
-    };
-
-    if (params.relation !== undefined) {
-      payload.relation = params.relation;
-    }
-
-    if (params.foodPreference !== undefined) {
-      payload.foodPreference = params.foodPreference;
-    }
-
-    if (params.name !== undefined) {
-      payload.username = params.name;
-    }
-
     const result = await db
       .update(users)
-      .set(payload)
+      .set(params)
       .where(and(eq(users.familyId, familyId), eq(users.id, memberId)))
       .returning();
 
@@ -153,11 +139,16 @@ class Family {
   }
 
   static async findIfMemberOfFamily(familyId: number, userId: number) {
+    console.log(familyId, userId);
+    const user = await db.select().from(users).where(eq(users.id, userId));
+
+    console.log(user);
     const result = await db
       .select(Repository.selectMemersQuery)
       .from(users)
       .where(and(eq(users.familyId, familyId), eq(users.id, userId)));
 
+    console.log(result);
     return result[0] || null;
   }
 }

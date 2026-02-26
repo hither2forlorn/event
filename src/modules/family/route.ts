@@ -18,7 +18,7 @@ const routes: IRoute[] = [
     validation: validate(createFamilyValidation),
   },
   {
-    method: "put",
+    method: "patch",
     controller: Controller.update,
     path: "family/:id",
     authorization: true,

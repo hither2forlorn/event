@@ -11,6 +11,8 @@ const selectQuery = {
 const selectMemersQuery = {
   familyId: users.familyId,
   userId: users.id,
+  username: users.username,
+  phone: users.phone,
   relation: users.relation,
   name: users.username,
   email: users.email,

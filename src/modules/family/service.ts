@@ -16,6 +16,7 @@ const checkAuthorization = async (
   onlyCreator: boolean = false,
 ): Promise<boolean> => {
   const family = await Model.find(familyId);
+
   if (!family) {
     return false;
   }
@@ -57,7 +58,7 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
     await Model.addMemberIfUser(result.id, user, {
       name: creator.username || creator.email,
       email: creator.email,
-      relation: null,
+      relation: "self",
       foodPreference: null,
     });
 
@@ -186,6 +187,7 @@ const listMembers = async (familyId: number) => {
   try {
     await get(familyId);
     const members = await Model.getMembers(familyId);
+    console.log(members);
     return Resource.collectionMembers(members);
   } catch (error) {
     throw error;
