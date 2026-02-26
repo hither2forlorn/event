@@ -15,7 +15,7 @@ const schema = pgTable(tableName, eventAttribute);
 const event_member_attribute = {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
-    .references(() => schema.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" }),
   eventId: integer("event_id")
     .references(() => schema.id, { onDelete: "cascade" }),
   role: text("role"),
@@ -33,7 +33,7 @@ const event_guest_attribute = {
   familyId: integer("family_id"),
   role: text("role"),
   invited_by: integer("invited_by")
-    .references(() => schema.id)
+    .references(() => user.id)
     .notNull(),
   joined_at: text("joined_at"),
 };
