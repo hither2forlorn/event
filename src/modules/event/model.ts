@@ -104,6 +104,20 @@ class Event {
     };
   }
 
+  static async getInvitedGuest(eventId: number) {
+    const result = await db
+      .select({
+        user: repository.selectEventGuest.user,
+        status: rsvp.status,
+        familyId: rsvp.familyId,
+        category: rsvp.category,
+        invited_by: rsvp.invited_by,
+      })
+      .from(rsvp)
+      .innerJoin(user, eq(rsvp.userId, user.id))
+      .where(eq(rsvp.eventId, eventId));
+    return result;
+  }
   static async getEventMember(eventId: number) {
     const result = await db
       .select(repository.SelectEventOwners)

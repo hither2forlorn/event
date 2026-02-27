@@ -12,7 +12,7 @@ import {
 import UserService from "@/modules/user/service";
 import RSVP from "../rsvp/service";
 import crypto from "crypto";
-import { throwErrorOnValidation, throwNotFoundError, throwUnauthorizedError } from "@/utils/error";
+import { throwErrorOnValidation, throwNotFoundError, throwUnauthorizedError, throwForbiddenError } from "@/utils/error";
 import { UserColumn } from "../user/resource";
 
 const list = async (params: any) => {
@@ -161,11 +161,26 @@ const create = async (input: any, userId: number) => {
 
 const find = async (id: number) => {
   try {
+    console.log('finding the event with the id', id);
     const data = await Model.find({ id });
     if (!data) throw new Error("Event not found");
     return Resource.toJson(data);
   } catch (err: any) {
     logger.error("Error in event finding:", err);
+    throw err;
+  }
+};
+const getInvitedGuest = async (eventId: number, userId: number) => {
+  try {
+    const isAuthorized = await checkAuthorized(eventId, userId);
+    if (!isAuthorized) {
+      return throwForbiddenError("Not allowed to get the guest for this event");
+    }
+
+    const invitedGuest = await Model.getInvitedGuest(eventId);
+    return invitedGuest;
+  } catch (err: any) {
+    logger.error(err, "Error in getInvitedGuest service");
     throw err;
   }
 };
@@ -284,6 +299,7 @@ export default {
   inviteGuest,
   makeEventGuest,
   getEventguest,
+  getInvitedGuest,
   getUserRelatedToEvent,
   getEventVendor,
 };

@@ -119,6 +119,21 @@ const sendEventinvitaion = async (req: IAuthRequest) => {
   }
 };
 
+const getEventInvitation = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.id);
+    const userId = req.user.id;
+    if (isNaN(eventId)) {
+      throwErrorOnValidation("Invalid Event ID");
+    }
+    const eventInformation = await Service.getInvitedGuest(eventId, userId);
+    return eventInformation;
+  } catch (err: any) {
+    logger.error(err, "Error in getEventInvitation controller");
+    throw err;
+  }
+};
+
 const getEventGuest = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
@@ -145,5 +160,6 @@ export default {
   deleteModule,
   listMyEvents,
   getUserRelatedToEvent,
-  sendEventinvitaion
+  sendEventinvitaion,
+  getEventInvitation
 };

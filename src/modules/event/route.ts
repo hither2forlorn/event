@@ -39,6 +39,13 @@ const routes = [
   },
   {
     method: "get",
+    controller: Controller.getEventInvitation,
+    path: "event/event/:id/invitation",
+    authorization: true,
+    authCheckType: [role.user]
+  },
+  {
+    method: "get",
     controller: Controller.getUserRelatedToEvent, // get the SelectEventOwners[]
     path: "event/:eventId/users",
     authorization: true,
