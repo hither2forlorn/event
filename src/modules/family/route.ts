@@ -18,6 +18,12 @@ const routes: IRoute[] = [
     validation: validate(createFamilyValidation),
   },
   {
+    method: "get",
+    controller: Controller.getMyFamilies,
+    path: "family",
+    authorization: true,
+  },
+  {
     method: "patch",
     controller: Controller.update,
     path: "family/:id",

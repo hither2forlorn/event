@@ -12,6 +12,16 @@ const create = async (req: IAuthRequest) => {
   }
 };
 
+const getMyFamilies = async (req: IAuthRequest) => {
+  try {
+    const userId = req.user.id;
+    const data = await Service.getMyFamilies(userId);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const get = async (req: IAuthRequest) => {
   try {
     const { params } = req;
@@ -131,4 +141,5 @@ export default {
   getMemberDetails,
   updateMember,
   deleteMember,
+  getMyFamilies,
 };

@@ -83,6 +83,15 @@ const get = async (id: number) => {
   }
 };
 
+const getMyFamilies = async (userId: number) => {
+  try {
+    const result = await Model.findByUserId(userId);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const update = async (
   familyId: number,
   input: UpdateFamilyValidation["body"],
@@ -273,4 +282,5 @@ export default {
   getMemberDetails,
   updateMember,
   removeMember,
+  getMyFamilies,
 };

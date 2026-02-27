@@ -151,6 +151,21 @@ class Family {
     console.log(result);
     return result[0] || null;
   }
+
+  static async findByUserId(userId: number) {
+    const user = await db
+      .select({ familyId: users.familyId })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    if (!user[0] || !user[0].familyId) {
+      return [];
+    }
+
+    const family = await this.find(user[0].familyId);
+
+    return family;
+  }
 }
 
 export default Family;
