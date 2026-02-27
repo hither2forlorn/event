@@ -25,8 +25,7 @@ const list = async (params: any) => {
       }
     })
     return {
-      ...mapped_data,
-      items: Resource.collection(data.items),
+      items: Resource.collection(mapped_data),
     };
   } catch (err: any) {
     logger.error("Error in Category listing:", err);
