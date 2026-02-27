@@ -49,7 +49,7 @@ class Resource {
       theme: event.theme || "Cozy",
       parentId: event.parentId,
       location: event.location,
-      role: event.id == event.organizer ? "Organizer" : "Guest",
+      role: event.role,
       status: "upcoming",
       organizer: event.organizer,
       createdAt: event.createdAt,
