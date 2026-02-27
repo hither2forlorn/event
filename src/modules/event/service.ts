@@ -20,7 +20,7 @@ const list = async (params: any) => {
     const data = await Model.findAllAndCount(params);
     return {
       ...data,
-      items: Resource.collection(data.items as any),
+      items: Resource.collection(data.items),
     };
   } catch (err: any) {
     logger.error("Error in Category listing:", err);
@@ -147,7 +147,7 @@ const create = async (input: any, userId: number) => {
     if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
-    return { ...Resource.toJson(data), eventMembershipId: eventMember.id };
+    return { ...Resource.toJson(data), ownerShipId: eventMember.id };
   } catch (err: any) {
     logger.error("Error in Event creation:", err);
     throw err;

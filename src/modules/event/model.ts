@@ -18,7 +18,7 @@ class Event {
     );
 
     const result = await db
-      .select(repository.selectQuery)
+      .selectDistinct(repository.selectQuery)
       .from(event)
       .leftJoin(rsvp, eq(rsvp.eventId, event.id))
       .where(whereClause)
