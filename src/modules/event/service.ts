@@ -18,6 +18,12 @@ import { UserColumn } from "../user/resource";
 const list = async (params: any) => {
   try {
     const data = await Model.findAllAndCount(params);
+    data.items.map((event) => {
+      return {
+        ...event,
+        role: event.organizer == params.userId ? "Organizer" : "Guest"
+      }
+    })
     return {
       ...data,
       items: Resource.collection(data.items),
