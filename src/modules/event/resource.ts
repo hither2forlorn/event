@@ -1,17 +1,14 @@
 import User from "@/modules/user/resource";
-import { RsvpColumn } from "../rsvp/resource";
 export interface EventColumn {
   id?: number;
   title: string | null;
   description: string | null;
   type: any;
-  startDate: any;
-  endDate: any;
   budget: number | null;
   theme: string | null;
   parentId: number | null;
-  startTime: string | null;
-  endTIme: string | null;
+  startDateTime: string | null;
+  endDateTime: string | null;
   attire: string | null;
   side: string | null;
   location: string | null;
@@ -42,9 +39,9 @@ class Resource {
         event.description ||
         "Witness the World comming together, Be part of the celebration in wedding of Bishwas and Salena Gomez",
       type: event.type,
-      startDate: event.startDate,
+      startDateTime: event.startDateTime,
       date: "Nov 12, 2023",
-      endDate: event.endDate,
+      endDateTime: event.endDateTime,
       budget: event.budget || 10000,
       theme: event.theme || "Cozy",
       parentId: event.parentId,
