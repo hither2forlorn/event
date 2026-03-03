@@ -1,5 +1,5 @@
 import Model from "./model";
-import Resource from "./resource";
+import Resource, { EventColumn } from "./resource";
 import logger from "@/config/logger";
 import FamilyModel from "@/modules/family/model"
 import {
@@ -136,13 +136,11 @@ const create = async (input: any, userId: number) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-    console.log(JSON.stringify(input));
     const eventData = {
       ...input,
       startDateTime: new Date(input.startDateTime),
       endDateTime: new Date(input.endDateTime),
     };
-    console.log(eventData);
     const data = await Model.create(eventData);
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
@@ -210,7 +208,7 @@ const update = async (id: number, input: updateEventType, userId?: number) => {
       );
     }
 
-    const eventData: any = {
+    const eventData = {
       ...input,
       ...(input.startDateTime && { startDateTime: new Date(input.startDateTime) }),
       ...(input.endDateTime && { endDateTime: new Date(input.endDateTime) }),
