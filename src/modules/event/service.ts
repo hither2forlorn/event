@@ -136,14 +136,13 @@ const create = async (input: any, userId: number) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-
+    console.log(JSON.stringify(input));
     const eventData = {
       ...input,
-      startDate: new Date(input.startDate),
-      endDate: new Date(input.endDate),
+      startDateTime: new Date(input.startDateTime),
+      endDateTime: new Date(input.endDateTime),
     };
-
-
+    console.log(eventData);
     const data = await Model.create(eventData);
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
@@ -213,8 +212,8 @@ const update = async (id: number, input: updateEventType, userId?: number) => {
 
     const eventData: any = {
       ...input,
-      ...(input.startDate && { startDate: new Date(input.startDate) }),
-      ...(input.endDate && { endDate: new Date(input.endDate) }),
+      ...(input.startDateTime && { startDateTime: new Date(input.startDateTime) }),
+      ...(input.endDateTime && { endDateTime: new Date(input.endDateTime) }),
     };
 
     const data = await Model.update(eventData, id);

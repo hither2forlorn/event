@@ -41,7 +41,7 @@ class Event {
   static async create(params: EventColumn) {
     const result = await db
       .insert(event)
-      .values(params as any)
+      .values(params)
       .returning();
     return result[0];
   }

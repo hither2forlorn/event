@@ -9,13 +9,13 @@ const EventValidationSchema = z.object({
       "https://images.unsplash.com/photo-1522673607200-1645062cd5d1?w=800&q=80",
     ),
   type: z.string().default("WEDDING"),
-  startDate: z
+  startDateTime: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine((date) => !isNaN(Date.parse(date)), { // if this is not the valid date fformat then 
       message: "Invalid date format",
     })
     .optional(),
-  endDate: z
+  endDateTime: z
     .string()
     .refine((date) => !isNaN(Date.parse(date)), {
       message: "Invalid date format",
