@@ -1,5 +1,5 @@
 import event, { event_guest_schema, event_member_schema } from "./schema";
-import RSVP from "@/modules/rsvp/repository"
+import RSVP from "@/modules/invitation/repository"
 import User from "@/modules/user/repository"
 
 const selectQuery = {

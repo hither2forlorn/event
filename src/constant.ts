@@ -19,6 +19,11 @@ const attendingstate = {
   pending: "pending",
   completed: "completed",
 };
+const invitationStatus = {
+  invited: "invited",
+  accepted: "accepted",
+  rejected: "rejected",
+} as const;
 const role = {
   user: "user",
   admin: "admin",
@@ -26,4 +31,4 @@ const role = {
   guest: "guest",
 };
 const ROOT_PATH = path.join(__dirname);
-export { role, ROOT_PATH, foodPreference, attendingstate };
+export { role, ROOT_PATH, foodPreference, attendingstate, invitationStatus };

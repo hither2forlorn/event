@@ -92,6 +92,7 @@ const login = async (input: loginType) => {
       id: user!.id,
       role: role.user,
       email: user!.email,
+
     };
     const token = await Token.sign(tokenPayload, "30d");
 
@@ -211,8 +212,18 @@ const remove = async (id: number) => {
     throw error;
   }
 };
+const update = async (params: Partial<UserColumn>, userId: number) => {
+  try {
+    const updated_data = await Model.update(params, userId)
+    return updated_data;
+  }
+  catch (err) {
+    throw err;
+  }
+}
 export default {
   list,
+  update,
   create,
   login,
   // logout,

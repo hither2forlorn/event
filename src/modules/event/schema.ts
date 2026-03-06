@@ -1,4 +1,5 @@
 import { pgTable } from "drizzle-orm/pg-core";
+import family from "@/modules/family/schema"
 import { integer, serial, text, timestamp } from "drizzle-orm/pg-core";
 import user from "@/modules/user/schema"
 import {
@@ -30,7 +31,7 @@ const event_guest_attribute = {
   eventId: integer("event_id")
     .notNull()
     .references(() => schema.id),
-  familyId: integer("family_id"),
+  familyId: integer("family_id").references(() => family.id),
   role: text("role"),
   invited_by: integer("invited_by")
     .references(() => user.id)

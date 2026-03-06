@@ -1,6 +1,9 @@
 import { EventColumn } from "@/modules/event/resource";
 export interface RsvpColumn {
   id: number;
+  eventId: number;
+  familyId: number;
+  invited_by: number;
   event_guest_id: string;
   responded_by: number;
   status: string;

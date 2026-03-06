@@ -10,7 +10,7 @@ import {
 import { family } from "@/modules/family/schema";
 import { statusEnum } from "@/modules/event/attributes";
 import event from "@/modules/event/schema";
-import rsvp from "@/modules/rsvp/schema";
+import rsvp from "@/modules/invitation/schema";
 export {
   admin,
   statusEnum,

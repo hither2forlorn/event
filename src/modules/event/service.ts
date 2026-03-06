@@ -1,5 +1,5 @@
 import Model from "./model";
-import Resource, { EventColumn } from "./resource";
+import Resource from "./resource";
 import logger from "@/config/logger";
 import FamilyModel from "@/modules/family/model"
 import {
@@ -10,7 +10,7 @@ import {
   type updateEventType,
 } from "./validators";
 import UserService from "@/modules/user/service";
-import RSVP from "../rsvp/service";
+import RSVP from "../invitation/service";
 import crypto from "crypto";
 import { throwErrorOnValidation, throwNotFoundError, throwUnauthorizedError, throwForbiddenError } from "@/utils/error";
 import { UserColumn } from "../user/resource";
@@ -69,7 +69,7 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
     }
     const isValid = await checkAuthorized(input.eventId, userId);
     if (!isValid) {
-      return throwErrorOnValidation("Unauthorized: You are not the organizer of this event");
+      return throwErrorOnValidation("Unauthorized: You are not allowed to invite guests for this event");
     }
 
     const { fullName, email, phone, eventId, isFamily } = input;
@@ -92,7 +92,7 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
         phone: placeholderPhone,
       });
     }
-    if (!guestUser) throw new Error("Error while making the user ")
+    if (!guestUser || guestUser.id == undefined) throw new Error("Error while making the user ")
     if (isFamily && !guestUser.familyId) {
       //Making the family table and then upadaing the guest family id 
       const userFamily = await FamilyModel.create({
@@ -101,8 +101,9 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
 
       })
       guestUser.familyId = userFamily?.id;
+      const updateUser = await UserService.update({ familyId: userFamily?.id }, guestUser.id)
+      guestUser.familyId = updateUser.familyId;
     }
-
     // 2. Create RSVP (Invitation) entry
     const invitation = await RSVP.create({
       eventId: eventId,
@@ -186,10 +187,20 @@ const checkAuthorized = async (id: number, userId?: number) => {
   if (!userId) {
     throw new Error("Unauthorized: User not authenticated");
   }
-
   const event = await find(id);
   if (!event) return throwNotFoundError("Event not found");
   //if the event organizer is not the person also check the organizer family and then also 
+
+
+  const eventMember = await Model.getEventMember(id);
+  if (!event.organizer) {
+    return throwUnauthorizedError("Unauthorized: Event organizer not found");
+  }
+
+  // Organizer is always authorized.
+  if (event.organizer === userId || eventMember.some((member: any) => member.userId === userId)) {
+    return event;
+  }
   if (event.organizer !== userId) {
     throw new Error("Unauthorized: You are not the organizer of this event");
   }
@@ -214,7 +225,7 @@ const update = async (id: number, input: updateEventType, userId?: number) => {
       ...(input.endDateTime && { endDateTime: new Date(input.endDateTime) }),
     };
 
-    const data = await Model.update(eventData, id);
+    const data = await Model.update(eventData as any, id); //TODO:
     if (!data) throw new Error("Event not found or update failed");
     return Resource.toJson(data as any);
   } catch (err: any) {
@@ -276,9 +287,9 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
   }
 };
 
-const makeEventGuest = async (eventId: number, guestId: number, inviterId: number, familyId: number | null) => {
+const makeEventGuest = async ({ eventId, guestId, inviterId, familyId, params }: { eventId: number, guestId: number, inviterId: number, familyId?: number | null, params: any }) => {
   try {
-    const data = await Model.makeEventGuest(eventId, guestId, inviterId, familyId);
+    const data = await Model.makeEventGuest({ eventId, guestId, invited_by: inviterId, familyId, params });
     return data;
   } catch (error: any) {
     logger.error("Error in making event guest:", error);

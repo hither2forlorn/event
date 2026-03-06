@@ -60,14 +60,14 @@ const getInvitations = async (req: IAuthRequest) => {
 
 const setResponce = async (req: IAuthRequest) => {
   try {
-    //validation should have the user with the array in the one value , 
-    //service check if the user in the family and the event is the invitaion with the family id or not 
-    // Entry to the table of the event guest if event guest dont have the value with the family of the user and the 
-    // 
-    const service = await Service.
-
+    const userId = req.user.id;
+    const eventId = req.params.id;
+    //the userId is one doing the request and the body.userid is for whom the responce is made for the event guest
+    const service = await Service.setResponce({ ...req.body, eventId }, userId); // TODO:update the validaion in this line of the code 
+    return service;
   } catch (err) {
     throw err;
+
   }
 
 }

@@ -8,6 +8,7 @@ import {
   type AddMemberValidation,
   type UpdateMemberValidation,
 } from "./validators";
+import { id } from "zod/v4/locales";
 
 class Family {
   static async create(params: FamilyInsert) {
@@ -154,7 +155,7 @@ class Family {
 
   static async findByUserId(userId: number) {
     const user = await db
-      .select({ familyId: users.familyId })
+      .select({ familyId: users.familyId, userid: users.id })
       .from(users)
       .where(eq(users.id, userId));
 

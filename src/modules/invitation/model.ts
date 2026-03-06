@@ -1,5 +1,5 @@
 import event from "@/modules/event/schema"
-import { eq, or, sql } from "drizzle-orm";
+import { eq, and, sql, or } from "drizzle-orm";
 import rsvp from "./schema";
 import db from "@/config/db";
 
@@ -25,14 +25,15 @@ export default class Rsvp {
   }
 
   static async findAllInvitation(params: any) {
-    const { page = 1, limit = 10, userId } = params;
+    const { page = 1, limit = 10, userId, familyId } = params;
     const offset = (page - 1) * limit;
+    const conditions = or(eq(rsvp.userId, userId), (rsvp.familyId, familyId));
 
     const result = await db
       .select()
       .from(rsvp)
       .innerJoin(event, eq(rsvp.eventId, event.id))
-      .where(eq(rsvp.userId, userId))
+      .where(conditions)
       .limit(limit)
       .offset(offset);
 
@@ -65,7 +66,27 @@ export default class Rsvp {
       .returning();
     return result[0];
   }
-  static async find(params: any) {
+
+  static async updateInvitationStatus(id: number, status: string, respondedBy?: number) {
+    const now = new Date().toISOString();
+    const result = await db
+      .update(rsvp)
+      .set({
+        status,
+        respondedAt: now,
+        updatedAt: now,
+        responded_by: respondedBy,
+      } as any)
+      .where(eq(rsvp.id, id))
+      .returning();
+    return result[0];
+  }
+
+  static async find(params: {
+    id: number,
+    eventId?: number,
+    userId?: number
+  }) {
     const { id, eventId, userId } = params;
     const conditions = [];
     if (id !== undefined) {
@@ -83,7 +104,7 @@ export default class Rsvp {
     const result = await db
       .select()
       .from(rsvp)
-      .where(or(...conditions));
+      .where(and(...conditions));
     return result[0] || null;
   }
 }

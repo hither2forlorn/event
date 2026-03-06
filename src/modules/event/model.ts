@@ -13,8 +13,7 @@ class Event {
     const offset = (page - 1) * limit;
 
     const whereClause = or(
-      eq(event.organizer, userId),
-      sql`${rsvp.userId} = ${userId} AND ${rsvp.status} != 'Pending'`
+      eq(event.organizer, userId), // TODO: update the check to also include the event member 
     );
 
     const result = await db
@@ -22,6 +21,7 @@ class Event {
       .from(event)
       .leftJoin(rsvp, eq(rsvp.eventId, event.id))
       .where(whereClause)
+      .orderBy(event.startDateTime)
       .limit(limit)
       .offset(offset);
 
@@ -156,22 +156,32 @@ class Event {
     return event_vendor;
   }
   static async makeEventGuest(
-    eventId: number,
-    guestId: number,
-    invited_by: number
-    ,
-    familyId: number | null
+    {
+      eventId,
+      guestId,
+      invited_by,
+      familyId,
+      params
+    }: {
+      eventId: number,
+      guestId: number,
+      invited_by: number,
+      params: any
+      familyId?: number | null
+    }
   ) {
     const event_guest = await db
       .insert(event_guest_schema)
       .values({
         invited_by: invited_by,
-        joined_at: "",
+        joined_at: new Date().toISOString(),
         eventId: eventId,
-        familyId: familyId,
+        familyId: familyId ?? null,
         userId: guestId,
+        notes: params.note ?? params.notes ?? null,
+        role: params.role
       })
-      .returning();
+      .returning().onConflictDoNothing();
     return event_guest;
   }
 }

@@ -272,6 +272,14 @@ const removeMember = async (
   }
 };
 
+const getMyFamily_userId = async (userId: number) => {
+  try {
+    const result = await Model.findIfUserHasFamily(userId);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
 export default {
   create,
   get,
