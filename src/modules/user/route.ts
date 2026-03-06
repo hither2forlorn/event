@@ -25,6 +25,12 @@ const routes = [
     authCheckType: ["user"],
   },
   {
+    method: "patch",
+    controller: Controller.updateProfile,
+    path: "user/me",
+    authorization: true,
+  },
+  {
     method: "delete",
     controller: Controller.deleteModule,
     path: "user/:id",

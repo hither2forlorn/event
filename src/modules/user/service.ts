@@ -1,9 +1,11 @@
 import {
   changePasswordValidationSchema,
   loginValidationSchema,
+  updateProfileValidationSchema,
   validationSchema,
   type createUserType,
   type loginType,
+  type updateProfileType,
 } from "./validators";
 import { role } from "@/constant";
 import z from "zod";
@@ -157,6 +159,40 @@ const changePassword = async (input: any, id: number) => {
   }
 };
 
+const updateProfile = async (input: updateProfileType, id: number) => {
+  try {
+    const result = updateProfileValidationSchema.safeParse(input);
+    if (!result.success) {
+      throwErrorOnValidation(
+        result.error.issues.map((issue) => issue.message).join(", "),
+      );
+      return;
+    }
+    const updateData = result.data;
+
+    const user = await Model.find({ id });
+    if (!user) {
+      throwNotFoundError("User");
+    }
+
+    if (updateData.email) {
+      const duplicateUser = await Model.find({ email: updateData.email });
+      if (duplicateUser && duplicateUser.id !== id) {
+        throwErrorOnValidation("User with this email already exists");
+      }
+    }
+
+    const updatedUser = await Model.update(updateData, id);
+    if (!updatedUser) {
+      throwNotFoundError("User");
+    }
+
+    return Resource.toJson(updatedUser as any);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const remove = async (id: number) => {
   try {
     // Check if admin exists
@@ -182,5 +218,6 @@ export default {
   // logout,
   find,
   changePassword,
+  updateProfile,
   remove,
 };

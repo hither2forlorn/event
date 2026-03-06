@@ -10,12 +10,26 @@ const changePasswordValidationSchema = z.object({
   confirmPassword: z.string(),
 });
 
-const updateValidation = z.object({
-  userName: z.string(),
-  avatar: z.string(),
-  password: z.string(),
-  email: z.string(),
-});
+const updateProfileValidationSchema = z
+  .object({
+    username: z.string().min(1).optional(),
+    email: z.string().email().optional(),
+    phone: z.string().min(1).optional(),
+    location: z.string().optional(),
+    bio: z.string().optional(),
+    photo: z.string().optional(),
+    country: z.string().optional(),
+    city: z.string().optional(),
+    address: z.string().optional(),
+    zip: z.string().optional(),
+    relation: z.string().optional(),
+    foodPreference: z.string().optional(),
+    coverPhoto: z.string().optional(),
+    info: z.any().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field is required for profile update",
+  });
 
 const validationSchema = z.object({
   username: z.string(),
@@ -26,13 +40,13 @@ const validationSchema = z.object({
 
 type createUserType = z.infer<typeof validationSchema>;
 type loginType = z.infer<typeof loginValidationSchema>;
-type updateType = z.infer<typeof updateValidation>;
+type updateProfileType = z.infer<typeof updateProfileValidationSchema>;
 export {
   loginValidationSchema,
   changePasswordValidationSchema,
   validationSchema,
-  updateValidation,
+  updateProfileValidationSchema,
   type createUserType,
   type loginType,
-  type updateType,
+  type updateProfileType,
 };

@@ -53,6 +53,16 @@ const changePassword = async (req: IAuthRequest) => {
     throw err;
   }
 };
+
+const updateProfile = async (req: IAuthRequest) => {
+  try {
+    const { user, body } = req;
+    const data = await Service.updateProfile(body, user?.id);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
+};
 const deleteModule = async (req: Request) => {
   try {
     logger.info("This is the deletemodule");
@@ -66,6 +76,7 @@ export default {
   create,
   get,
   changePassword,
+  updateProfile,
   profile,
   deleteModule,
 };
