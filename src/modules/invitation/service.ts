@@ -117,10 +117,10 @@ const listinvitationsResponce = async (
       throwErrorOnValidation("userId must be a valid number");
     }
 
-    const allowedInvitation = await permissionService.canUserModifyInvitation(eventId, params.userId);
+    /*const allowedInvitation = await permissionService.canUserModifyInvitation(eventId, params.userId, params.familyId);
     if (!allowedInvitation) {
       throwForbiddenError("You do not have permission to view this invitation response");
-    }
+    }*/
     return await Model.listInvitationResponse(eventId, {
       familyId: parsedFamilyId,
       userId: parsedUserId,
@@ -159,10 +159,10 @@ const setResponce = async (
     if (!targetFamilyId || Number.isNaN(targetFamilyId)) {
       throwErrorOnValidation("valid familyId is required in body");
     }
-console.log("The event id in the service is ", eventId ,'The userId is ', targetUserId , 'familyId is ', targetFamilyId)
+    console.log("The event id in the service is ", eventId, 'The userId is ', targetUserId, 'familyId is ', targetFamilyId)
     const existingInvitation = await Model.find({
       eventId,
-      userId:  targetFamilyId? undefined : targetUserId,
+      userId: targetFamilyId ? undefined : targetUserId,
       familyId: targetFamilyId,
     });
 
