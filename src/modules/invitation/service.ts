@@ -93,7 +93,7 @@ const listinvitationsResponce = async (
   params: { familyId?: number; userId: number },
 ) => {
   try {
-    
+
     const parsedFamilyId =
       params.familyId !== undefined ? Number(params.familyId) : undefined;
     const parsedUserId =
@@ -138,18 +138,20 @@ const setResponce = async (body: {
   userid: number;
 
   [key: string]: any;
-}, userId: number , familyId?:number | null ) => {
+}, userId: number, familyId?: number | null) => {
   try {
-    const invitations = (await Model.find({ eventId: body.eventId, userId }));
+    console.log(`This is the ivitation of the userId: ${userId} and the eventid:${body.eventId}`)
+    const invitations = await Model.find({ eventId: body.eventId, userId })
+    console.log(invitations);
     if (!invitations) {
       return throwNotFoundError("Invitation was not found");
     }
-   //Check invitation to the user or the family in the family id 
-    if(invitations.userId !== userId && (familyId && invitations.familyId !== familyId)){
+    //Check invitation to the user or the family in the family id 
+    if (invitations.userId !== userId && (familyId && invitations.familyId !== familyId)) {
       throwForbiddenError("You'r family id and the invitaion family id didn't match ");
     }
     //invitdtion duplicate check 
-    const eventGuest = await EventService.getEventguest( body.eventId, body.userid );
+    const eventGuest = await EventService.getEventguest(body.eventId, body.userid);
     if (eventGuest) {
       throwErrorOnValidation("Responce already exist for this user and event");
     }
