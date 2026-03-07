@@ -133,40 +133,84 @@ const listinvitationsResponce = async (
   }
 }
 
-const setResponce = async (body: {
-  eventId: number;
-  userid: number;
-
-  [key: string]: any;
-}, userId: number, familyId?: number | null) => {
+const setResponce = async (
+  body: {
+    eventId: number;
+    userId: number;
+    familyId: number;
+    [key: string]: any;
+  },
+  actorUserId: number,
+  actorFamilyId?: number | null,
+) => {
   try {
-    console.log(`This is the ivitation of the userId: ${userId} and the eventid:${body.eventId}`)
-    const invitations = await Model.find({ eventId: body.eventId, userId })
-    console.log(invitations);
-    if (!invitations) {
-      return throwNotFoundError("Invitation was not found");
+    const eventId = Number(body.eventId);
+    const targetUserId = Number(body.userId);
+    const targetFamilyId = Number(body.familyId);
+
+    if (!eventId || Number.isNaN(eventId)) {
+      throwErrorOnValidation("valid eventId is required");
     }
-    //Check invitation to the user or the family in the family id 
-    if (invitations.userId !== userId && (familyId && invitations.familyId !== familyId)) {
-      throwForbiddenError("You'r family id and the invitaion family id didn't match ");
+
+    if (!targetUserId || Number.isNaN(targetUserId)) {
+      throwErrorOnValidation("valid userId is required in body");
     }
-    //invitdtion duplicate check 
-    const eventGuest = await EventService.getEventguest(body.eventId, body.userid);
-    if (eventGuest) {
-      throwErrorOnValidation("Responce already exist for this user and event");
+
+    if (!targetFamilyId || Number.isNaN(targetFamilyId)) {
+      throwErrorOnValidation("valid familyId is required in body");
     }
+console.log("The event id in the service is ", eventId ,'The userId is ', targetUserId , 'familyId is ', targetFamilyId)
+    const existingInvitation = await Model.find({
+      eventId,
+      userId:  targetFamilyId? undefined : targetUserId,
+      familyId: targetFamilyId,
+    });
+
+    if (!existingInvitation) {
+      throwNotFoundError("Invitation");
+    }
+
+    const invitation = existingInvitation as NonNullable<typeof existingInvitation>;
+
+    const isSelfAction = Number(actorUserId) === targetUserId;
+    if (!isSelfAction) {
+      if (!actorFamilyId) {
+        throwForbiddenError("You are not allowed to respond for this user");
+      }
+
+      if (Number(actorFamilyId) !== targetFamilyId) {
+        throwForbiddenError("You can only respond for users in your family");
+      }
+
+      if (
+        invitation.familyId !== null
+        && invitation.familyId !== undefined
+        && Number(invitation.familyId) !== Number(actorFamilyId)
+      ) {
+        throwForbiddenError("Invitation family does not match your family");
+      }
+    }
+
+    const existingResponse = await Model.getInvitationResponce(
+      eventId,
+      targetUserId,
+      targetFamilyId,
+    );
+
+    if (existingResponse) {
+      throwErrorOnValidation("Response already exists for this user and event");
+    }
+
     const result = await EventService.makeEventGuest({
-      eventId: body.eventId,
-      guestId: body.userid,
-      inviterId: Number(invitations?.invited_by!),
-      familyId: familyId,
-      params: body
+      eventId,
+      guestId: targetUserId,
+      inviterId: Number(invitation.invited_by),
+      familyId: targetFamilyId,
+      params: body,
     });
     return result;
-
   } catch (err) {
     throw err;
-
   }
 }
 export default {

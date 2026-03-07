@@ -60,10 +60,10 @@ const getInvitations = async (req: IAuthRequest) => {
 
 const getInvitationResponse = async (req: IAuthRequest) => {
   try {
-    const eventId = req.params.id;
+    const eventId = Number(req.params.eventId);
     const userId = req.user.id;
     const familyId = req.user.familyId;
-    if (!eventId) {
+    if (!eventId || Number.isNaN(eventId)) {
       throwErrorOnValidation("eventId is required");
     }
     if (!familyId && !userId) {
@@ -82,11 +82,23 @@ const getInvitationResponse = async (req: IAuthRequest) => {
 const setResponce = async (req: IAuthRequest) => {
   try {
     const userId = req.user.id;
-    const eventId = req.params.id;
+    const eventId = Number(req.params.eventId);
     const familyId = req.user.familyId;
+    if (!eventId || Number.isNaN(eventId)) {
+      throwErrorOnValidation("valid eventId is required");
+    }
 
-    //the userId is one doing the request and the body.userid is for whom the responce is made for the event guest
-    const service = await Service.setResponce({ ...req.body, eventId }, userId, familyId); // TODO:update the validaion in this line of the code 
+    // userId in body is target user for whom response is set
+    const service = await Service.setResponce(
+      {
+        ...req.body,
+        eventId,
+        userId: Number(req.body.userId),
+        familyId: Number(req.body.familyId),
+      },
+      userId,
+      familyId,
+    );
     return service;
   } catch (err) {
     throw err;

@@ -8,7 +8,10 @@ import {
 } from "@/utils/error";
 
 const canUserModifyInvitation = async (eventId: number, actorUserId: number) => {
-  const invitation = await RsvpModel.find({ id: eventId  , userId: actorUserId });
+   const invitation = await RsvpModel.find({
+    eventId,
+    userId: actorUserId,
+  });
 
   if (!invitation) {
     throwNotFoundError("Invitation");

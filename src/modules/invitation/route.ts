@@ -21,13 +21,13 @@ const route = [
   {
     method: "get",
     controller: Controller.getInvitationResponse,
-    path: "invitation/event-responses/:id",
+    path: "invitation/event-responses/:eventId",
     authorization: true,
   },
   {
     method: "post",
     controller: Controller.setResponce,
-    path: "invitation/responce/:id",
+    path: "invitation/responce/:eventId",
     authorization: true
   }
 

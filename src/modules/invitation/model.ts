@@ -156,8 +156,20 @@ export default class Rsvp {
     return result[0];
   }
   static async getInvitationResponce(id: number, userId: number, familyId: number) {
-    void familyId;
-    const data = await db.select(repository.selectguestResponce).from(event_guest_schema).where(and(eq(event_guest_schema.eventId, id), (eq(event_guest_schema.userId, userId))));
+    const conditions = [
+      eq(event_guest_schema.eventId, id),
+      eq(event_guest_schema.userId, userId),
+    ];
+
+    if (familyId !== undefined && familyId !== null && !Number.isNaN(Number(familyId))) {
+      conditions.push(eq(event_guest_schema.familyId, Number(familyId)));
+    }
+
+    const data = await db
+      .select(repository.selectguestResponce)
+      .from(event_guest_schema)
+      .innerJoin(user, eq(event_guest_schema.userId, user.id))
+      .where(and(...conditions));
     return data[0];
 
   }
@@ -165,8 +177,9 @@ export default class Rsvp {
     id?: number,
     eventId?: number,
     userId?: number
+    familyId?: number
   }) {
-    const { id, eventId, userId } = params;
+    const { id, eventId, userId, familyId } = params;
     const conditions = [];
     if (id !== undefined) {
       conditions.push(eq(rsvp.id, id));
@@ -176,6 +189,10 @@ export default class Rsvp {
     }
     if (userId !== undefined) {
       conditions.push(eq(rsvp.userId, userId));
+    }
+
+    if (familyId !== undefined) {
+      conditions.push(eq(rsvp.familyId, familyId));
     }
 
     if (conditions.length === 0) return null;
