@@ -138,7 +138,7 @@ const setResponce = async (
   body: {
     eventId: number;
     userId: number;
-    familyId: number;
+    familyId?: number;
     [key: string]: any;
   },
   actorUserId: number,
@@ -157,9 +157,6 @@ const setResponce = async (
       throwErrorOnValidation("valid userId is required in body");
     }
 
-    if (!targetFamilyId || Number.isNaN(targetFamilyId)) {
-      throwErrorOnValidation("valid familyId is required in body");
-    }
     const existingInvitation = await Model.find({
       eventId,
       userId: targetFamilyId ? undefined : targetUserId,
