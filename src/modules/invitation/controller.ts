@@ -94,7 +94,7 @@ const setResponce = async (req: IAuthRequest) => {
         ...req.body,
         eventId,
         userId: Number(req.body.userId),
-        familyId: Number(req.body.familyId),
+        familyId: req.body.familyId,
       },
       userId,
       familyId,

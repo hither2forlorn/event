@@ -145,9 +145,21 @@ const setResponce = async (
   actorFamilyId?: number | null,
 ) => {
   try {
+    const parseOptionalNumber = (value: any): number | undefined => {
+      if (value === undefined || value === null) return undefined;
+      if (typeof value === "string") {
+        const trimmed = value.trim().toLowerCase();
+        if (trimmed === "" || trimmed === "null" || trimmed === "undefined") {
+          return undefined;
+        }
+      }
+      const parsed = Number(value);
+      return Number.isNaN(parsed) ? undefined : parsed;
+    };
+
     const eventId = Number(body.eventId);
     const targetUserId = Number(body.userId);
-    const targetFamilyId = Number(body.familyId);
+    const targetFamilyId = parseOptionalNumber(body.familyId);
 
     if (!eventId || Number.isNaN(eventId)) {
       throwErrorOnValidation("valid eventId is required");
@@ -160,7 +172,7 @@ const setResponce = async (
     const existingInvitation = await Model.find({
       eventId,
       userId: targetFamilyId ? undefined : targetUserId,
-      familyId: targetFamilyId ? targetFamilyId : undefined
+      familyId: targetFamilyId,
     });
     if (!existingInvitation) {
       throwNotFoundError("Invitation");
@@ -171,6 +183,10 @@ const setResponce = async (
     if (!isSelfAction) {
       if (!actorFamilyId) {
         throwForbiddenError("You are not allowed to respond for this user");
+      }
+
+      if (!targetFamilyId) {
+        throwForbiddenError("Target user does not have a family invitation");
       }
 
       if (Number(actorFamilyId) !== targetFamilyId) {
@@ -189,7 +205,7 @@ const setResponce = async (
       eventId,
       guestId: targetUserId,
       inviterId: Number(invitation.invited_by),
-      familyId: targetFamilyId,
+      familyId: targetFamilyId ?? null,
       params: body,
     });
     return result;
