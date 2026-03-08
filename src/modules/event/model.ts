@@ -1,5 +1,5 @@
 import db from "@/config/db";
-import { sql, eq, or } from "drizzle-orm";
+import { sql, eq, or, and } from "drizzle-orm";
 import event, { event_guest_schema, event_vendor_schema } from "./schema";
 import { event_member_schema } from "./schema";
 import repository from "./repository";
@@ -170,19 +170,53 @@ class Event {
       familyId?: number | null
     }
   ) {
-    const event_guest = await db
+    const parseDate = (value: any) => {
+      if (!value) return null;
+      const date = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const guestPayload = {
+      invited_by,
+      eventId,
+      familyId: familyId ?? null,
+      userId: guestId,
+      notes: params.note ?? params.notes ?? null,
+      role: params.role ?? null,
+      arrival_date_time: parseDate(params.arrival_date_time ?? params.arrivalDateTime),
+      departure_date_time: parseDate(params.departure_date_time ?? params.departureDateTime),
+      isAccomodation: params.isAccomodation ?? params.isAccommodation ?? null,
+      status: params.status ?? null,
+    };
+
+    const existingGuest = await db
+      .select({ id: event_guest_schema.id })
+      .from(event_guest_schema)
+      .where(
+        and(
+          eq(event_guest_schema.eventId, eventId),
+          eq(event_guest_schema.userId, guestId),
+        ),
+      )
+      .limit(1);
+
+    if (existingGuest[0]?.id) {
+      const updated = await db
+        .update(event_guest_schema)
+        .set(guestPayload)
+        .where(eq(event_guest_schema.id, existingGuest[0].id))
+        .returning();
+      return updated[0] ?? null;
+    }
+
+    const inserted = await db
       .insert(event_guest_schema)
       .values({
-        invited_by: invited_by,
+        ...guestPayload,
         joined_at: new Date().toISOString(),
-        eventId: eventId,
-        familyId: familyId ?? null,
-        userId: guestId,
-        notes: params.note ?? params.notes ?? null,
-        role: params.role
       })
-      .returning().onConflictDoNothing();
-    return event_guest;
+      .returning();
+    return inserted[0] ?? null;
   }
 }
 

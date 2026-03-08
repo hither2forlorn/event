@@ -160,17 +160,14 @@ const setResponce = async (
     if (!targetFamilyId || Number.isNaN(targetFamilyId)) {
       throwErrorOnValidation("valid familyId is required in body");
     }
-    console.log("The event id in the service is ", eventId, 'The userId is ', targetUserId, 'familyId is ', targetFamilyId)
     const existingInvitation = await Model.find({
       eventId,
       userId: targetFamilyId ? undefined : targetUserId,
       familyId: targetFamilyId,
     });
-
     if (!existingInvitation) {
       throwNotFoundError("Invitation");
     }
-
     const invitation = existingInvitation as NonNullable<typeof existingInvitation>;
 
     const isSelfAction = Number(actorUserId) === targetUserId;
