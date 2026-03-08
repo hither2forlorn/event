@@ -160,7 +160,7 @@ const setResponce = async (
     const existingInvitation = await Model.find({
       eventId,
       userId: targetFamilyId ? undefined : targetUserId,
-      familyId: targetFamilyId,
+      familyId: targetFamilyId ? targetFamilyId : undefined
     });
     if (!existingInvitation) {
       throwNotFoundError("Invitation");
