@@ -170,10 +170,35 @@ class Event {
       familyId?: number | null
     }
   ) {
+    const normalizeNullable = (value: any) => {
+      if (value === undefined) return undefined;
+      if (value === null) return null;
+      if (typeof value === "string") {
+        const trimmed = value.trim().toLowerCase();
+        if (trimmed === "null" || trimmed === "") return null;
+      }
+      return value;
+    };
+
     const parseDate = (value: any) => {
-      if (!value) return null;
-      const date = value instanceof Date ? value : new Date(value);
+      const normalized = normalizeNullable(value);
+      if (normalized === undefined) return undefined;
+      if (normalized === null) return null;
+      const date = normalized instanceof Date ? normalized : new Date(normalized);
       return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const parseBoolean = (value: any) => {
+      const normalized = normalizeNullable(value);
+      if (normalized === undefined) return undefined;
+      if (normalized === null) return null;
+      if (typeof normalized === "boolean") return normalized;
+      if (typeof normalized === "string") {
+        const lowered = normalized.toLowerCase();
+        if (lowered === "true") return true;
+        if (lowered === "false") return false;
+      }
+      return Boolean(normalized);
     };
 
     const guestPayload = {
@@ -181,12 +206,12 @@ class Event {
       eventId,
       familyId: familyId ?? null,
       userId: guestId,
-      notes: params.note ?? params.notes ?? null,
-      role: params.role ?? null,
+      notes: normalizeNullable(params.note ?? params.notes),
+      role: normalizeNullable(params.role),
       arrival_date_time: parseDate(params.arrival_date_time ?? params.arrivalDateTime),
       departure_date_time: parseDate(params.departure_date_time ?? params.departureDateTime),
-      isAccomodation: params.isAccomodation ?? params.isAccommodation ?? null,
-      status: params.status ?? null,
+      isAccomodation: parseBoolean(params.isAccomodation ?? params.isAccommodation),
+      status: normalizeNullable(params.status),
     };
 
     const existingGuest = await db
@@ -201,18 +226,25 @@ class Event {
       .limit(1);
 
     if (existingGuest[0]?.id) {
+      const updatePayload = Object.fromEntries(
+        Object.entries(guestPayload).filter(([, value]) => value !== undefined),
+      );
       const updated = await db
         .update(event_guest_schema)
-        .set(guestPayload)
+        .set(updatePayload as any)
         .where(eq(event_guest_schema.id, existingGuest[0].id))
         .returning();
       return updated[0] ?? null;
     }
 
+    const insertPayload = Object.fromEntries(
+      Object.entries(guestPayload).map(([key, value]) => [key, value === undefined ? null : value]),
+    );
+
     const inserted = await db
       .insert(event_guest_schema)
       .values({
-        ...guestPayload,
+        ...(insertPayload as any),
         joined_at: new Date().toISOString(),
       })
       .returning();
