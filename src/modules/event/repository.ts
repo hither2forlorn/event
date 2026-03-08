@@ -16,6 +16,7 @@ const selectQuery = {
   organizer: event.organizer,
   createdAt: event.createdAt,
   updatedAt: event.updatedAt,
+  role: event_member_schema.role
 };
 
 const SelectEventOwners = {

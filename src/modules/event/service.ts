@@ -12,7 +12,7 @@ import {
 import UserService from "@/modules/user/service";
 import RSVP from "../invitation/service";
 import crypto from "crypto";
-import { throwErrorOnValidation, throwNotFoundError, throwUnauthorizedError, throwForbiddenError } from "@/utils/error";
+import { throwNotFoundError, throwUnauthorizedError, throwForbiddenError } from "@/utils/error";
 import { UserColumn } from "../user/resource";
 
 const list = async (params: any) => {

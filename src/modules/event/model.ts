@@ -14,12 +14,15 @@ class Event {
 
     const whereClause = or(
       eq(event.organizer, userId), // TODO: update the check to also include the event member 
+      eq(event_member_schema.userId, userId)
     );
 
     const result = await db
       .selectDistinct(repository.selectQuery)
       .from(event)
-      .leftJoin(rsvp, eq(rsvp.eventId, event.id))
+      .innerJoin(event_member_schema,
+        eq(event_member_schema.eventId, event.id)
+      )
       .where(whereClause)
       .orderBy(event.startDateTime)
       .limit(limit)
@@ -28,7 +31,9 @@ class Event {
     const [{ count }]: any = await db
       .select({ count: sql<number>`count(DISTINCT ${event.id})` })
       .from(event)
-      .leftJoin(rsvp, eq(rsvp.eventId, event.id))
+      .innerJoin(event_member_schema,
+        eq(event_member_schema.eventId, event.id)
+      )
       .where(whereClause);
 
     return {
