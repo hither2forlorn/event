@@ -3,6 +3,7 @@ const tableName = "event";
 import user from "@/modules/user/schema";
 
 //status
+
 const eventType = pgEnum("event_type", ["wedding"]); // might have multiple type of event so not including this for now
 const statusEnum = pgEnum("status", [
   "draft",

@@ -59,7 +59,7 @@ const getEventVendor = async (eventid: number) => {
   }
 };
 
-const inviteGuest = async (input: EventInvitationType, userId: number) => {
+const inviteGuest = async (input: EventInvitationType, userId: number, eventId: number) => {
   try {
     const result = EventInvitation.safeParse(input);
     if (!result.success) {
@@ -67,12 +67,8 @@ const inviteGuest = async (input: EventInvitationType, userId: number) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-    const isValid = await checkAuthorized(input.eventId, userId);
-    if (!isValid) {
-      return throwErrorOnValidation("Unauthorized: You are not allowed to invite guests for this event");
-    }
 
-    const { fullName, email, phone, eventId, isFamily } = input;
+    const { fullName, email, phone, isFamily } = input;
     let guestUser: Partial<UserColumn> | undefined;
     if (email) {
       try {

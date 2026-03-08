@@ -7,7 +7,6 @@ import { throwErrorOnValidation, throwForbiddenError, throwNotFoundError } from 
 import z from "zod";
 import { invitationStatusValidation, validationRSVP } from "./validators";
 import { EventInvitationColumn } from "./resource";
-import permissionService from "./permission.service";
 
 const create = async (input: any) => {
   try {
@@ -116,15 +115,17 @@ const listinvitationsResponce = async (
     if (parsedUserId !== undefined && Number.isNaN(parsedUserId)) {
       throwErrorOnValidation("userId must be a valid number");
     }
-
-    /*const allowedInvitation = await permissionService.canUserModifyInvitation(eventId, params.userId, params.familyId);
-    if (!allowedInvitation) {
-      throwForbiddenError("You do not have permission to view this invitation response");
-    }*/
-    return await Model.listInvitationResponse(eventId, {
-      familyId: parsedFamilyId,
+    const invitation = await Model.find({ eventId: eventId });
+    params.familyId = invitation?.familyId == null ? undefined : invitation.familyId;
+    const responce = await Model.listInvitationResponse(eventId, {
+      familyId: params.familyId,
       userId: parsedUserId,
     });
+
+    return {
+      responses: responce,
+      isFamily: params.familyId ? true : false,
+    }
   } catch (err: any) {
     logger.error(
       `Error fetching invitation response for event ${eventId}: ${err.message}`,

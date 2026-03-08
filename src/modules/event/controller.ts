@@ -109,10 +109,11 @@ const getUserRelatedToEvent = async (req: IAuthRequest) => {
 const sendEventinvitaion = async (req: IAuthRequest) => {
   try {
     const userId = req.user?.id;
+    const eventId = Number(req.params.eventId);
     if (!userId) {
       throwErrorOnValidation("User not authenticated");
     }
-    const data = await Service.inviteGuest(req.body, userId);
+    const data = await Service.inviteGuest(req.body, userId, eventId);
     return data;
   } catch (error: any) {
     throw error;
