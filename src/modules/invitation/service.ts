@@ -188,17 +188,6 @@ const setResponce = async (
         throwForbiddenError("Invitation family does not match your family");
       }
     }
-
-    const existingResponse = await Model.getInvitationResponce(
-      eventId,
-      targetUserId,
-      targetFamilyId,
-    );
-
-    if (existingResponse) {
-      throwErrorOnValidation("Response already exists for this user and event");
-    }
-
     const result = await EventService.makeEventGuest({
       eventId,
       guestId: targetUserId,
