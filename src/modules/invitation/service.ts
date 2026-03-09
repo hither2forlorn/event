@@ -63,15 +63,26 @@ const setResponce = async (body: {
 [key: string]: any;
 }, userId: number, familyId: number | null = null  , eventId:number) => {
   try { 
-    
-    const invitations = await Model.findInvitationEvent({ eventId: eventId, userId:body.userId  ,familyId: familyId ?? undefined });
+   const invitations = await Model.findInvitationEvent({ eventId: eventId, userId:userId , familyId:familyId??undefined }); 
 
     if (!invitations) {
       return throwNotFoundError("Invitation was not found");
     }
-    //Check invitation to the user or the family in the family id 
-    if (invitations.userId !== userId && (familyId && invitations.familyId !== familyId)) {
-      throwForbiddenError("You'r family id and the invitaion family id didn't match ");
+    const canRespondAsSelf = invitations.userId === userId;
+    const canRespondAsFamily =
+      familyId !== null &&
+      invitations.familyId !== null &&
+      invitations.familyId === familyId;
+
+    if (!canRespondAsSelf && !canRespondAsFamily) {
+      throwForbiddenError("You are not allowed to respond to this invitation");
+    }
+    if(body.userId !== userId){
+  
+      const members = await FamilyService.listMembers(familyId??0);
+     if (members.some(member => member?.id === userId)) {
+    }else{
+      throwForbiddenError("You can only set responce for your family members");
     }
     const result = await Model.makeEventGuest({ 
       eventId:eventId ,
@@ -81,7 +92,8 @@ const setResponce = async (body: {
        params: body
       });
     return result;
-  } catch (err) {
+  }
+} catch (err) {
     throw err;
 
   }
