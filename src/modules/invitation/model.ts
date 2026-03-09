@@ -271,13 +271,20 @@ export default class Invitation {
       }
       return Boolean(normalized);
     };
-
+     const rawName = params?.invitation_name ?? params?.invitationName;
+    
+const invitationName =
+      typeof rawName === "string" && rawName.trim().length > 0
+        ? rawName.trim()
+        : (params?.familyId ?? params?.family_id) != null
+          ? "Family"
+          : "Guest";
     const guestPayload = {
       invited_by,
       eventId: eventId,
       familyId: familyId ?? null,
       userId: guestId,
-      invitation_name: "Family",
+      invitation_name: invitationName,
       notes: normalizeNullable(params.note ?? params.notes),
       role: normalizeNullable(params.role),
       arrival_date_time: parseDate(params.arrival_date_time ?? params.arrivalDateTime),
