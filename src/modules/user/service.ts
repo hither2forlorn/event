@@ -52,7 +52,7 @@ const create = async (input: createUserType) => {
       id: user!.id,
       email: user!.email,
       role: role.user,
-      familyId: user.familyId == 0 ? undefined : user.familyId
+      familyId: user.familyId == 0 ? undefined : user.familyId,
     };
     const token = await Token.sign(tokenPayload, "30d");
     const jsonData = Resource.toJson(user);
@@ -93,7 +93,7 @@ const login = async (input: loginType) => {
       id: user!.id,
       role: role.user,
       email: user!.email,
-      familyId: user?.familyId == 0 ? undefined : user?.familyId
+      familyId: user?.familyId == 0 ? undefined : user?.familyId,
     };
     const token = await Token.sign(tokenPayload, "30d");
 
@@ -132,13 +132,8 @@ const changePassword = async (input: any, id: number) => {
         result.error.issues.map((issue) => issue.message).join(", "),
       );
     }
-    const { currentPassword, newPassword, confirmPassword } = input;
-    // Check if new password and confirm password match and then return if there is not the match in the password
-    if (newPassword !== confirmPassword) {
-      return throwErrorOnValidation(
-        "New password and confirm password do not match",
-      );
-    }
+    const { currentPassword, newPassword } = input;
+
     const user = await Model.find({ id });
     if (!user) {
       throwNotFoundError("User");
@@ -215,13 +210,12 @@ const remove = async (id: number) => {
 };
 const update = async (params: Partial<UserColumn>, userId: number) => {
   try {
-    const updated_data = await Model.update(params, userId)
+    const updated_data = await Model.update(params, userId);
     return updated_data;
-  }
-  catch (err) {
+  } catch (err) {
     throw err;
   }
-}
+};
 export default {
   list,
   update,
