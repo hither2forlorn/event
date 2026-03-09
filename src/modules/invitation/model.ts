@@ -50,50 +50,53 @@ export default class Invitation {
     return result;
   }
   //get the family event or the user event based on the user id and family id
-  static async listAllInvitationEvent(params:any){
+ static async listAllInvitationEvent(params:any){
   const { page = 1, limit = 10, userId, familyId, eventId } = params;
-    const offset = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-    const invitationConditions = [];
-    if (userId !== undefined && familyId !== undefined) {
-      invitationConditions.push(or(eq(invitation.userId, userId), eq(invitation.familyId, familyId)));
-    } else if (userId !== undefined) {
-      invitationConditions.push(eq(invitation.userId, userId));
-    } else if (familyId !== undefined) {
-      invitationConditions.push(eq(invitation.familyId, familyId));
-    }
-    if (eventId !== undefined) {
-      invitationConditions.push(eq(invitation.eventId, Number(eventId)));
-    }
-
-    const whereCondition = invitationConditions.length
-      ? or(...invitationConditions)
-      : undefined;
-
-    let query = db
-      .selectDistinct(repository.selectInvitationEvent)
-      .from(invitation)
-      .where(whereCondition)
-      .limit(limit)
-      .offset(offset);
-    const result = await query;
-    let countQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(invitation);
-
-    if (whereCondition) {
-      countQuery = countQuery.where(whereCondition) as any;
-    }
-
-    const [{ count }]: any = await countQuery;
-
-    return {
-      items: Resource.invitationeventCollection(result as any),
-      page,
-      totalItems: parseInt(count.toString(), 10),
-      totalPages: Math.ceil(count / limit),
-    };
+  const invitationConditions = [];
+  if (userId !== undefined && familyId !== undefined) {
+    invitationConditions.push(or(eq(invitation.userId, userId), eq(invitation.familyId, familyId)));
+  } else if (userId !== undefined) {
+    invitationConditions.push(eq(invitation.userId, userId));
+  } else if (familyId !== undefined) {
+    invitationConditions.push(eq(invitation.familyId, familyId));
   }
+  if (eventId !== undefined) {
+    invitationConditions.push(eq(invitation.eventId, Number(eventId)));
+  }
+
+  const whereCondition = invitationConditions.length
+    ? and(...invitationConditions)
+    : undefined;
+
+  let query = db
+    .selectDistinct(repository.selectInvitationEvent)
+    .from(invitation)
+    .leftJoin(event, eq(event.id, invitation.eventId))
+    .where(whereCondition)
+    .limit(limit)
+    .offset(offset);
+
+  const result = await query;
+
+  let countQuery = db
+    .select({ count: sql<number>`count(*)` })
+    .from(invitation);
+
+  if (whereCondition) {
+    countQuery = countQuery.where(whereCondition) as any;
+  }
+
+  const [{ count }]: any = await countQuery;
+
+  return {
+    items: Resource.invitationeventCollection(result as any),
+    page,
+    totalItems: parseInt(count.toString(), 10),
+    totalPages: Math.ceil(count / limit),
+  };
+}
 
   static async findInvitationEvent({
     userId , 
