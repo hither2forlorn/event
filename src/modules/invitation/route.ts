@@ -19,13 +19,13 @@ const route = [
     path: "invitation/responce/:id",
     authorization: true
   },
-//  {
-//     method: "get",
-//     controller: Controller.getEventGuest, // get the guest of the event in the id
-//     path: "event/guest/:id",
-//     authorization: true,
-//     authCheckType: [role.user],
-//   },
+  //  {
+  //     method: "get",
+  //     controller: Controller.getEventGuest, // get the guest of the event in the id
+  //     path: "event/guest/:id",
+  //     authorization: true,
+  //     authCheckType: [role.user],
+  //   },
   // {
   //   method: "get",
   //   controller: Controller.getEventInvitation,
@@ -33,12 +33,12 @@ const route = [
   //   authorization: true,
   //   authCheckType: [role.user]
   // },
-    {
-      method: "post",
-      controller: Controller.sendInvitation, // send the invitation to the guest in the evnt 
-      path: "event/:eventId/invite",
-      authorization: true,
-      authCheckType: [role.user],
-    },
+  {
+    method: "post",
+    controller: Controller.sendInvitation, // send the invitation to the guest in the evnt 
+    path: "event/:eventId/invite",
+    authorization: true,
+    authCheckType: [role.user],
+  },
 ]
 export default route; 

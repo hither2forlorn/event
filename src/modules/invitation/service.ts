@@ -7,12 +7,12 @@ import UserService from "@/modules/user/service";
 import FamilyService from "@/modules/family/service"
 import { UserColumn } from "../user/resource";
 import Invitation from "./model";
-import { EventInvitationType , EventInvitation } from "./validators";
+import { EventInvitationType, EventInvitation } from "./validators";
 
 //list of the event with the event detail and the user id in the header 
-const getInvitedEvent = async (params: Partial<Invitation_Event>, userId: number , familyId?:number ) => {
+const getInvitedEvent = async (params: Partial<Invitation_Event>, userId: number, familyId?: number) => {
   try {
-    const invited_event = await Model.listAllInvitationEvent({ ...params, userId , familyId });
+    const invited_event = await Model.listAllInvitationEvent({ ...params, userId, familyId });
     return invited_event;
   } catch (err: any) {
     logger.error(`Error fetching invitations for user ${userId}: ${err.message}`);
@@ -47,8 +47,8 @@ const listinvitationsResponce = async (
     if (parsedUserId !== undefined && Number.isNaN(parsedUserId)) {
       throwErrorOnValidation("userId must be a valid number");
     }
-    
-    const listEvent =  await Model.getInvitationResponces({ eventId, familyId: parsedFamilyId, userId: parsedUserId });
+
+    const listEvent = await Model.getInvitationResponces({ eventId, familyId: parsedFamilyId, userId: parsedUserId });
     return listEvent;
   } catch (err: any) {
     logger.error(
@@ -60,10 +60,10 @@ const listinvitationsResponce = async (
 
 const setResponce = async (body: {
   userId: number;
-[key: string]: any;
-}, userId: number, familyId: number | null = null  , eventId:number) => {
-  try { 
-   const invitations = await Model.findInvitationEvent({ eventId: eventId, userId:userId , familyId:familyId??undefined }); 
+  [key: string]: any;
+}, userId: number, familyId: number | null = null, eventId: number) => {
+  try {
+    const invitations = await Model.findInvitationEvent({ eventId: eventId, userId: userId, familyId: familyId ?? undefined });
 
     if (!invitations) {
       return throwNotFoundError("Invitation was not found");
@@ -77,29 +77,29 @@ const setResponce = async (body: {
     if (!canRespondAsSelf && !canRespondAsFamily) {
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
-    if(body.userId !== userId){
-  
-      const members = await FamilyService.listMembers(familyId??0);
-     if (members.some(member => member?.id === userId)) {
-    }else{
-      throwForbiddenError("You can only set responce for your family members");
-    }
-    const result = await Model.makeEventGuest({ 
-       eventId:eventId ,
-       guestId: body.userId,
-       invited_by: Number(invitations?.invited_by!),
-       familyId: familyId,
-       params: body
+    if (body.userId !== userId) {
+
+      const members = await FamilyService.listMembers(familyId ?? 0);
+      if (members.some(member => member?.id === userId)) {
+      } else {
+        throwForbiddenError("You can only set responce for your family members");
+      }
+      const result = await Model.makeEventGuest({
+        eventId: eventId,
+        guestId: body.userId,
+        invited_by: Number(invitations?.invited_by!),
+        familyId: familyId,
+        params: body
       });
-    return result;
-  }
-} catch (err) {
+      return result;
+    }
+  } catch (err) {
     throw err;
 
   }
 }
 
-const inviteGuest = async (input: EventInvitationType, userId: number , eventId:number ) => {
+const inviteGuest = async (input: EventInvitationType, userId: number, eventId: number) => {
   try {
     const result = EventInvitation.safeParse(input);
     if (!result.success) {
@@ -136,7 +136,7 @@ const inviteGuest = async (input: EventInvitationType, userId: number , eventId:
     const invitation = await Invitation.create({
       eventId: eventId,
       userId: guestUser.id!,
-      invitation_name: input.invitation_name,
+      invitation_name: input.invitation_name || "FAMILY",
       familyId: isFamily ? guestUser.familyId : undefined,
       invited_by: userId,
       status: "Pending",
@@ -146,7 +146,7 @@ const inviteGuest = async (input: EventInvitationType, userId: number , eventId:
       throw new Error("Failed to create invitation");
     }
 
-   return  Resource.toJson(invitation as any );
+    return Resource.toJson(invitation as any);
   } catch (err: any) {
     logger.error("Error in inviting guest:", err);
     throw err;
