@@ -40,5 +40,12 @@ const route = [
     authorization: true,
     authCheckType: [role.user],
   },
+  {
+    method: "get",
+    controller: Controller.getEventGuest,
+    path: "event/event/:id/invitation",
+    authorization: true,
+    authCheckType: [role.user],
+  }
 ]
 export default route; 
