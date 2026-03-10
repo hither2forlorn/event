@@ -71,19 +71,27 @@ export default class Invitation {
     const whereCondition = invitationConditions.length
       ? and(...invitationConditions)
       : undefined;
-
-    let query = db
-      .selectDistinct(repository.selectInvitationEvent)
+//Yesma eventId ko max id bhako invitation ra event euta row banera CTE banxa
+    const distinctEventInvitations = db
+      .select({
+        eventId: invitation.eventId,
+        latestInvitationId: sql<number>`max(${invitation.id})`,
+      })
       .from(invitation)
-      .leftJoin(event, eq(event.id, invitation.eventId))
       .where(whereCondition)
+      .groupBy(invitation.eventId)
+      .as("distinct_event_invitations");
+//Tyo pako CTE table bata eventId ani , invitation ko detail hamlai tannera chaini kura linxa 
+    const result = await db
+      .select(repository.selectInvitationEvent)
+      .from(distinctEventInvitations)
+      .leftJoin(invitation, eq(invitation.id, distinctEventInvitations.latestInvitationId))
+      .leftJoin(event, eq(event.id, distinctEventInvitations.eventId))
       .limit(limit)
       .offset(offset);
 
-    const result = await query;
-
     let countQuery = db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(distinct ${invitation.eventId})` })
       .from(invitation);
 
     if (whereCondition) {
