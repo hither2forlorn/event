@@ -75,7 +75,7 @@ export default class Invitation {
     const distinctEventInvitations = db
       .select({
         eventId: invitation.eventId,
-        latestInvitationId: sql<number>`max(${invitation.id})`,
+        latestInvitationId: sql<number>`max(${invitation.id})`.as("latestInvitationId"),
       })
       .from(invitation)
       .where(whereCondition)
