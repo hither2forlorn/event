@@ -287,7 +287,7 @@ export default class Invitation {
     const guestPayload = {
       invited_by,
       eventId: eventId,
-      familyId: familyId ?? null,
+      familyId: familyId ?? undefined,
       userId: guestId,
       invitation_name: invitationName,
       notes: normalizeNullable(params.note ?? params.notes),
@@ -297,8 +297,6 @@ export default class Invitation {
       isAccomodation: parseBoolean(params.isAccomodation ?? params.isAccommodation),
       status: normalizeNullable(params.status),
     };
-    console.log("😂😂 the guest payload after parsing is ", guestPayload)
-
     const existingGuest = await db
       .select({ id: invitation.id, isFamily: invitation.familyId })
       .from(invitation).leftJoin(event, eq(invitation.eventId, eventId))
@@ -311,10 +309,11 @@ export default class Invitation {
       .limit(1);
 
     if (existingGuest[0]?.id) {
+      guestPayload.familyId = undefined
       const updatePayload = Object.fromEntries(
         Object.entries(guestPayload).filter(([, value]) => value !== undefined),
       );
-      guestPayload.familyId = existingGuest[0].isFamily
+
       const updated = await db
         .update(invitation)
         .set(updatePayload)
