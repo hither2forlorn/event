@@ -196,7 +196,8 @@ export default class Invitation {
       );
 
     return {
-      ...data, isFamily: isFamilyInvite ? true : false
+       responses: data ,
+        isFamily: isFamilyInvite ? true : false
     }
   }
 
