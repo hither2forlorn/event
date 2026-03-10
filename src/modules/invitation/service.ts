@@ -78,7 +78,7 @@ const setResponce = async (body: {
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
     if (body.userId !== userId) {
-      console.log('This is the member id ',familiyId);
+      console.log('This is the member id ',familyId);
 
       const members = await FamilyService.listMembers(familyId ?? 0);
             console.log(members)
