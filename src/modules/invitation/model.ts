@@ -1,5 +1,6 @@
 import { eq, and, sql, or, isNull } from "drizzle-orm";
 import invitation from "./schema";
+import family from "@/modules/family/schema"
 import event from "@/modules/event/schema";
 import db from "@/config/db";
 import repository from "./repository";
@@ -33,24 +34,10 @@ export default class Invitation {
     const event_guest = await db
       .select(repository.selectInvitationResponse)
       .from(invitation)
-      .leftJoin(user, eq(invitation.userId, user.id))
+      .leftJoin(user, eq(invitation.userId, user.id)).
+      leftJoin(family, eq(family.id, invitation.familyId))
       .where(eq(invitation.eventId, eventId));
     return event_guest;
-  }
-
-  static async getInvitedGuest(eventId: number) {
-    const result = await db
-      .select({
-        user: repository.selectInvitationResponse.user_detail,
-        status: invitation.status,
-        familyId: invitation.familyId,
-        category: invitation.category,
-        invited_by: invitation.invited_by,
-      })
-      .from(invitation)
-      .leftJoin(user, eq(user.id, invitation.userId))
-      .where(eq(invitation.eventId, eventId));
-    return result;
   }
 
   //get the family event or the user event based on the user id and family id
@@ -204,7 +191,7 @@ export default class Invitation {
       .leftJoin(
         invitation,
         and(eq(invitation.eventId, eventId), eq(invitation.userId, user.id)),
-      )
+      ).leftJoin(family, eq(family.id, invitation.familyId))
       .where(
         isFamilyInvite
           ? eq(user.familyId, targetFamilyId!)
@@ -297,20 +284,12 @@ export default class Invitation {
       }
       return Boolean(normalized);
     };
-    const rawName = params?.invitation_name ?? params?.invitationName;
-
-    const invitationName =
-      typeof rawName === "string" && rawName.trim().length > 0
-        ? rawName.trim()
-        : (params?.familyId ?? params?.family_id) != null
-          ? "Family"
-          : "Guest";
     const guestPayload = {
       invited_by,
       eventId: eventId,
       familyId: familyId ?? undefined,
       userId: guestId,
-      invitation_name: invitationName,
+      invitation_name: params.GuestName || "Inviting name ",
       notes: normalizeNullable(params.note ?? params.notes),
       role: normalizeNullable(params.role),
       arrival_date_time: parseDate(

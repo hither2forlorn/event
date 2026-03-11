@@ -43,7 +43,7 @@ const route = [
   {
     method: "get",
     controller: Controller.getEventGuest,
-    path: "event/event/:id/invitation",
+    path: "event/:id/invitation",
     authorization: true,
     authCheckType: [role.user],
   }

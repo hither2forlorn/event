@@ -169,22 +169,6 @@ const getEventguest = async (eventid: number, userId: number) => {
 };
 
 
-const getInvitedGuest = async (eventId: number, userId: number) => {
-  try {
-    const isAuthorized = await EventService.checkAuthorized(eventId, userId);
-    if (!isAuthorized) {
-      return throwForbiddenError("Not allowed to get the guest for this event");
-    }
-
-    const invitedGuest = await Model.getInvitedGuest(eventId);
-    return invitedGuest;
-  } catch (err: any) {
-    logger.error(err, "Error in getInvitedGuest service");
-    throw err;
-  }
-};
-
-
 export default {
   setResponce,
   inviteGuest,
