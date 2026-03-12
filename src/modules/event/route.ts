@@ -19,6 +19,13 @@ const routes = [
     authCheckType: [role.user],
   },
   {
+    method: "post",
+    controller: Controller.
+      path: "event/:eventId/member",
+    authorization: true,
+    authCheckType: [role.user],
+  },
+  {
     method: "get",
     controller: Controller.listMyEvents,
     path: "event/my-events",

@@ -113,6 +113,14 @@ const getSubEventOfEvent = async (req: IAuthRequest) => {
   const subEvents = await Service.getSubEventOfEvent(Number(params.id));
   return subEvents;
 };
+const makeUserRelatedToEvent = async (req: IAuthRequest) => {
+  try {
+
+  } catch (err) {
+    throw err;
+  }
+
+}
 export default {
   get,
   create,

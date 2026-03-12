@@ -10,7 +10,7 @@ import {
 import {
   throwNotFoundError,
   throwUnauthorizedError,
-  throwForbiddenError,
+
 } from "@/utils/error";
 
 const list = async (params: any) => {
@@ -195,6 +195,15 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
     throw error;
   }
 };
+const makeEventMember = async (eventId: number, userId: number, params: any) => {
+  try {
+    await checkAuthorized(eventId, userId);
+
+  } catch (err: any) {
+    logger.error("Error in getting the user with the info")
+  }
+
+}
 
 const getSubEventOfEvent = async (eventId: number) => {
   try {
@@ -212,6 +221,7 @@ const getSubEventOfEvent = async (eventId: number) => {
 };
 
 export default {
+  makeEventMember,
   list,
   create,
   find,
