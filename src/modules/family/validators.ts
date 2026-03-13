@@ -74,7 +74,7 @@ const updateMemberValidation = z.object({
         .min(2, "Relation must be at least 2 characters long")
         .nullable()
         .optional(),
-      name: z
+      username: z
         .string()
         .min(2, "Name must be at least 2 characters long")
         .optional(),

@@ -8,9 +8,9 @@ export interface FamilyColumn {
 
 export interface FamilyMemberColumn {
   familyId: number | null;
-  id?: number;
+  id: number;
   relation: string | null;
-  userId: number | null;
+
   username?: string | null;
   email: string;
   foodPreference?: string | null;
@@ -42,7 +42,7 @@ class Resource {
     if (!member) return null;
     const data: Partial<FamilyMemberColumn> = {
       familyId: member.familyId || null,
-      userId: member.userId || null,
+      id: member.id,
       relation: member.relation,
       username: member.username,
       email: member.email,
@@ -57,6 +57,5 @@ class Resource {
     return members.map(this.toJsonMember);
   }
 }
-
 
 export default Resource;

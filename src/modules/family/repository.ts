@@ -10,7 +10,7 @@ const selectQuery = {
 
 const selectMemersQuery = {
   familyId: users.familyId,
-  userId: users.id,
+  id: users.id,
   username: users.username,
   phone: users.phone,
   relation: users.relation,
@@ -20,7 +20,6 @@ const selectMemersQuery = {
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
 };
-
 
 export default {
   selectQuery,

@@ -6,6 +6,7 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
   if (user.role === "admin") {
     return user;
   }
+
   console.log(allowTo);
   console.log(user.role);
   if (!allowTo.includes(user?.role)) {
@@ -17,6 +18,7 @@ const checkSpecificRole = async (user: any, allowTo: string[]) => {
 const checkAuthentication = async (request: any, allowTo: string[]) => {
   try {
     const token = request.headers["authorization"];
+    console.log(token);
 
     if (!token) {
       throw new Error("UNAUTHORIZED");
