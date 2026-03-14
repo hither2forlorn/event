@@ -22,10 +22,9 @@ const EventInvitation = z.object({
   isFamily: z.boolean().default(false)
 });
 const setResponcevalidation = z.object({
-  invited_by: z.number().int().positive(),
-  eventId: z.number().int().positive(),
+  invited_by: z.number().int().positive().optional(),
   familyId: z.number().int().positive().optional().nullable(),
-  userId: z.number().int().positive().optional().nullable(),
+  userId: z.number().int().positive(),
   invitation_name: z.string().min(1).max(50).default("Family name"),
   notes: z.string().max(40).optional().nullable(),
   role: z.string().min(1).max(16).default("Guest"),

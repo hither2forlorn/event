@@ -61,8 +61,9 @@ const setResponce = async (body: setResponcevalidationType, userId: number, fami
   try {
     const { error, data } = setResponcevalidation.safeParse(body)
     if (error) {
-      throw error;
+      return throwErrorOnValidation(error.message);
     }
+
     const invitations = await Model.findInvitationEvent({ eventId: eventId, userId: userId, familyId: familyId ?? undefined });
 
     if (!invitations) {
@@ -78,23 +79,22 @@ const setResponce = async (body: setResponcevalidationType, userId: number, fami
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
     if (body.userId !== userId) {
-      console.log('This is the member id ', familyId);
-
-      const members = await FamilyService.listMembers(familyId ?? 0);
-      console.log(members)
+      await FamilyService.listMembers(familyId ?? 0);
       // if (members.some(member => member?.id === userId)) {
       // } else {
       //   throwForbiddenError("You can only set responce for your family members");
       // }
-      const result = await Model.makeEventGuest({
-        eventId: eventId,
-        guestId: data?.userId!,
-        invited_by: Number(invitations?.invited_by!),
-        familyId: familyId,
-        params: body
-      });
-      return result;
     }
+    const result = await Model.makeEventGuest({
+      eventId: eventId,
+      guestId: data?.userId!,
+      invited_by: Number(invitations?.invited_by!),
+      familyId: familyId,
+      params: data
+    });
+    return result;
+
+
   } catch (err) {
     throw err;
 

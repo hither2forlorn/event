@@ -9,7 +9,7 @@ import { InvitationColumn } from "./resource";
 import user from "@/modules/user/schema";
 import { setResponcevalidationType } from "./validators";
 
-export default class Invitation {
+export default class Invitation {   
   static async list(params: any) {
     const { page, limit } = params;
     const offset = (page - 1) * limit;
@@ -247,28 +247,22 @@ export default class Invitation {
     params: setResponcevalidationType
     familyId?: number | null;
   }) {
-    console.log("the params i am getting in the make event guest is ", {
-      eventId,
-      guestId,
-      invited_by,
-      familyId,
-      params,
-    });
     const existingGuest = await db
       .select({ id: invitation.id, isFamily: invitation.familyId })
       .from(invitation)
-      .leftJoin(event, eq(invitation.eventId, eventId))
+      .leftJoin(event, eq(invitation.eventId, event.id))
       .where(
         and(eq(invitation.eventId, eventId), eq(invitation.userId, guestId)),
       )
       .limit(1);
 
     if (existingGuest[0]?.id) {
-
       const updated = await db
         .update(invitation)
         .set({
           ...params,
+          userId: guestId,
+          eventId,
           updatedAt: new Date()
         }
         )
@@ -281,6 +275,9 @@ export default class Invitation {
       .insert(invitation)
       .values({
         ...params,
+        eventId,
+        userId: guestId,
+        familyId: params.familyId ?? familyId ?? null,
         joined_at: new Date(),
         invited_by: invited_by
       })
