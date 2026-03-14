@@ -40,11 +40,17 @@ const create = async (input: createUserType) => {
 
     const duplicateUser = await Model.find({ email });
 
-    if (duplicateUser) {
+    if (duplicateUser?.id) {
       throwErrorOnValidation("User with this email already exists");
     }
-    const hashedPw = await hashPassword(password);
-    const user = await Model.create({ ...input, password: hashedPw } as any);
+    const dob = input.dob ? input.dob : new Date().toISOString().split("T")[0];
+    const hashedPw = await hashPassword(password ?? `${Date.now()}`);
+    const user = await Model.create({
+      ...input,
+      dob,
+      phone: input.phone ?? `+977${Date.now()}`
+
+    }, hashedPw);
     if (!user) {
       throw Error("Failed to create user");
     }
@@ -230,14 +236,15 @@ const UserGeneratorWithPhoneOrEmail = async (fullName: string, email?: string, p
   const randomPassword = crypto.randomBytes(8).toString("hex");
   const placeholderEmail = email || `guest_${Date.now()}_${Math.floor(Math.random() * 1000)}@khumbaya.com`;
   const placeholderPhone = phone || `+977${Date.now()}`;
-  const guestUser = await create({
+  const user = await create({
     username: fullName,
     email: placeholderEmail,
     password: randomPassword,
+    relation: "Friend",
     phone: placeholderPhone,
   });
-  if (!guestUser || guestUser.id == undefined) throw new Error("Error while making the user ")
-  return guestUser;
+  if (!user || user.id == undefined) throw new Error("Error while making the user ")
+  return user;
 }
 export default {
   list,

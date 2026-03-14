@@ -6,6 +6,14 @@ import { sql, not, eq, or } from "drizzle-orm";
 import { user } from "@/config/db/schema";
 
 class User {
+
+  private static toDobString(value: unknown): string | undefined {
+    if (value === undefined || value === null || value === "") return undefined;
+    if (value instanceof Date) return value.toISOString().split("T")[0];
+    if (typeof value === "string") return value;
+    return undefined;
+  }
+
   static async findAllAndCount(params: any) {
     const { page, limit, email, phone } = params;
     let conditions = []
@@ -68,8 +76,17 @@ class User {
 
   }
 
-  static async create(params: UserColumn) {
-    const result = await db.insert(users).values(params).returning();
+  static async create(params: Partial<UserColumn>, password: string) {
+    const insertParams: any = {
+      ...params,
+      dob: User.toDobString(params.dob) ?? new Date().toISOString().split("T")[0],
+      phone: params.phone ?? `+977${Date.now()}`,
+      password,
+      relation: params.relation ?? "Default relation"
+    };
+
+
+    const result = await db.insert(users).values(insertParams).returning();
     return result[0];
   }
 
@@ -97,9 +114,19 @@ class User {
     params: Partial<UserColumn | { password: string }>,
     id: number,
   ) {
+    const updatedParams: any = {
+      ...params,
+    };
+
+    if ("dob" in updatedParams) {
+      const normalizedDob = User.toDobString(updatedParams.dob);
+      if (normalizedDob !== undefined) updatedParams.dob = normalizedDob;
+      else delete updatedParams.dob;
+    }
+
     const result: any = await db
       .update(users)
-      .set(params)
+      .set(updatedParams)
       .where(eq(users.id, id))
       .returning();
     return result[0] || null;

@@ -33,9 +33,11 @@ const updateProfileValidationSchema = z
 
 const validationSchema = z.object({
   username: z.string(),
-  password: z.string(),
+  password: z.string().min(8).optional(),
   email: z.string(),
-  phone: z.string().optional(),
+  relation: z.string().optional().default("User"),
+  phone: z.string().min(10).max(15).default(`${Date.now()}`),
+  dob: z.string().optional()
 });
 
 type createUserType = z.infer<typeof validationSchema>;
