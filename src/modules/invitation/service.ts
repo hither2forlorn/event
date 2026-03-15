@@ -1,23 +1,43 @@
 import logger from "@/config/logger";
 import Model from "./model";
 import Resource, { Invitation_Event } from "./resource";
-import EventService from "@/modules/event/service"
-import { throwErrorOnValidation, throwForbiddenError, throwNotFoundError, throwUnauthorizedError } from "@/utils/error";
+import EventService from "@/modules/event/service";
+import {
+  throwErrorOnValidation,
+  throwForbiddenError,
+  throwNotFoundError,
+  throwUnauthorizedError,
+} from "@/utils/error";
 import UserService from "@/modules/user/service";
-import FamilyService from "@/modules/family/service"
+import FamilyService from "@/modules/family/service";
 import Invitation from "./model";
-import { EventInvitationType, EventInvitation, setResponcevalidationType, setResponcevalidation } from "./validators";
+import {
+  EventInvitationType,
+  EventInvitation,
+  setResponcevalidationType,
+  setResponcevalidation,
+} from "./validators";
 
-//list of the event with the event detail and the user id in the header 
-const getInvitedEvent = async (params: Partial<Invitation_Event>, userId: number, familyId?: number) => {
+//list of the event with the event detail and the user id in the header
+const getInvitedEvent = async (
+  params: Partial<Invitation_Event>,
+  userId: number,
+  familyId?: number,
+) => {
   try {
-    const invited_event = await Model.listAllInvitationEvent({ ...params, userId, familyId });
+    const invited_event = await Model.listAllInvitationEvent({
+      ...params,
+      userId,
+      familyId,
+    });
     return invited_event;
   } catch (err: any) {
-    logger.error(`Error fetching invitations for user ${userId}: ${err.message}`);
+    logger.error(
+      `Error fetching invitations for user ${userId}: ${err.message}`,
+    );
     throw err;
   }
-}
+};
 
 const listinvitationsResponce = async (
   eventId: number,
@@ -32,10 +52,7 @@ const listinvitationsResponce = async (
       throwErrorOnValidation("eventId must be a valid number");
     }
 
-    if (
-      parsedFamilyId === undefined
-      && parsedUserId === undefined
-    ) {
+    if (parsedFamilyId === undefined && parsedUserId === undefined) {
       throwErrorOnValidation("Either familyId or userId is required");
     }
 
@@ -47,7 +64,11 @@ const listinvitationsResponce = async (
       throwErrorOnValidation("userId must be a valid number");
     }
 
-    const listEvent = await Model.getInvitationResponces({ eventId, familyId: parsedFamilyId, userId: parsedUserId });
+    const listEvent = await Model.getInvitationResponces({
+      eventId,
+      familyId: parsedFamilyId,
+      userId: parsedUserId,
+    });
     return listEvent;
   } catch (err: any) {
     logger.error(
@@ -55,16 +76,27 @@ const listinvitationsResponce = async (
     );
     throw err;
   }
-}
+};
 
-const setResponce = async (body: setResponcevalidationType, userId: number, familyId: number | null = null, eventId: number) => {
+const setResponce = async (
+  body: setResponcevalidationType,
+  userId: number,
+  familyId: number | null = null,
+  eventId: number,
+) => {
   try {
-    const { error, data } = setResponcevalidation.safeParse(body)
+    const { error, data } = setResponcevalidation.safeParse(body);
     if (error) {
       return throwErrorOnValidation(error.message);
     }
 
-    const invitations = await Model.findInvitationEvent({ eventId: eventId, userId: userId, familyId: familyId ?? undefined });
+    console.log(data);
+
+    const invitations = await Model.findInvitationEvent({
+      eventId: eventId,
+      userId: userId,
+      familyId: familyId ?? undefined,
+    });
 
     if (!invitations) {
       return throwNotFoundError("Invitation was not found");
@@ -90,18 +122,19 @@ const setResponce = async (body: setResponcevalidationType, userId: number, fami
       guestId: data?.userId!,
       invited_by: Number(invitations?.invited_by!),
       familyId: familyId,
-      params: data
+      params: data,
     });
     return result;
-
-
   } catch (err) {
     throw err;
-
   }
-}
+};
 
-const inviteGuest = async (input: EventInvitationType, userId: number, eventId: number) => {
+const inviteGuest = async (
+  input: EventInvitationType,
+  userId: number,
+  eventId: number,
+) => {
   try {
     const result = EventInvitation.safeParse(input);
     if (!result.success) {
@@ -111,28 +144,43 @@ const inviteGuest = async (input: EventInvitationType, userId: number, eventId: 
     }
     const isValid = await EventService.checkAuthorized(eventId, userId);
     if (!isValid) {
-      return throwErrorOnValidation("Unauthorized: You are not allowed to invite guests for this event");
+      return throwErrorOnValidation(
+        "Unauthorized: You are not allowed to invite guests for this event",
+      );
     }
 
     const { fullName, email, phone, isFamily } = input;
     let guestUser = undefined;
     if (email || phone) {
       try {
-        guestUser = (await UserService.list({ email: input.email, phone: input.phone })).items[0] // get the user with the email and the phone
-        if (!guestUser?.id) { // No user with the email or overall no user found 
-          guestUser = await UserService.UserGeneratorWithPhoneOrEmail(fullName, email, phone);
+        guestUser = (
+          await UserService.list({ email: input.email, phone: input.phone })
+        ).items[0]; // get the user with the email and the phone
+        if (!guestUser?.id) {
+          // No user with the email or overall no user found
+          guestUser = await UserService.UserGeneratorWithPhoneOrEmail(
+            fullName,
+            email,
+            phone,
+          );
         }
       } catch (err) {
         throw err;
       }
     }
     if (!guestUser || guestUser.id == undefined) {
-      throw new Error("Error while making the user ")
+      throw new Error("Error while making the user ");
     }
     if (isFamily && !guestUser.familyId) {
-      guestUser.familyId = await FamilyService.makeFamilyAndAddUserToFamily(guestUser.id, fullName)
+      guestUser.familyId = await FamilyService.makeFamilyAndAddUserToFamily(
+        guestUser.id,
+        fullName,
+      );
     }
-    const invitationexist = await Model.find({ eventId: eventId, userId: guestUser.id });
+    const invitationexist = await Model.find({
+      eventId: eventId,
+      userId: guestUser.id,
+    });
     if (invitationexist) {
       throwErrorOnValidation("This user is already invited to the event");
     }
@@ -160,7 +208,9 @@ const getEventguest = async (eventid: number, userId: number) => {
   try {
     const isAllowed = await EventService.checkAuthorized(eventid, userId);
     if (!isAllowed) {
-      return throwUnauthorizedError("User with the details cannot get the information of the guest ");
+      return throwUnauthorizedError(
+        "User with the details cannot get the information of the guest ",
+      );
     }
     const event_guest = Model.getEventGuest(eventid);
     return event_guest;

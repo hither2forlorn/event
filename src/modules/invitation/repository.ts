@@ -1,7 +1,8 @@
-import event from "@/modules/event/schema"
-import invitation from "./schema"
-import Family from "@/modules/family/repository"
-import User from "@/modules/user/repository"
+import event from "@/modules/event/schema";
+import invitation from "./schema";
+import Family from "@/modules/family/repository";
+import User from "@/modules/user/repository";
+
 const select = {
   id: invitation.id,
   userId: invitation.userId,
@@ -12,6 +13,8 @@ const select = {
   status: invitation.status,
   notes: invitation.notes,
   category: invitation.category,
+  isArrivalPickupRequired: invitation.isArrivalPickupRequired,
+  isDeparturePickupRequired: invitation.isDeparturePickupRequired,
   arrival_date_time: invitation.arrival_date_time,
   departure_date_time: invitation.departure_date_time,
   isAccomodation: invitation.isAccomodation,
@@ -32,17 +35,16 @@ const selectInvitationEvent = {
   familyId: invitation.familyId,
   userId: invitation.userId,
   invitation_status: invitation.status,
-  role: invitation.category
-}
-
+  role: invitation.category,
+};
 
 const selectInvitationResponse = {
   user_detail: User.selectQuery,
   event_guest: select,
-  family_name: Family.selectQuery.familyName
+  family_name: Family.selectQuery.familyName,
 };
 export default {
   select,
   selectInvitationEvent,
-  selectInvitationResponse
+  selectInvitationResponse,
 };

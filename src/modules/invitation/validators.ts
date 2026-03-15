@@ -14,12 +14,16 @@ const invitationStatusValidation = z.enum([
   invitationStatus.rejected,
 ]);
 const EventInvitation = z.object({
-  fullName: z.string().min(1, "Full name is required").max(100).default("Family Default"),
+  fullName: z
+    .string()
+    .min(1, "Full name is required")
+    .max(100)
+    .default("Family Default"),
   email: z.string().email("Invalid email").max(255).optional(),
   phone: z.string().max(20).optional(),
   role: z.string().max(16).optional(),
   invitation_name: z.string().min(1, "Invitation name is required").max(50),
-  isFamily: z.boolean().default(false)
+  isFamily: z.boolean().default(false),
 });
 const setResponcevalidation = z.object({
   invited_by: z.number().int().positive().optional(),
@@ -33,11 +37,18 @@ const setResponcevalidation = z.object({
   arrival_date_time: z.coerce.date().optional().nullable(),
   departure_date_time: z.coerce.date().optional().nullable(),
   isAccomodation: z.boolean().optional().nullable(),
-})
-
+  isArrivalPickupRequired: z.boolean().optional().nullable(),
+  isDeparturePickupRequired: z.boolean().optional().nullable(),
+});
 
 type EventInvitationType = z.infer<typeof EventInvitation>;
-type setResponcevalidationType = z.infer<typeof setResponcevalidation>
+type setResponcevalidationType = z.infer<typeof setResponcevalidation>;
 
-
-export { setResponcevalidation, setResponcevalidationType, validationRSVP, invitationStatusValidation, EventInvitation, EventInvitationType };
+export {
+  setResponcevalidation,
+  setResponcevalidationType,
+  validationRSVP,
+  invitationStatusValidation,
+  EventInvitation,
+  EventInvitationType,
+};

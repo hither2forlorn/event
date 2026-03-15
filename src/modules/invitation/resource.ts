@@ -2,18 +2,24 @@ import { UserColumn } from "../user/resource";
 export interface InvitationColumn {
   id: number;
   eventId: number;
-  familyId: number | null ;
+  familyId: number | null;
   invited_by: number;
-  userId:number | null ;  
-  responded_by: number | null ;
-  status: string | null ;
-  notes: string | null ;
-  respondedAt: string | null ;
-  updatedAt: Date | null ;
-  createdAt: Date  ;
+  userId: number | null;
+  responded_by: number | null;
+  status: string | null;
+  isArrivalPickupRequired: boolean | null;
+  isDeparturePickupRequired: boolean | null;
+  isAccomodation: boolean | null;
+  arrival_date_time: Date | null;
+  departure_date_time: Date | null;
+  joined_at: Date | null;
+  notes: string | null;
+  respondedAt: string | null;
+  updatedAt: Date | null;
+  createdAt: Date;
 }
 export interface FamilyInvitationResponseColumn {
-  user_detail:UserColumn  
+  user_detail: UserColumn;
   event_guest: {
     id: number;
     userId: number;
@@ -26,9 +32,11 @@ export interface FamilyInvitationResponseColumn {
     arrival_date_time: Date | null;
     departure_date_time: Date | null;
     isAccomodation: boolean | null;
+    isArrivalPickupRequired: boolean | null;
+    isDeparturePickupRequired: boolean | null;
     joined_at: string | null;
-    createdAt:Date ; 
-    updatedAt:Date ; 
+    createdAt: Date;
+    updatedAt: Date;
   } | null;
 }
 
@@ -46,7 +54,7 @@ export interface Invitation_Event {
   invitation_status: string | null;
   invited_by: number;
   familyId: number | null;
-  role?: string | null; 
+  role?: string | null;
 }
 class Resource {
   static toJson(invitation: InvitationColumn) {
@@ -56,8 +64,12 @@ class Resource {
       notes: invitation.notes,
       status: invitation.status,
       respondedAt: invitation.respondedAt,
-      updatedAt: invitation.updatedAt ? invitation.updatedAt.toISOString() : null,
-      createdAt:invitation.createdAt ? invitation.createdAt.toISOString() : null,
+      updatedAt: invitation.updatedAt
+        ? invitation.updatedAt.toISOString()
+        : null,
+      createdAt: invitation.createdAt
+        ? invitation.createdAt.toISOString()
+        : null,
     };
     return data;
   }
@@ -68,24 +80,28 @@ class Resource {
       invitation_status: invitation.invitation_status,
       invited_by: invitation.invited_by,
       familyId: invitation.familyId,
-      role: invitation.role ?? "Guest"
-    }
+      role: invitation.role ?? "Guest",
+    };
     return data;
   }
 
-  static toFamilyInvitationResponseJson(data: FamilyInvitationResponseColumn): FamilyInvitationResponseColumn {
+  static toFamilyInvitationResponseJson(
+    data: FamilyInvitationResponseColumn,
+  ): FamilyInvitationResponseColumn {
     return {
       user_detail: data.user_detail,
       event_guest: data.event_guest,
     };
   }
 
-  static familyInvitationResponseCollection(data: FamilyInvitationResponseColumn[]) {
+  static familyInvitationResponseCollection(
+    data: FamilyInvitationResponseColumn[],
+  ) {
     return data.map(this.toFamilyInvitationResponseJson);
   }
 
   static invitationeventCollection(invitations: Invitation_Event[]) {
-    return invitations.map(this.toEventJson)
+    return invitations.map(this.toEventJson);
   }
 }
 export default Resource;
