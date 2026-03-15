@@ -39,6 +39,9 @@ const setResponcevalidation = z.object({
   isAccomodation: z.boolean().optional().nullable(),
   isArrivalPickupRequired: z.boolean().optional().nullable(),
   isDeparturePickupRequired: z.boolean().optional().nullable(),
+  arrival_info: z.string().max(200).optional().nullable(),
+  departure_info: z.string().max(200).optional().nullable(),
+  assigned_room: z.string().max(150).optional().nullable(),
 });
 
 type EventInvitationType = z.infer<typeof EventInvitation>;

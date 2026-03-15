@@ -1,6 +1,6 @@
 import { eq, and, sql, or, isNull } from "drizzle-orm";
 import invitation from "./schema";
-import family from "@/modules/family/schema"
+import family from "@/modules/family/schema";
 import event from "@/modules/event/schema";
 import db from "@/config/db";
 import repository from "./repository";
@@ -9,7 +9,7 @@ import { InvitationColumn } from "./resource";
 import user from "@/modules/user/schema";
 import { setResponcevalidationType } from "./validators";
 
-export default class Invitation {   
+export default class Invitation {
   static async list(params: any) {
     const { page, limit } = params;
     const offset = (page - 1) * limit;
@@ -35,9 +35,11 @@ export default class Invitation {
     const event_guest = await db
       .select(repository.selectInvitationResponse)
       .from(invitation)
-      .leftJoin(user, eq(invitation.userId, user.id)).
-      leftJoin(family, eq(family.id, invitation.familyId))
+      .leftJoin(user, eq(invitation.userId, user.id))
+      .leftJoin(family, eq(family.id, invitation.familyId))
       .where(eq(invitation.eventId, eventId));
+
+    console.log(event_guest);
     return event_guest;
   }
 
@@ -75,7 +77,7 @@ export default class Invitation {
       .where(whereCondition)
       .groupBy(invitation.eventId)
       .as("distinct_event_invitations");
-    //Tyo pako CTE table bata eventId ani , invitation ko detail hamlai tannera chaini kura linxa 
+    //Tyo pako CTE table bata eventId ani , invitation ko detail hamlai tannera chaini kura linxa
     const result = await db
       .select(repository.selectInvitationEvent)
       .from(distinctEventInvitations)
@@ -182,6 +184,7 @@ export default class Invitation {
         ),
       )
       .limit(1);
+
     if (!invite.length) return [];
     const isFamilyInvite = invite[0]?.familyId !== null;
     const targetFamilyId = invite[0]?.familyId;
@@ -192,7 +195,8 @@ export default class Invitation {
       .leftJoin(
         invitation,
         and(eq(invitation.eventId, eventId), eq(invitation.userId, user.id)),
-      ).leftJoin(family, eq(family.id, invitation.familyId))
+      )
+      .leftJoin(family, eq(family.id, invitation.familyId))
       .where(
         isFamilyInvite
           ? eq(user.familyId, targetFamilyId!)
@@ -244,7 +248,7 @@ export default class Invitation {
     eventId: number;
     guestId: number;
     invited_by: number;
-    params: setResponcevalidationType
+    params: setResponcevalidationType;
     familyId?: number | null;
   }) {
     const existingGuest = await db
@@ -263,9 +267,8 @@ export default class Invitation {
           ...params,
           userId: guestId,
           eventId,
-          updatedAt: new Date()
-        }
-        )
+          updatedAt: new Date(),
+        })
         .where(eq(invitation.id, existingGuest[0].id))
         .returning();
       return updated[0] ?? null;
@@ -279,7 +282,7 @@ export default class Invitation {
         userId: guestId,
         familyId: params.familyId ?? familyId ?? null,
         joined_at: new Date(),
-        invited_by: invited_by
+        invited_by: invited_by,
       })
       .returning();
     return inserted;

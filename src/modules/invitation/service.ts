@@ -64,12 +64,12 @@ const listinvitationsResponce = async (
       throwErrorOnValidation("userId must be a valid number");
     }
 
-    const listEvent = await Model.getInvitationResponces({
+    const invitationResponse = await Model.getInvitationResponces({
       eventId,
       familyId: parsedFamilyId,
       userId: parsedUserId,
     });
-    return listEvent;
+    return invitationResponse;
   } catch (err: any) {
     logger.error(
       `Error fetching invitation response for event ${eventId}: ${err.message}`,
@@ -90,11 +90,22 @@ const setResponce = async (
       return throwErrorOnValidation(error.message);
     }
 
-    console.log(data);
+    const eventMembers = await EventService.getUserRelatedToEvent(
+      eventId,
+      userId,
+    );
+
+    console.log("eventMembers", eventMembers);
+
+    const isOrganizer = eventMembers.users.some(
+      (user) => user.userId === userId,
+    );
+
+    console.log("isOrganizer", isOrganizer);
 
     const invitations = await Model.findInvitationEvent({
       eventId: eventId,
-      userId: userId,
+      userId: isOrganizer ? body.userId : userId,
       familyId: familyId ?? undefined,
     });
 
@@ -107,16 +118,19 @@ const setResponce = async (
       invitations.familyId !== null &&
       invitations.familyId === familyId;
 
-    if (!canRespondAsSelf && !canRespondAsFamily) {
+    const canRespondAsOrganizer = invitations.invited_by === userId;
+
+    if (!canRespondAsSelf && !canRespondAsFamily && !canRespondAsOrganizer) {
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
-    if (body.userId !== userId) {
-      await FamilyService.listMembers(familyId ?? 0);
-      // if (members.some(member => member?.id === userId)) {
-      // } else {
-      //   throwForbiddenError("You can only set responce for your family members");
-      // }
-    }
+    console.log("setResponce result", {
+      eventId: eventId,
+      guestId: data?.userId!,
+      invited_by: Number(invitations?.invited_by!),
+      familyId: familyId,
+      params: data,
+    });
+
     const result = await Model.makeEventGuest({
       eventId: eventId,
       guestId: data?.userId!,
@@ -124,6 +138,7 @@ const setResponce = async (
       familyId: familyId,
       params: data,
     });
+    console.log("setResponce result", result);
     return result;
   } catch (err) {
     throw err;

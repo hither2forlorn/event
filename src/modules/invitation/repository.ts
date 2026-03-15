@@ -19,6 +19,11 @@ const select = {
   departure_date_time: invitation.departure_date_time,
   isAccomodation: invitation.isAccomodation,
   joined_at: invitation.joined_at,
+  assigned_room: invitation.assignedRoom,
+  arrival_info: invitation.arrival_info,
+  departure_info: invitation.departure_info,
+  createdAt: invitation.createdAt,
+  updatedAt: invitation.updatedAt,
 };
 const selectInvitationEvent = {
   id: invitation.id,
