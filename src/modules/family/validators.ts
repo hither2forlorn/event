@@ -1,3 +1,4 @@
+import { generateRandomNumber } from "@/utils/helper";
 import z from "zod";
 
 const familyIdParamValidation = z.object({
@@ -45,17 +46,21 @@ const addMemberValidation = z.object({
     id: z.coerce.number().int().positive("Family ID must be a positive number"),
   }),
   body: z.object({
-    email: z.string().email("Invalid email address"),
-    name: z
-      .string()
-      .min(2, "Name must be at least 2 characters long")
-      .optional(),
-    relation: z
-      .string()
-      .min(2, "Relation must be at least 2 characters long")
-      .nullable()
-      .optional(),
+    email: z.preprocess(
+      (val) => val || `${generateRandomNumber(5)}@gmail.com`,
+      z.string().email("Invalid email address")
+    ),
+
+    username: z.string().min(2, "Name must be at least 2 characters long").optional(),
+
+    relation: z.string().min(2).nullable().optional(),
+
     foodPreference: z.string().min(2).nullable().optional(),
+
+    phone: z.preprocess(
+      (val) => val || generateRandomNumber(10).toString(),
+      z.string().length(10)
+    ),
   }),
 });
 
@@ -79,6 +84,8 @@ const updateMemberValidation = z.object({
         .min(2, "Name must be at least 2 characters long")
         .optional(),
       foodPreference: z.string().min(2).nullable().optional(),
+      email: z.string().optional(),
+      phone: z.string().optional(),
     })
     .refine((body) => Object.keys(body).length > 0, {
       message: "At least one field is required to update member",

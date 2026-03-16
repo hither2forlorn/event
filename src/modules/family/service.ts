@@ -38,9 +38,17 @@ const checkAuthorization = async (
 
 const create = async (input: CreateFamilyValidation["body"], user: number) => {
   try {
-    const existedFamily = await Model.findIfUserHasFamily(user);
-
-    if (existedFamily) {
+    const userDetail = await UserService.find({ id: user });
+    if (!userDetail) {
+      return throwNotFoundError("User with information was not found")
+    }
+    if (!userDetail.email) {
+      throw new Error("User email was not found");
+    }
+    if (!userDetail.phone) {
+      throw new Error("User phone was not found");
+    }
+    if (userDetail && userDetail.familyId) {
       throw new Error("User already has a family");
     }
 
@@ -52,14 +60,11 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
       throw new Error("Failed to create family");
     }
 
-    const creator = await userModel.find({ id: user });
-    if (!creator) {
-      throw new Error("Creator user not found");
-    }
 
     await Model.addMemberIfUser(result.id, user, {
-      name: creator.username || creator.email,
-      email: creator.email,
+      username: userDetail.username || userDetail.email,
+      email: userDetail.email,
+      phone: userDetail.phone,
       relation: "self",
       foodPreference: null,
     });
@@ -157,10 +162,9 @@ const addMember = async (
       throwForbiddenError("Only family members can add members");
     }
 
-    const user = await userModel.find({ email: input.email });
+    const user = await userModel.find({ email: input.email, phone: input.phone });
 
     let userId;
-
     if (user) {
       const existedFamily = await Model.findIfUserHasFamily(user.id);
       if (existedFamily && existedFamily.familyId !== familyId) {
@@ -168,14 +172,16 @@ const addMember = async (
       }
 
       userId = user.id;
-      if (!input.name && user.username) {
-        input.name = user.username;
+      if (!input.username && user.username) {
+        input.username = user.username;
       }
     } else {
       const newUser = await UserService.create({
-        username: input.name ?? "Member",
+        username: input.username ?? "Member",
         password: `${new Date()}_User`,
         email: input.email,
+        phone: input.phone,
+        relation: input.relation ?? "Family member"
       });
       if (!newUser || !newUser.id) {
         throw new Error("Failed to create user for family member");
@@ -200,7 +206,7 @@ const listMembers = async (familyId: number) => {
     await get(familyId);
     const members = await Model.getMembers(familyId);
     console.log(members);
-    return Resource.collectionMembers(members);
+    return Resource.collectionMembers(members as any);
   } catch (error) {
     throw error;
   }
@@ -215,7 +221,7 @@ const getMemberDetails = async (familyId: number, memberId: number) => {
       return throwNotFoundError("Family member");
     }
 
-    return Resource.toJsonMember(member);
+    return Resource.toJsonMember(member as any);
   } catch (error) {
     throw error;
   }
@@ -282,15 +288,6 @@ const removeMember = async (
     } else {
       throw new Error("Failed to remove family member");
     }
-  } catch (error) {
-    throw error;
-  }
-};
-
-const getMyFamily_userId = async (userId: number) => {
-  try {
-    const result = await Model.findIfUserHasFamily(userId);
-    return result;
   } catch (error) {
     throw error;
   }

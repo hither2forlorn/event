@@ -1,3 +1,4 @@
+import { UserColumn } from "@/modules/user/resource";
 export interface FamilyColumn {
   id: number;
   familyName: string;
@@ -5,19 +6,7 @@ export interface FamilyColumn {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-export interface FamilyMemberColumn {
-  familyId: number | null;
-  id: number;
-  relation: string | null;
-  username: string;
-  email: string;
-  foodPreference?: string | null;
-  dob?: Date | null;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
-  phone?: string | null;
-}
+export type FamilyMemberColumn = UserColumn;
 
 export type FamilyInsert = Omit<FamilyColumn, "id" | "createdAt" | "updatedAt">;
 
@@ -47,7 +36,7 @@ class Resource {
       email: member.email,
       foodPreference: member.foodPreference || null,
       dob: member.dob || undefined,
-      phone: member.phone || null,
+      phone: member.phone,
     };
     return data;
   }

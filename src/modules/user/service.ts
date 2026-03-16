@@ -44,7 +44,7 @@ const create = async (input: createUserType) => {
     const user = await Model.create({
       ...input,
       dob,
-      phone: input.phone ?? `+977${Date.now()}`
+      phone: `+977${input.phone}`
 
     }, hashedPw);
     if (!user) {

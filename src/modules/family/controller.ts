@@ -66,6 +66,7 @@ const addMember = async (req: IAuthRequest) => {
     const { params, body } = req;
 
     const familyId = Number(params.id);
+    console.log(req.body);
 
     const data = await Service.addMember(familyId, req.user.id, body);
 
@@ -78,9 +79,7 @@ const addMember = async (req: IAuthRequest) => {
 const getMembers = async (req: IAuthRequest) => {
   try {
     const familyId = Number(req.params.id);
-
     const data = await Service.listMembers(familyId);
-
     return data;
   } catch (error) {
     throw error;
