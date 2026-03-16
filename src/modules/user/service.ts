@@ -72,7 +72,6 @@ const create = async (input: createUserType) => {
 const login = async (input: loginType) => {
   try {
     const result = loginValidationSchema.safeParse(input);
-    console.log(result);
 
     if (!result.success) {
       throwErrorOnValidation(

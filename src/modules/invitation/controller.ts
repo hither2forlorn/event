@@ -56,8 +56,6 @@ const setResponce = async (req: IAuthRequest) => {
   try {
     const userId = req.user.id;
     const eventId = Number(req.params.id);
-    console.log('This is sthe id for the event id responc⟵⟵⟵⟵e', eventId)
-    console.log('This is the body to be parsed and check for the alidation while updating the rsvp content in the db ', req.body);
     const familyId = req.user.familyId;
     const service = await Service.setResponce(req.body, userId, familyId, eventId); // TODO:update the validaion in this line of the code 
     return service;
