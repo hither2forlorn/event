@@ -42,7 +42,7 @@ const attributes = {
   responded_at: timestamp("responded_at", { withTimezone: true }),
   arrival_date_time: timestamp("arrival_date_time", { withTimezone: true }),
   departure_date_time: timestamp("departure_date_time", { withTimezone: true }),
-  assignedRoom: varchar("assigned_room", { length: 150 }),
+  assigned_room: varchar("assigned_room", { length: 150 }),
   arrival_info: varchar("arrival_info", { length: 200 }),
   departure_info: varchar("departure_info", { length: 200 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),

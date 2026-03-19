@@ -261,6 +261,7 @@ export default class Invitation {
       .limit(1);
 
     if (existingGuest[0]?.id) {
+      console.log("this dfjhsdkjfhsdjkfhsdkjlfhsdfskfsdjghfzsdjfggjhdgf", existingGuest[0]);
       const updated = await db
         .update(invitation)
         .set({

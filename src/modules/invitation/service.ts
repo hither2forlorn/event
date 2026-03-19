@@ -127,13 +127,6 @@ const setResponce = async (
     if (!canRespondAsSelf && !canRespondAsFamily && !canRespondAsOrganizer) {
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
-    console.log("setResponce result", {
-      eventId: eventId,
-      guestId: data?.userId!,
-      invited_by: Number(invitations?.invited_by!),
-      familyId: familyId,
-      params: data,
-    });
 
     const result = await Model.makeEventGuest({
       eventId: eventId,
@@ -142,7 +135,6 @@ const setResponce = async (
       familyId: familyId,
       params: data,
     });
-    console.log("setResponce result", result);
     return result;
   } catch (err) {
     throw err;
