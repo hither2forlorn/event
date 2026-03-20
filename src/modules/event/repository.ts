@@ -20,10 +20,8 @@ const selectQuery = {
 };
 
 const SelectEventOwners = {
-  userId: event_member_schema.userId,
-  username: User.selectQuery.username,
-  userEmail: User.selectQuery.email,
-  userPhone: User.selectQuery.phone,
+  user: User.selectQuery,
+  role: event_member_schema.role
 };
 
 

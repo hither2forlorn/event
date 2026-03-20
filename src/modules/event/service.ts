@@ -190,11 +190,7 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
     await checkAuthorized(eventId, userId);
 
     const data = await Model.getEventMember(eventId);
-    return {
-      eventId,
-      users: data,
-      totalUsers: data.length,
-    };
+    return data;
   } catch (error: any) {
     logger.error("Error in getting users related to event:", error);
     throw error;
@@ -212,8 +208,9 @@ const makeEventMember = async (eventId: number, userId: number, params: AddEvent
     if (!userInfo || !userInfo.id) {
       return throwNotFoundError("User with the phone was not found")
     }
-    const eventIsOwner = eventMembers.users.find((user) => user.userId == userInfo.id);
-    if (eventIsOwner?.userId || eventIsOwner) {
+    console.log("This is the event", userInfo);
+    const eventIsOwner = eventMembers.find((member: any) => member.user?.id == userInfo.id);
+    if (eventIsOwner) {
       return throwForbiddenError("Already event member")
     }
     const event_owner_data = await Model.makeEventOwner(eventId, userInfo.id, data?.role ?? "Host");
