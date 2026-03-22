@@ -1,5 +1,6 @@
 import z from "zod";
 import { invitationStatus } from "@/constant";
+import { generateRandomNumber } from "@/utils/helper";
 
 const validationRSVP = z.object({
   eventId: z.number(),
@@ -19,8 +20,14 @@ const EventInvitation = z.object({
     .min(1, "Full name is required")
     .max(100)
     .default("Family Default"),
-  email: z.string().email("Invalid email").max(255).optional(),
-  phone: z.string().max(15),
+  email: z.preprocess(
+    (val) => val || `${generateRandomNumber(5)}@gmail.com`,
+    z.string().email("Invalid email address")
+  ),
+  phone: z.preprocess(
+    (val) => val || `+977-${generateRandomNumber(10)}`,
+    z.string().max(15)
+  ),
   role: z.string().max(16).optional(),
   invitation_name: z.string().min(1, "Invitation name is required").max(50),
   relation: z.string().optional(),
@@ -44,11 +51,16 @@ const setResponcevalidation = z.object({
   departure_info: z.string().max(200).optional().nullable(),
   assigned_room: z.string().max(150).optional().nullable(),
 });
-
+const removeInvitationValidation = z.object({
+  userId: z.number().nonoptional()
+})
+type EventInvitationRemoveType = z.infer<typeof removeInvitationValidation>
 type EventInvitationType = z.infer<typeof EventInvitation>;
 type setResponcevalidationType = z.infer<typeof setResponcevalidation>;
 
 export {
+  EventInvitationRemoveType,
+  removeInvitationValidation,
   setResponcevalidation,
   setResponcevalidationType,
   validationRSVP,

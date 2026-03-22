@@ -257,6 +257,7 @@ const UserGeneratorWithPhoneOrEmail = async ({
   const randomPassword = crypto.randomBytes(8).toString("hex");
   const placeholderEmail = email || `guest_${Date.now()}_${Math.floor(Math.random() * 1000)}@khumbaya.com`;
   const placeholderPhone = phone || `+977${Date.now()}`;
+
   const user = await create({
     dob: new Date(),
     username: fullName,

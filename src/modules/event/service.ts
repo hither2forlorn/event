@@ -210,10 +210,10 @@ const makeEventMember = async (eventId: number, userId: number, params: AddEvent
     }
     console.log("This is the event", userInfo);
     const eventIsOwner = eventMembers.find((member: any) => member.user?.id == userInfo.id);
+
     if (eventIsOwner) {
       return throwForbiddenError("Already event member")
-    }
-    const event_owner_data = await Model.makeEventOwner(eventId, userInfo.id, data?.role ?? "Host");
+    } const event_owner_data = await Model.makeEventOwner(eventId, userInfo.id, data?.role ?? "Host");
     return event_owner_data;
   } catch (err: any) {
     logger.error("Error in getting the user with the info")

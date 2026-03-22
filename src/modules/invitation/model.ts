@@ -302,4 +302,13 @@ export default class Invitation {
 
     return deleted;
   }
+  static async removeinvitation(
+    userId: number,
+    eventId: number
+  ) {
+    const deletedEvent_guest = await db.delete(invitation).where(
+      and(eq(invitation.eventId, eventId), eq(invitation.userId, userId))
+    ).returning();
+    return deletedEvent_guest;
+  }
 }

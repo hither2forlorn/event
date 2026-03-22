@@ -1,4 +1,3 @@
-import { role } from "@/constant";
 import Controller from "./controller"
 const route = [
   {
@@ -24,21 +23,24 @@ const route = [
     controller: Controller.getEventGuest, // get the guest of the event in the id
     path: "event/guest/:id",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "post",
     controller: Controller.sendInvitation, // send the invitation to the guest in the evnt 
     path: "event/:eventId/invite",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "get",
     controller: Controller.getEventGuest,
     path: "event/:id/invitation",
     authorization: true,
-    authCheckType: [role.user],
+  }
+  , {
+    method: "delete",
+    controller: Controller.removeinvitation,
+    path: "event/:id/invitation",
+    authorization: true,
   }
 ]
 export default route; 

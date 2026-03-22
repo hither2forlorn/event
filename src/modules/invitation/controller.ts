@@ -82,10 +82,21 @@ const getEventGuest = async (req: IAuthRequest) => {
     throw err;
   }
 }
+const removeinvitation = async (req: IAuthRequest) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const updated_user = await Service.remove_invitation(id, userId, req.body);
+    return updated_user;
+  } catch (err) {
+    throw err;
+  }
+}
 
 //updateresponce  ( individual )
 export default {
   setResponce,
+  removeinvitation,
   sendInvitation,
   getInvitations,
   getInvitationResponse,

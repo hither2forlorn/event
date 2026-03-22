@@ -16,6 +16,7 @@ import {
   EventInvitation,
   setResponcevalidationType,
   setResponcevalidation,
+  EventInvitationRemoveType,
 } from "./validators";
 
 //list of the event with the event detail and the user id in the header
@@ -232,10 +233,24 @@ const getEventguest = async (eventid: number, userId: number) => {
   }
 };
 
+const remove_invitation = async (eventId: number, userId: number, params: EventInvitationRemoveType) => {
+  try {
+    const isAuthToEvent = EventService.checkAuthorized(eventId, userId);
+    if (!isAuthToEvent) {
+      return throwForbiddenError("Unauthorized to remvoe the guest");
+    }
+    const remove_invitation = await Model.removeinvitation(params.userId, eventId);
+    return remove_invitation;
+  } catch (err) {
+    throw err;
+  }
+}
+
 export default {
   setResponce,
   inviteGuest,
   getInvitedEvent,
   getEventguest,
   listinvitationsResponce,
+  remove_invitation,
 };
