@@ -4,6 +4,7 @@ export interface IAuthRequest extends Request {
   query: any;
   params: any;
   body: any;
+  file: any;
   user: {
     id: number;
     name: string;
@@ -17,9 +18,10 @@ export interface IRoute {
   method: "get" | "post" | "put" | "delete" | "patch";
   path: string;
   controller: (req: IAuthRequest) => Promise<any>;
-authorization?: boolean;
+  authorization?: boolean;
   authCheckType?: string[];
   validation?: any;
+  middlewares?: any[];
 }
 //const routeHandlerCache = new Map();
 const createRouteHandler = (controller: Function, path: string) => {
@@ -59,6 +61,7 @@ const routesInit = async (app: any) => {
         authorization,
         authCheckType,
         validation,
+        middlewares: routeMiddlewares,
       } = route as IRoute | any;
       const routeHandler = createRouteHandler(controller, path);
       console.log("route handler", routeHandler);
@@ -66,6 +69,10 @@ const routesInit = async (app: any) => {
       let middlewares = [];
 
       if (validation) middlewares.push(validation);
+
+      if (routeMiddlewares?.length) {
+        middlewares.push(...routeMiddlewares);
+      }
 
       if (authorization) {
         middlewares.push((req: any, _: any, next: any) => {

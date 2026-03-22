@@ -1,5 +1,8 @@
 import Controller from "./controller";
-const routes = [
+import { uploadProfilePicture } from "@/middlewares/uploadMiddleware";
+import type { IRoute } from "@/routes";
+
+const routes: IRoute[] = [
   {
     method: "get",
     controller: Controller.get,
@@ -10,7 +13,7 @@ const routes = [
     controller: Controller.findUserByPhone,
     path: "user/phone",
     authorization: true,
-    authCheckType: ["user"]
+    authCheckType: ["user"],
   },
   {
     method: "get",
@@ -23,8 +26,7 @@ const routes = [
     method: "get",
     controller: Controller.findUserByPhone,
     path: "user/find",
-  }
-  ,
+  },
   {
     method: "post",
     controller: Controller.create,
@@ -47,6 +49,14 @@ const routes = [
     controller: Controller.updateProfile,
     path: "user/me",
     authorization: true,
+  },
+  {
+    method: "patch",
+    controller: Controller.updateProfilePicture,
+    path: "user/profile-picture",
+    authorization: true,
+    authCheckType: ["user"],
+    middlewares: [uploadProfilePicture],
   },
   {
     method: "delete",

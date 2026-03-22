@@ -25,29 +25,30 @@ const profile = async (req: IAuthRequest) => {
 };
 const findUserByPhone = async (req: IAuthRequest) => {
   try {
-    const phone = `+` + req.query.phone.trim();// This is due to the issue in the ui 
-    console.log(phone)
+    const phone = `+` + req.query.phone.trim(); // This is due to the issue in the ui
+    console.log(phone);
     const userDetail = await Service.find({
-      phone: phone.trim()
-    })
+      phone: phone.trim(),
+    });
 
-    console.log('User witht he info', userDetail);
+    console.log("User witht he info", userDetail);
     return userDetail;
-  }
-  catch (err) {
+  } catch (err) {
     throw err;
   }
-}
+};
 const resetPassword = async (req: IAuthRequest) => {
   try {
-    const { userId, newPassword } = req.body
-    const updatedUser = Service.resetPassword({ newPassword: newPassword }, userId)
+    const { userId, newPassword } = req.body;
+    const updatedUser = Service.resetPassword(
+      { newPassword: newPassword },
+      userId,
+    );
     return updatedUser;
-  }
-  catch (err) {
+  } catch (err) {
     throw err;
   }
-}
+};
 
 const create = async (req: IAuthRequest) => {
   try {
@@ -88,6 +89,18 @@ const updateProfile = async (req: IAuthRequest) => {
     throw err;
   }
 };
+
+const updateProfilePicture = async (req: IAuthRequest) => {
+  const { user } = req;
+  const fileBuffer = req.file?.buffer;
+
+  if (!fileBuffer) {
+    throw new Error("Profile image is required");
+  }
+
+  return await Service.updateProfilePicture(user.id, fileBuffer);
+};
+
 const deleteModule = async (req: Request) => {
   try {
     logger.info("This is the deletemodule");
@@ -102,8 +115,9 @@ export default {
   get,
   changePassword,
   updateProfile,
+  updateProfilePicture,
   profile,
   deleteModule,
   resetPassword,
-  findUserByPhone
+  findUserByPhone,
 };
