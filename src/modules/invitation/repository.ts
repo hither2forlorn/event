@@ -41,6 +41,8 @@ const selectInvitationEvent = {
   userId: invitation.userId,
   invitation_status: invitation.status,
   role: invitation.category,
+  category: invitation.category,
+  invitation_name: invitation.invitation_name,
 };
 
 const selectInvitationResponse = {

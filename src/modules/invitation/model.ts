@@ -141,6 +141,7 @@ export default class Invitation {
       .where(whereCondition);
 
     const result = await query;
+
     return result[0] || null;
   }
 
@@ -261,7 +262,10 @@ export default class Invitation {
       .limit(1);
 
     if (existingGuest[0]?.id) {
-      console.log("this dfjhsdkjfhsdjkfhsdkjlfhsdfskfsdjghfzsdjfggjhdgf", existingGuest[0]);
+      console.log(
+        "this dfjhsdkjfhsdjkfhsdkjlfhsdfskfsdjghfzsdjfggjhdgf",
+        existingGuest[0],
+      );
       const updated = await db
         .update(invitation)
         .set({
@@ -302,13 +306,13 @@ export default class Invitation {
 
     return deleted;
   }
-  static async removeinvitation(
-    userId: number,
-    eventId: number
-  ) {
-    const deletedEvent_guest = await db.delete(invitation).where(
-      and(eq(invitation.eventId, eventId), eq(invitation.userId, userId))
-    ).returning();
+  static async removeinvitation(userId: number, eventId: number) {
+    const deletedEvent_guest = await db
+      .delete(invitation)
+      .where(
+        and(eq(invitation.eventId, eventId), eq(invitation.userId, userId)),
+      )
+      .returning();
     return deletedEvent_guest;
   }
 }

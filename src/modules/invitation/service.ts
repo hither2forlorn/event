@@ -103,8 +103,8 @@ const setResponce = async (
         userId,
       );
 
-      const isOrganizer = eventMembers.users.some(
-        (user) => user.userId === userId,
+      const isOrganizer = eventMembers.some(
+        (user) => user?.user?.id === userId,
       );
 
       invitations = await Model.findInvitationEvent({
@@ -129,12 +129,28 @@ const setResponce = async (
       throwForbiddenError("You are not allowed to respond to this invitation");
     }
 
+    let params;
+
+    if (invitations && userId !== data.userId && familyId !== null) {
+      params = {
+        ...data,
+        category: invitations.category as
+          | "friend"
+          | "family"
+          | "colleague"
+          | "vvip",
+        invitation_name: invitations.invitation_name,
+      };
+    } else {
+      params = data;
+    }
+
     const result = await Model.makeEventGuest({
       eventId: eventId,
       guestId: data?.userId!,
       invited_by: Number(invitations?.invited_by!),
       familyId: familyId,
-      params: data,
+      params,
     });
     return result;
   } catch (err) {
@@ -162,7 +178,7 @@ const inviteGuest = async (
     }
 
     const { fullName, email, phone, isFamily, relation } = input;
-    let guestUser = undefined;
+    let guestUser;
     if (email || phone) {
       try {
         guestUser = (
@@ -174,9 +190,8 @@ const inviteGuest = async (
             fullName,
             email,
             phone,
-            relation: relation ? relation : `${isFamily ? "Family" : "Friend"}`
-          }
-          );
+            relation: relation ? relation : `${isFamily ? "Family" : "Friend"}`,
+          });
         }
       } catch (err) {
         throw err;
@@ -205,6 +220,7 @@ const inviteGuest = async (
       familyId: isFamily ? guestUser.familyId : undefined,
       invited_by: userId,
       status: "Pending",
+      category: input.category,
     });
 
     if (!invitation) {
@@ -233,18 +249,25 @@ const getEventguest = async (eventid: number, userId: number) => {
   }
 };
 
-const remove_invitation = async (eventId: number, userId: number, params: EventInvitationRemoveType) => {
+const remove_invitation = async (
+  eventId: number,
+  userId: number,
+  params: EventInvitationRemoveType,
+) => {
   try {
     const isAuthToEvent = EventService.checkAuthorized(eventId, userId);
     if (!isAuthToEvent) {
       return throwForbiddenError("Unauthorized to remvoe the guest");
     }
-    const remove_invitation = await Model.removeinvitation(params.userId, eventId);
+    const remove_invitation = await Model.removeinvitation(
+      params.userId,
+      eventId,
+    );
     return remove_invitation;
   } catch (err) {
     throw err;
   }
-}
+};
 
 export default {
   setResponce,
