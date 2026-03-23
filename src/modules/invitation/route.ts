@@ -1,4 +1,6 @@
-import Controller from "./controller"
+import { validate } from "@/middlewares/zodValidation";
+import Controller from "./controller";
+import { EventInvitation } from "./validators";
 const route = [
   {
     method: "get",
@@ -16,7 +18,7 @@ const route = [
     method: "post",
     controller: Controller.setResponce,
     path: "invitation/responce/:id",
-    authorization: true
+    authorization: true,
   },
   {
     method: "get",
@@ -26,7 +28,7 @@ const route = [
   },
   {
     method: "post",
-    controller: Controller.sendInvitation, // send the invitation to the guest in the evnt 
+    controller: Controller.sendInvitation, // send the invitation to the guest in the evnt
     path: "event/:eventId/invite",
     authorization: true,
   },
@@ -35,12 +37,12 @@ const route = [
     controller: Controller.getEventGuest,
     path: "event/:id/invitation",
     authorization: true,
-  }
-  , {
+  },
+  {
     method: "delete",
     controller: Controller.removeinvitation,
     path: "event/:id/invitation",
     authorization: true,
-  }
-]
-export default route; 
+  },
+];
+export default route;
