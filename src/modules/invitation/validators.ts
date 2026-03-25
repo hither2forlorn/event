@@ -7,7 +7,7 @@ const validationRSVP = z.object({
   userId: z.number(),
   invited_by: z.number().optional(),
   familyId: z.number().optional(),
-  category: z.string().optional(),
+  category: z.enum(["friend", "family", "colleague", "vvip"]),
 });
 const invitationStatusValidation = z.enum([
   invitationStatus.invited,
@@ -22,25 +22,24 @@ const EventInvitation = z.object({
     .default("Family Default"),
   email: z.preprocess(
     (val) => val || `${generateRandomNumber(5)}@gmail.com`,
-    z.string().email("Invalid email address")
+    z.string().email("Invalid email address"),
   ),
   phone: z.preprocess(
     (val) => val || `+977-${generateRandomNumber(10)}`,
-    z.string().max(15)
+    z.string().max(15),
   ),
   role: z.string().max(16).optional(),
   invitation_name: z.string().min(1, "Invitation name is required").max(50),
   relation: z.string().optional(),
   isFamily: z.boolean().default(false),
+  category: z.enum(["friend", "family", "colleague", "vvip"]),
 });
 const setResponcevalidation = z.object({
   invited_by: z.number().int().positive().optional(),
   familyId: z.number().int().positive().optional().nullable(),
   userId: z.number().int().positive(),
-  invitation_name: z.string().min(1).max(50).default("Family name"),
+  invitation_name: z.string().min(1).max(50).optional(),
   notes: z.string().max(40).optional().nullable(),
-  role: z.string().min(1).max(16).default("Guest"),
-  category: z.string().min(1).max(10).default("Friend"),
   status: z.string().min(1).max(10).optional().nullable(),
   arrival_date_time: z.coerce.date().optional().nullable(),
   departure_date_time: z.coerce.date().optional().nullable(),
@@ -50,11 +49,12 @@ const setResponcevalidation = z.object({
   arrival_info: z.string().max(200).optional().nullable(),
   departure_info: z.string().max(200).optional().nullable(),
   assigned_room: z.string().max(150).optional().nullable(),
+  category: z.enum(["friend", "family", "colleague", "vvip"]).optional(),
 });
 const removeInvitationValidation = z.object({
-  userId: z.number().nonoptional()
-})
-type EventInvitationRemoveType = z.infer<typeof removeInvitationValidation>
+  userId: z.number().nonoptional(),
+});
+type EventInvitationRemoveType = z.infer<typeof removeInvitationValidation>;
 type EventInvitationType = z.infer<typeof EventInvitation>;
 type setResponcevalidationType = z.infer<typeof setResponcevalidation>;
 
