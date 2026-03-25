@@ -3,94 +3,115 @@ import { throwNotFoundError } from "@/utils/error";
 import Service from "./service";
 
 const createBudgetCategory = async (req: IAuthRequest) => {
-  try {
-    const userId = req.user?.id;
-    const eventId = Number(req.params.eventId);
-
-    if (!eventId) {
-      throwNotFoundError("Event");
-    }
-
-    const data = await Service.createBudgetCategory(req.body, userId, eventId);
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const userId = req.user?.id;
+  const eventId = Number(req.params.eventId);
+  if (!eventId) throwNotFoundError("Event");
+  return await Service.createBudgetCategory(req.body, userId, eventId);
 };
 
 const getBudgetCategory = async (req: IAuthRequest) => {
-  try {
-    const userId = req.user?.id;
-    const categoryId = Number(req.params.categoryId);
-
-    if (!categoryId) {
-      throwNotFoundError("Budget Category");
-    }
-
-    const data = await Service.getBudgetCategory(categoryId, userId);
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const userId = req.user?.id;
+  const categoryId = Number(req.params.categoryId);
+  if (!categoryId) throwNotFoundError("Budget Category");
+  return await Service.getBudgetCategory(categoryId, userId);
 };
 
 const getAllBudgetCategories = async (req: IAuthRequest) => {
-  try {
-    const userId = req.user?.id;
-    const eventId = Number(req.params.eventId);
-
-    if (!eventId) {
-      throwNotFoundError("Event");
-    }
-
-    const data = await Service.getAllBudgetCategories(eventId, userId);
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const userId = req.user?.id;
+  const eventId = Number(req.params.eventId);
+  if (!eventId) throwNotFoundError("Event");
+  return await Service.getAllBudgetCategories(eventId, userId);
 };
 
 const updateBudgetCategory = async (req: IAuthRequest) => {
-  try {
-    const userId = req.user?.id;
-    const categoryId = Number(req.params.categoryId);
-
-    if (!categoryId) {
-      throwNotFoundError("Budget Category");
-    }
-
-    const data = await Service.updateBudgetCategory(
-      categoryId,
-      req.body,
-      userId,
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const userId = req.user?.id;
+  const categoryId = Number(req.params.categoryId);
+  if (!categoryId) throwNotFoundError("Budget Category");
+  return await Service.updateBudgetCategory(categoryId, req.body, userId);
 };
 
 const deleteBudgetCategory = async (req: IAuthRequest) => {
-  try {
-    const userId = req.user?.id;
-    const categoryId = Number(req.params.categoryId);
+  const userId = req.user?.id;
+  const categoryId = Number(req.params.categoryId);
+  if (!categoryId) throwNotFoundError("Budget Category");
+  return await Service.deleteBudgetCategory(categoryId, userId);
+};
 
-    if (!categoryId) {
-      throwNotFoundError("Budget Category");
-    }
-
-    const data = await Service.deleteBudgetCategory(categoryId, userId);
-    return data;
-  } catch (error) {
-    throw error;
-  }
+const getBudgetSummary = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const eventId = Number(req.params.eventId);
+  if (!eventId) throwNotFoundError("Event");
+  return await Service.getBudgetSummary(eventId, userId);
 };
 
 const addExpenseToCategory = async (req: IAuthRequest) => {
-  try {
-  } catch (error) {
-    throw error;
-  }
+  const userId = req.user?.id;
+  const categoryId = Number(req.params.categoryId);
+  if (!categoryId) throwNotFoundError("Budget Category");
+  return await Service.addExpenseToCategory(req.body, userId, categoryId);
+};
+
+const getExpense = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const expenseId = Number(req.params.expenseId);
+  if (!expenseId) throwNotFoundError("Expense");
+  return await Service.getExpense(expenseId, userId);
+};
+
+const getAllExpensesByCategory = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const categoryId = Number(req.params.categoryId);
+  if (!categoryId) throwNotFoundError("Budget Category");
+  return await Service.getAllExpensesByCategory(categoryId, userId);
+};
+
+const updateExpense = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const expenseId = Number(req.params.expenseId);
+  if (!expenseId) throwNotFoundError("Expense");
+  return await Service.updateExpense(expenseId, req.body, userId);
+};
+
+const deleteExpense = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const expenseId = Number(req.params.expenseId);
+  if (!expenseId) throwNotFoundError("Expense");
+  return await Service.deleteExpense(expenseId, userId);
+};
+
+const addPaymentToExpense = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const expenseId = Number(req.params.expenseId);
+  if (!expenseId) throwNotFoundError("Expense");
+  return await Service.addPaymentToExpense(req.body, userId, expenseId);
+};
+
+const getPayment = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const paymentId = Number(req.params.paymentId);
+  if (!paymentId) throwNotFoundError("Payment");
+  return await Service.getPayment(paymentId, userId);
+};
+
+const getAllPaymentsByExpense = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const expenseId = Number(req.params.expenseId);
+  if (!expenseId) throwNotFoundError("Expense");
+  return await Service.getAllPaymentsByExpense(expenseId, userId);
+};
+
+const updatePayment = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const paymentId = Number(req.params.paymentId);
+  if (!paymentId) throwNotFoundError("Payment");
+  return await Service.updatePayment(paymentId, req.body, userId);
+};
+
+const deletePayment = async (req: IAuthRequest) => {
+  const userId = req.user?.id;
+  const paymentId = Number(req.params.paymentId);
+  if (!paymentId) throwNotFoundError("Payment");
+  return await Service.deletePayment(paymentId, userId);
 };
 
 export default {
@@ -99,4 +120,15 @@ export default {
   getAllBudgetCategories,
   updateBudgetCategory,
   deleteBudgetCategory,
+  getBudgetSummary,
+  addExpenseToCategory,
+  getExpense,
+  getAllExpensesByCategory,
+  updateExpense,
+  deleteExpense,
+  addPaymentToExpense,
+  getPayment,
+  getAllPaymentsByExpense,
+  updatePayment,
+  deletePayment,
 };

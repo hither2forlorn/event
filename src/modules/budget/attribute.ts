@@ -71,6 +71,8 @@ const paymentAttributes = {
   mode: paymentModeEnum("mode").notNull(),
   status: paymentStatusEnum("status").default("pending").notNull(),
   notes: varchar("notes", { length: 999 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 };
 
 export {
