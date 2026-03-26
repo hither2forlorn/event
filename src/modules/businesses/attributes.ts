@@ -6,35 +6,126 @@ import {
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
-export const tableName = "businesses"
+export const tableName = "businesses";
+export const vendorVenueTableName = "vendor_venues";
+export const vendorArtistTableName = "vendor_personal_services";
+
+export const vendorBusinessTypes = [
+  "Venues",
+  "Banquet Halls",
+  "Marriage Garden / Lawns",
+  "Wedding Resorts",
+  "Small Function / Party Halls",
+  "Destination Wedding Venues",
+  "Kalyana Mandapams",
+  "4 Star & Above Wedding Hotels",
+  "Wedding Farmhouses",
+  "Photographers",
+  "Makeup / Bridal Makeup Artists",
+  "Wedding Planners",
+  "Decorators",
+  "Mehendi Artists",
+  "DJs",
+  "Wedding Entertainment",
+  "Invitations",
+  "Favors",
+  "Invitation Gifts",
+  "Mehndi Favors",
+  "Catering Services",
+  "Cake",
+  "Chaat & Food Stalls",
+  "Pre Wedding Shoot",
+  "Bridal Lehengas",
+  "Kanjeevaram / Silk Sarees",
+  "Cocktail Gowns",
+  "Trousseau Sarees",
+  "Bridal Lehenga on Rent",
+  "Jewelry",
+  "Flower Jewelry",
+  "Bridal Jewelry on Rent",
+  "Accessories",
+  "Security Guard",
+] as const;
+
+// Subset used to branch venue vs artist logic
+export const VENUE_TYPES = [
+  "Venues",
+  "Banquet Halls",
+  "Marriage Garden / Lawns",
+  "Wedding Resorts",
+  "Small Function / Party Halls",
+  "Destination Wedding Venues",
+  "Kalyana Mandapams",
+  "4 Star & Above Wedding Hotels",
+  "Wedding Farmhouses",
+] as const;
+
+
 export const businessesAttribute = {
   id: serial("id").primaryKey(),
   business_name: varchar("business_name", { length: 100 }).notNull(),
-  type: varchar("type", { length: 50 }), // e.g., "catering", "venue", "entertainment" , "photography"
-  category: varchar("category", { length: 100 }),// e.g., "food", "drinks", "music", "decor" , "modern", "classic" , "rustic" and all this thing
+  type: varchar("type", { length: 50 }),
+  category: varchar("category", { length: 100 }),
   avatar: text("avatar"),
   cover: text("cover"),
   location: varchar("location", { length: 255 }),
   city: varchar("city", { length: 100 }),
   country: varchar("country", { length: 100 }),
-  legal_document: text("legal_document"), // URL to PDF/image
+  legal_document: varchar("legal_document", { length: 255 }),
   is_verified: boolean("is_verified").default(false),
-  owner_id: integer("owner_id").notNull(), // Reference to users.id
+  owner_id: integer("owner_id").notNull(),
   description: text("description"),
+  price_starting_from: integer("price_starting_from"),
+  years_of_experience: integer("years_of_experience"),
+  team_size: integer("team_size"),
+  service_area: varchar("service_area", { length: 255 }),
+  contact_person_name: varchar("contact_person_name", { length: 120 }),
+  contact_phone: varchar("contact_phone", { length: 20 }),
+  website_url: text("website_url"),
+  instagram_url: text("instagram_url"),
+  whatsapp_number: varchar("whatsapp_number", { length: 20 }),
+  provides_home_service: boolean("provides_home_service").default(false),
+  travel_policy: text("travel_policy"),
+  cancellation_policy: text("cancellation_policy"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  venue_id: integer("venue_id")
-}
 
+};
+
+// Venue-only attributes
 export const venueAttribute = {
+  id: serial("id").primaryKey(),
+  business_id: integer("business_id").notNull(),
+  venue_type: varchar("venue_type", { length: 100 }),
   capacity: integer("capacity"),
-  business_id: integer("business_id"),
   area_sqft: varchar("area_sqft", { length: 40 }),
   min_booking_hours: integer("min_booking_hours").default(1),
   max_booking_hours: integer("max_booking_hours"),
   has_catering: boolean("has_catering").default(false),
   has_av_equipment: boolean("has_av_equipment").default(false),
-  is_outDoor: varchar("is_outDoor"),
+  is_outDoor: varchar("is_outDoor", { length: 20 }),
   price_per_hour: integer("price_per_hour"),
-  parking: varchar("parking", { length: 50 }), // free , open and all this thing 
-}
+  parking: varchar("parking", { length: 50 }),
+  rooms_available: integer("rooms_available"),
+  valet_available: boolean("valet_available").default(false),
+  alcohol_allowed: boolean("alcohol_allowed").default(false),
+  sound_limit_db: integer("sound_limit_db"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+};
+
+// Artist-like vendor attributes (makeup, mehendi, photography, decorators, etc.)
+export const PersonVendorAttribute = {
+  id: serial("id").primaryKey(),
+  business_id: integer("business_id").notNull(),
+  artist_type: varchar("artist_type", { length: 100 }),
+  styles_specialized: text("styles_specialized"),
+  max_bookings_per_day: integer("max_bookings_per_day"),
+  advance_amount: integer("advance_amount"),
+  uses_own_material: boolean("uses_own_material").default(true),
+  travel_charges: integer("travel_charges"),
+  portfolio_link: text("portfolio_link"),
+  available_for_destination: boolean("available_for_destination").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+};
