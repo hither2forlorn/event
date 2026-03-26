@@ -1,5 +1,5 @@
 import buisness from "@/modules/businesses/schema";
-import invitation from "@/modules/invitation/schema"
+import invitation from "@/modules/invitation/schema";
 import category from "@/modules/category/schema";
 import user from "@/modules/user/schema";
 import admin from "@/modules/admin/schema";
@@ -12,6 +12,13 @@ import { family } from "@/modules/family/schema";
 import { statusEnum } from "@/modules/event/attributes";
 import event from "@/modules/event/schema";
 import rsvp from "@/modules/invitation/schema";
+import {
+  budget_category,
+  expense,
+  payment,
+  paymentModeEnum,
+  paymentStatusEnum,
+} from "@/modules/budget/schema";
 import { vwEventDetails } from "./view";
 export {
   admin,
@@ -27,4 +34,9 @@ export {
   event_vendor_schema,
   rsvp,
   family,
+  budget_category,
+  expense,
+  payment,
+  paymentModeEnum,
+  paymentStatusEnum,
 };
