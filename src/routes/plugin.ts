@@ -15,6 +15,7 @@ export const routeConfig = [
   "family",
   "invitation",
   "todo",
+  "budget",
 ];
 class RouteLoader {
   private loadedRoutes: RouteModule[] = [];

@@ -16,6 +16,13 @@ import { statusEnum } from "@/modules/event/attributes";
 import event from "@/modules/event/schema";
 import rsvp from "@/modules/invitation/schema";
 import { vwEventDetails, vw_event_user } from "./view";
+import {
+  budget_category,
+  expense,
+  payment,
+  paymentModeEnum,
+  paymentStatusEnum,
+} from "@/modules/budget/schema";
 export {
   admin,
   vw_event_user,
@@ -33,4 +40,9 @@ export {
   event_vendor_schema,
   rsvp,
   family,
+  budget_category,
+  expense,
+  payment,
+  paymentModeEnum,
+  paymentStatusEnum,
 };

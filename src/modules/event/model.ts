@@ -24,8 +24,8 @@ class Event {
         event_member_schema,
         and(
           eq(event_member_schema.eventId, event.id),
-          eq(event_member_schema.userId, userId)
-        )
+          eq(event_member_schema.userId, userId),
+        ),
       )
       .where(whereClause)
       .orderBy(event.startDateTime)
@@ -122,13 +122,34 @@ class Event {
     return result;
   }
 
-  static async makeEventOwner(eventId: number, eventMemberId: number, role: string) {
+  static async isUserEventAdmin(eventId: number, userId: number) {
+    const result = await db
+      .select()
+      .from(event_member_schema)
+      .where(
+        and(
+          eq(event_member_schema.eventId, eventId),
+          eq(event_member_schema.userId, userId),
+          or(
+            eq(event_member_schema.role, "Organizer"),
+            eq(event_member_schema.role, "co-host"),
+          ),
+        ),
+      );
+    return result.length > 0;
+  }
+
+  static async makeEventOwner(
+    eventId: number,
+    eventMemberId: number,
+    role: string,
+  ) {
     const event_member_returning = await db
       .insert(event_member_schema)
       .values({
         eventId: eventId,
         userId: eventMemberId,
-        role: role
+        role: role,
       })
       .returning();
     return event_member_returning[0];
