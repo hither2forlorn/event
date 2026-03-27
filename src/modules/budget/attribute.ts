@@ -33,7 +33,7 @@ const budgetCateogryAttributes = {
   name: varchar("name", { length: 100 }).notNull(),
   eventId: integer("event_id")
     .notNull()
-    .references(() => event.id),
+    .references(() => event.id, { onDelete: "cascade" }),
   allocatedBudget: numeric("allocated_budget", {
     precision: 15,
     scale: 2,

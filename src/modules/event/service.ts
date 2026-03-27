@@ -1,5 +1,5 @@
 import Model from "./model";
-import UserService from "@/modules/user/service"
+import UserService from "@/modules/user/service";
 import TodoService from "@/modules/todo/service";
 import Resource from "./resource";
 import logger from "@/config/logger";
@@ -15,8 +15,7 @@ import {
   throwNotFoundError,
   throwUnauthorizedError,
   throwErrorOnValidation,
-  throwForbiddenError
-
+  throwForbiddenError,
 } from "@/utils/error";
 
 const list = async (params: any) => {
@@ -25,7 +24,10 @@ const list = async (params: any) => {
     const mapped_data = data.items.map((event) => {
       return {
         ...event,
-        role: event.organizer && event.event_member_userId == params.userId ? event.role || "Organizer" : "Guest",
+        role:
+          event.organizer && event.event_member_userId == params.userId
+            ? event.role || "Organizer"
+            : "Guest",
       };
     });
     return {
@@ -54,7 +56,6 @@ const getEventVendor = async (eventid: number) => {
 
 const create = async (input: any, userId: number) => {
   try {
-    // eventValidation.parse(input);
     console.log(input);
     const result = EventValidationSchema.safeParse(input);
     if (!result.success) {
@@ -71,13 +72,21 @@ const create = async (input: any, userId: number) => {
     if (!data || !data.organizer) {
       throw new Error("Event creation failed");
     }
-    const eventMember = await Model.makeEventOwner(data.id, userId, "Organizer");
+    const eventMember = await Model.makeEventOwner(
+      data.id,
+      userId,
+      "Organizer",
+    );
     if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
-    await TodoService.populateDefaultChecklist(data.id, {
-      weddingDate: data.startDateTime,
-    }, userId);
+    await TodoService.populateDefaultChecklist(
+      data.id,
+      {
+        weddingDate: data.startDateTime,
+      },
+      userId,
+    );
     return { ...Resource.toJson(data), ownerShipId: eventMember.id };
   } catch (err: any) {
     logger.error("Error in Event creation:", err);
@@ -200,7 +209,11 @@ const getUserRelatedToEvent = async (eventId: number, userId: number) => {
     throw error;
   }
 };
-const makeEventMember = async (eventId: number, userId: number, params: AddEventMemberValidationSchemaType) => {
+const makeEventMember = async (
+  eventId: number,
+  userId: number,
+  params: AddEventMemberValidationSchemaType,
+) => {
   try {
     const { error, data } = AddEventMemberValidationSchema.safeParse(params);
     if (error) {
@@ -210,21 +223,27 @@ const makeEventMember = async (eventId: number, userId: number, params: AddEvent
     const eventMembers = await getUserRelatedToEvent(eventId, userId);
     const userInfo = await UserService.find({ id: params.userId });
     if (!userInfo || !userInfo.id) {
-      return throwNotFoundError("User with the phone was not found")
+      return throwNotFoundError("User with the phone was not found");
     }
     console.log("This is the event", userInfo);
-    const eventIsOwner = eventMembers.find((member: any) => member.user?.id == userInfo.id);
+    const eventIsOwner = eventMembers.find(
+      (member: any) => member.user?.id == userInfo.id,
+    );
 
     if (eventIsOwner) {
-      return throwForbiddenError("Already event member")
-    } const event_owner_data = await Model.makeEventOwner(eventId, userInfo.id, data?.role ?? "Host");
+      return throwForbiddenError("Already event member");
+    }
+    const event_owner_data = await Model.makeEventOwner(
+      eventId,
+      userInfo.id,
+      data?.role ?? "Host",
+    );
     return event_owner_data;
   } catch (err: any) {
-    logger.error("Error in getting the user with the info")
+    logger.error("Error in getting the user with the info");
     throw err;
   }
-
-}
+};
 
 const getSubEventOfEvent = async (eventId: number) => {
   try {
