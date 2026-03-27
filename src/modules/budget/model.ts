@@ -45,11 +45,51 @@ class Budget {
   }
 
   static async getBudgetCategoryById(categoryId: number) {
-    const result = await db
-      .select(Repository.budgetCategorySelectQuery)
+    const rows = await db
+      .select(Repository.expenseWithCategorySelectQuery)
       .from(budget_category)
+      .leftJoin(expense, eq(expense.categoryId, budget_category.id))
       .where(eq(budget_category.id, categoryId));
-    return result[0] || null;
+
+    if (rows.length === 0) return null;
+
+    const category = {
+      id: rows[0]?.categoryId,
+      name: rows[0]?.categoryName,
+      eventId: rows[0]?.eventId,
+      allocatedBudget: Number(rows[0]?.allocatedBudget),
+      createdAt: rows[0]?.categoryCreatedAt,
+      updatedAt: rows[0]?.categoryUpdatedAt,
+      expenses: [] as any[],
+    };
+
+    const expenseMap = new Map<number, any>();
+
+    for (const row of rows) {
+      if (row.expenseId) {
+        if (!expenseMap.has(row.expenseId)) {
+          const expenseObj = {
+            id: row.expenseId,
+            categoryId: row.categoryId,
+            name: row.expenseName,
+            businessId: row.businessId,
+            estimatedCost: Number(row.estimatedCost),
+            contractAmount: row.contractAmount
+              ? Number(row.contractAmount)
+              : null,
+            nextDueDate: row.nextDueDate,
+            notes: row.expenseNotes,
+            createdAt: row.expenseCreatedAt,
+            updatedAt: row.expenseUpdatedAt,
+          };
+
+          expenseMap.set(row.expenseId, expenseObj);
+          category.expenses.push(expenseObj);
+        }
+      }
+    }
+
+    return category;
   }
 
   static async getAllBudgetCategories(eventId: number) {
@@ -104,11 +144,57 @@ class Budget {
   }
 
   static async getExpenseById(expenseId: number) {
-    const result = await db
-      .select(Repository.expenseSelectQuery)
+    const rows = await db
+      .select()
       .from(expense)
+      .leftJoin(payment, eq(payment.expenseId, expense.id))
       .where(eq(expense.id, expenseId));
-    return result[0] || null;
+
+    console.log(rows);
+
+    if (rows.length === 0) return null;
+
+    const expenseData = {
+      id: rows[0]?.expense.id,
+      categoryId: rows[0]?.expense.categoryId,
+      name: rows[0]?.expense.name,
+      businessId: rows[0]?.expense.businessId,
+      estimatedCost: Number(rows[0]?.expense.estimatedCost),
+      contractAmount: Number(rows[0]?.expense.contractAmount),
+      nextDueDate: rows[0]?.expense.nextDueDate,
+      notes: rows[0]?.expense.notes,
+      createdAt: rows[0]?.expense.createdAt,
+      updatedAt: rows[0]?.expense.updatedAt,
+      payments: [] as any[],
+    };
+
+    const paymentMap = new Map<number, any>();
+
+    for (const row of rows) {
+      if (row.payment?.id) {
+        if (!paymentMap.has(row.payment.id)) {
+          const paymentObj = {
+            id: row.payment.id,
+            expenseId: row.payment.expenseId,
+            name: row.payment.name,
+            amount: Number(row.payment.amount),
+            paidOn: row.payment.paidOn,
+            mode: row.payment.mode,
+            status: row.payment.status,
+            notes: row.payment.notes,
+            createdAt: row.payment.createdAt,
+            updatedAt: row.payment.updatedAt,
+          };
+
+          paymentMap.set(row.payment.id, paymentObj);
+          expenseData.payments.push(paymentObj);
+        }
+      }
+    }
+
+    console.log(expenseData);
+
+    return expenseData;
   }
 
   static async getAllExpensesByCategory(categoryId: number) {
@@ -262,9 +348,15 @@ class Budget {
         expenseUpdatedAt: expense.updatedAt,
 
         paymentId: payment.id,
+        paymentName: payment.name,
         paymentAmount: payment.amount,
+        paymentPaidOn: payment.paidOn,
+        paymentMode: payment.mode,
         paymentStatus: payment.status,
+        paymentNotes: payment.notes,
         paymentExpenseId: payment.expenseId,
+        paymentCreatedAt: payment.createdAt,
+        paymentUpdatedAt: payment.updatedAt,
       })
       .from(budget_category)
       .leftJoin(expense, eq(expense.categoryId, budget_category.id))
