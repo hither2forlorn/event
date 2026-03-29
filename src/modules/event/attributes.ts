@@ -1,4 +1,10 @@
-import { integer, pgEnum, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgEnum,
+  serial,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 const tableName = "event";
 import user from "@/modules/user/schema";
 
@@ -18,7 +24,7 @@ const eventAttribute = {
   description: varchar("description", { length: 200 }),
   type: varchar("type", { length: 100 }).notNull(),
   startDateTime: timestamp("startDateTime", { withTimezone: true }).notNull(),
-  imageUrl: varchar("imageUrl", { length: 500 }), // For the longer folder and image url 
+  imageUrl: varchar("imageUrl", { length: 500 }), // For the longer folder and image url
   endDateTime: timestamp("endDateTime", { withTimezone: true }).notNull(),
   location: varchar("location", { length: 50 }),
   organizer: integer("organizer").references(() => user.id, {
