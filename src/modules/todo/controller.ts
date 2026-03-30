@@ -106,8 +106,18 @@ const deleteTodo = async (req: IAuthRequest) => {
     throw err;
   }
 }
+const bulkStatus = async (req: IAuthRequest) => {
+  try {
+    const udpateTodo = await Service.bulkUpdate(req.body);
+    return udpateTodo;
+  } catch (err) {
+    throw err;
+  }
+
+}
 
 export default {
+  bulkStatus,
   get,
   deleteTodo,
   getByEventId,

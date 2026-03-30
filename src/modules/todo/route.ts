@@ -39,6 +39,13 @@ const routes = [
     path: "todo/:id",
     authorization: true,
   }
+  ,
+  {
+    method: "post",
+    controller: Controller.bulkStatus,
+    path: "todo/bulk",
+    authorization: true
+  }
 ];
 
 export default routes;

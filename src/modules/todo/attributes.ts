@@ -10,6 +10,7 @@ export const todoAttribute = {
   assigned_to: integer("assigned_to").references(() => user.id),
   title: varchar("title", { length: 255 }),
   parentId: integer("parentId"),
+  category: varchar("category", { length: 100 }),
   dueDate: timestamp("due_date").defaultNow(),
   status: varchar("status", { length: 30 }),
   created_at: timestamp("created_at").defaultNow(),
