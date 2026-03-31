@@ -2,40 +2,45 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     // Environment setup & latest features
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
-    
     // Output configuration
     "outDir": "./dist",
     "declaration": true,
     "declarationDir": "dist/types",
     "emitDeclarationOnly": false,
-
     // Bundler mode
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
     "esModuleInterop": true,
-
     // Best practices
     "strict": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-
     // Some stricter flags (disabled by default)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
     "rootDir": "src"
   },
-  "exclude": ["node_modules", "drizzle.config.ts", "dist", "drizzle.config.js"]
+  "exclude": [
+    "node_modules",
+    "drizzle.config.ts",
+    "dist",
+    "drizzle.config.js"
+  ]
 }

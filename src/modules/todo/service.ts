@@ -8,7 +8,6 @@ import {
 } from "./validators";
 import { DEFAULT_WEDDING_TODO_TEMPLATE } from "./constants";
 import { throwErrorOnValidation, throwNotFoundError } from "@/utils/error";
-import { IAuthRequest } from "@/routes";
 
 const list = async (params: any) => {
   try {
@@ -55,7 +54,7 @@ const create = async (input: any, userId: number) => {
     const createInput = {
       ...parsedData,
       eventId: Number(parsedData.eventId),
-      assigned_to: userId,
+      assigned_to: parsedData.assigned_to ?? null,
       ...(parsedData.dueDate && {
         dueDate: new Date(parsedData.dueDate),
       }),
@@ -187,8 +186,42 @@ const deleteTodo = async (id: number) => {
 
   }
 }
+const bulkUpdate = async (
+  list: {
+    todoId: number,
+    isDone: boolean
+  }[]
+) => {
+  try {
+    const toComplete = list.filter(u => u.isDone).map((v) => v.todoId)
+    if (toComplete.length > 0) {
+      await Model.bulkcomplete({
+        isDone: true,
+        status: "completed",
+        todoIds: toComplete
+      })
+    }
+    const toUncomplete = list.filter(u => !u.isDone).map(u => u.todoId)
+    if (toUncomplete.length > 0) {
+      await Model.bulkcomplete({
+        isDone: false,
+        status: "completed",
+        todoIds: toComplete
+      })
+    }
+    return {
+      completed: toComplete,
+      incompleted: toUncomplete
+    }
+
+  } catch (err) {
+    throw err;
+
+  }
+}
 
 export default {
+  bulkUpdate,
   list,
   deleteTodo,
   findByEventId,

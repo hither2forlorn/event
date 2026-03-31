@@ -1,5 +1,6 @@
 import db from "@/config/db";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
+import user from "@/modules/user/schema"
 import todo from "./schema";
 import repository from "./repository";
 import type { TodoColumn } from "./resource";
@@ -34,7 +35,7 @@ class Todo {
 
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
-    const baseQuery = db.select(repository.selectQuery).from(todo);
+    const baseQuery = db.select(repository.selectQuery).from(todo).leftJoin(user, eq(todo.assigned_to, user.id))
     const result = whereClause
       ? await baseQuery.where(whereClause).orderBy(asc(todo.id))
       : await baseQuery.orderBy(asc(todo.id))
@@ -60,7 +61,6 @@ class Todo {
     if (params?.eventId != null) {
       conditions.push(eq(todo.eventId, params.eventId));
     }
-
     if (params?.assigned_to != null) {
       conditions.push(eq(todo.assigned_to, params.assigned_to));
     }
@@ -71,8 +71,8 @@ class Todo {
     if (conditions.length === 0) return null;
 
     const result = await db
-      .select()
-      .from(todo)
+      .select(repository.selectQuery)
+      .from(todo).leftJoin(user, eq(todo.assigned_to, user.id))
       .where(and(...conditions));
 
     return result[0] || null;
@@ -85,6 +85,24 @@ class Todo {
       .where(eq(todo.id, id))
       .returning();
     return result[0] || null;
+  }
+  static async bulkcomplete({
+    todoIds,
+    status = "completed",
+    isDone
+  }: {
+    todoIds: number[],
+    status: string,
+    isDone: boolean
+  }) {
+    const result = await db.update(todo).set({
+      status: status, isDone: isDone
+    }).where(
+      inArray(todo.id, todoIds)
+    )
+    return result;
+
+
   }
 
   static async create(params: Partial<TodoColumn>) {
