@@ -31,7 +31,6 @@ const getByEventId = async (req: IAuthRequest) => {
 
 
     const data = await Service.findByEventId(Number(eventId), { ...req?.query });
-    console.log("This is the data", data);
     return data;
   } catch (err: any) {
     throw err;
