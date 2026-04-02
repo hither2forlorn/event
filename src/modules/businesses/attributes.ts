@@ -10,6 +10,7 @@ export const tableName = "businesses";
 export const vendorVenueTableName = "vendor_venues_table";
 export const vendorServiceTableName = "vendor_services_table";
 import schema from "./schema"
+import { length } from "zod";
 
 export const businessesAttribute = {
   id: serial("id").primaryKey(),
@@ -45,6 +46,7 @@ export const businessesAttribute = {
 export const venueAttribute = {
   id: serial("id").primaryKey(),
   business_id: integer("business_id").notNull().references(() => schema.id),
+  venue_name: varchar("venue_name", { length: 100 }),
   venue_type: varchar("venue_type", { length: 100 }),
   capacity: integer("capacity"),
   area_sqft: varchar("area_sqft", { length: 40 }),

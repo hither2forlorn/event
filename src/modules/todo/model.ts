@@ -86,7 +86,7 @@ class Todo {
       .returning();
     return result[0] || null;
   }
-  static async bulkcomplete({
+  static async bulkupdate({
     todoIds,
     status = "completed",
     isDone

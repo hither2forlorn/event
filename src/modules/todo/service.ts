@@ -193,20 +193,24 @@ const bulkUpdate = async (
   }[]
 ) => {
   try {
+    console.log('bulk updae the data', list);
     const toComplete = list.filter(u => u.isDone).map((v) => v.todoId)
     if (toComplete.length > 0) {
-      await Model.bulkcomplete({
+      console.log("This is the to complete the data in the system ", toComplete);
+      await Model.bulkupdate({
         isDone: true,
         status: "completed",
         todoIds: toComplete
       })
     }
-    const toUncomplete = list.filter(u => !u.isDone).map(u => u.todoId)
+    const toUncomplete = list.filter(u => u.isDone == false).map(u => u.todoId)
+    console.log('This is the uncomplete data in the system ', toUncomplete);
     if (toUncomplete.length > 0) {
-      await Model.bulkcomplete({
+      console.log("th list to hdkjasdhf jkdshf ");
+      await Model.bulkupdate({
         isDone: false,
-        status: "completed",
-        todoIds: toComplete
+        status: "pending",
+        todoIds: toUncomplete
       })
     }
     return {

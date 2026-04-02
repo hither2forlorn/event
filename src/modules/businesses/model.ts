@@ -38,10 +38,9 @@ class BusinessModel {
   static async findAll(params: any,) {
     const { page = 1, limit = 10, userId } = params;
     const offset = (Number(page) - 1) * Number(limit);
-    let condition = []
-    if (userId) {
+    let condition = [];
+    if (!!userId) {
       condition.push(eq(schema.owner_id, userId));
-
     }
 
     const items = await db
@@ -62,7 +61,6 @@ class BusinessModel {
       totalPages: Math.ceil(count / limit),
     };
   }
-
 
   static async findById(id: number) {
     const business = await db
