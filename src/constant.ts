@@ -30,6 +30,17 @@ const role = {
   organizer: "organizer",
   guest: "guest",
 };
+export enum TODO_CATEGORIES {
+  planning = "Planning",
+  venue = "Venue",
+  caterying = "Catering",
+  decoration = "Decoration",
+  photography = "Photography",
+  entertainment = "Entertainment",
+  guest = "Guest Management",
+  transport = "Transport",
+}
+
 
 export enum VendorBusinessCategoryTypes {
   Venue = "Venue",
