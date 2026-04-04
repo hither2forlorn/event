@@ -62,7 +62,6 @@ const setResponce = async (req: IAuthRequest) => {
     return service;
   } catch (err) {
     throw err;
-
   }
 }
 
@@ -93,9 +92,21 @@ const removeinvitation = async (req: IAuthRequest) => {
   }
 }
 
-//updateresponce  ( individual )
+const getHotelManegemt = async (req: IAuthRequest) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const get_hotel_managemtn = await Service.getEventHotelManagement(id, userId);
+    return get_hotel_managemtn;
+  }
+  catch (err) {
+    throw err;
+  }
+}
+
 export default {
   setResponce,
+  getHotelManegemt,
   removeinvitation,
   sendInvitation,
   getInvitations,
