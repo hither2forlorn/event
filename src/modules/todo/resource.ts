@@ -8,6 +8,7 @@ export interface TodoColumn {
   assigned_user?: UserResource | null;
   title: string | null;
   parentId: number | null;
+  category: string | null;
   dueDate: Date | string | null;
   status: string | null;
   created_at?: Date | string | null;
@@ -20,6 +21,7 @@ class Resource {
     const data: Partial<TodoColumn> = {
       id: todo.id,
       eventId: todo.eventId,
+      category: todo.category,
       task: todo.task,
       isDone: todo.isDone,
       assigned_to: todo.assigned_to,
