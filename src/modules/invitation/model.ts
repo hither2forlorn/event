@@ -315,4 +315,12 @@ export default class Invitation {
       .returning();
     return deletedEvent_guest;
   }
+  static async EventHotelManagent(eventId: number) {
+    const hotel_management = await db.select({
+      assigned_room: invitation.assigned_room,
+      user: user
+    }).from(invitation).leftJoin(user, eq(invitation.userId, user.id)).where(eq(invitation.eventId, eventId))
+    return hotel_management;
+  }
+
 }

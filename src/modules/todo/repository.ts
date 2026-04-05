@@ -10,7 +10,7 @@ const selectQuery = {
   assigned_user: user_repository.selectQuery,
   title: todo.title,
   parentId: todo.parentId,
-  categoty: todo.category,
+  category: todo.category,
   dueDate: todo.dueDate,
   status: todo.status,
   created_at: todo.created_at,

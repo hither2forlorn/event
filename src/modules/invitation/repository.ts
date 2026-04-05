@@ -50,7 +50,12 @@ const selectInvitationResponse = {
   event_guest: select,
   family_name: Family.selectQuery.familyName,
 };
+const selectHotelManagement = {
+  user_detail: User.selectQuery,
+  user_room: select.assigned_room
+}
 export default {
+  selectHotelManagement,
   select,
   selectInvitationEvent,
   selectInvitationResponse,

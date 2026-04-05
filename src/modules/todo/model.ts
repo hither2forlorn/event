@@ -32,13 +32,15 @@ class Todo {
           : Boolean(params.isDone);
       conditions.push(eq(todo.isDone, isDoneValue));
     }
-
     const whereClause = conditions.length ? and(...conditions) : undefined;
-
-    const baseQuery = db.select(repository.selectQuery).from(todo).leftJoin(user, eq(todo.assigned_to, user.id))
+    const baseQuery = db
+      .select(repository.selectQuery)
+      .from(todo)
+      .leftJoin(user, eq(todo.assigned_to, user.id))
+      .orderBy(asc(todo.isDone), asc(todo.dueDate))
     const result = whereClause
-      ? await baseQuery.where(whereClause).orderBy(asc(todo.id))
-      : await baseQuery.orderBy(asc(todo.id))
+      ? await baseQuery.where(whereClause)
+      : await baseQuery
 
     const baseCountQuery = db
       .select({ count: sql<number>`count(*)` })

@@ -248,6 +248,21 @@ const getEventguest = async (eventid: number, userId: number) => {
     throw err;
   }
 };
+const getEventHotelManagement = async (eventId: number, userId: number) => {
+  try {
+    const isAllowed = await EventService.checkAuthorized(eventId, userId);
+    if (!isAllowed) {
+      return throwUnauthorizedError(
+        "User with the details cannot get the information of the guest ",
+      );
+    }
+    const event_hotel_management = Model.EventHotelManagent(eventId);
+    return event_hotel_management;
+  }
+  catch (err) {
+    throw err;
+  }
+}
 
 const remove_invitation = async (
   eventId: number,
@@ -274,6 +289,7 @@ export default {
   inviteGuest,
   getInvitedEvent,
   getEventguest,
+  getEventHotelManagement,
   listinvitationsResponce,
   remove_invitation,
 };
