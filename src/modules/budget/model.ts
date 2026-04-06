@@ -73,10 +73,7 @@ class Budget {
             categoryId: row.categoryId,
             name: row.expenseName,
             businessId: row.businessId,
-            estimatedCost: Number(row.estimatedCost),
-            contractAmount: row.contractAmount
-              ? Number(row.contractAmount)
-              : null,
+            allocatedAmount: Number(row.allocatedAmount),
             nextDueDate: row.nextDueDate,
             notes: row.expenseNotes,
             createdAt: row.expenseCreatedAt,
@@ -133,8 +130,7 @@ class Budget {
       .values({
         categoryId: params.categoryId,
         name: params.name,
-        estimatedCost: params.estimatedCost.toString(),
-        contractAmount: params.contractAmount?.toString() ?? null,
+        allocatedAmount: params.allocatedAmount.toString(),
         nextDueDate: params.nextDueDate?.toISOString().split("T")[0] ?? null,
         notes: params.notes ?? null,
         businessId: params.businessId ?? null,
@@ -159,8 +155,7 @@ class Budget {
       categoryId: rows[0]?.expense.categoryId,
       name: rows[0]?.expense.name,
       businessId: rows[0]?.expense.businessId,
-      estimatedCost: Number(rows[0]?.expense.estimatedCost),
-      contractAmount: Number(rows[0]?.expense.contractAmount),
+      allocatedAmount: Number(rows[0]?.expense.allocatedAmount),
       nextDueDate: rows[0]?.expense.nextDueDate,
       notes: rows[0]?.expense.notes,
       createdAt: rows[0]?.expense.createdAt,
@@ -208,10 +203,8 @@ class Budget {
   static async updateExpense(expenseId: number, params: UpdateExpenseInput) {
     const updateData: any = {};
     if (params.name) updateData.name = params.name;
-    if (params.estimatedCost)
-      updateData.estimatedCost = params.estimatedCost.toString();
-    if (params.contractAmount)
-      updateData.contractAmount = params.contractAmount.toString();
+    if (params.allocatedAmount)
+      updateData.allocatedAmount = params.allocatedAmount.toString();
     if (params.nextDueDate)
       updateData.nextDueDate = params.nextDueDate.toISOString().split("T")[0];
     if (params.notes !== undefined) updateData.notes = params.notes;
@@ -242,21 +235,21 @@ class Budget {
     return Number(result[0]?.total ?? 0);
   }
 
-  static async getTotalEstimatedCostByCategory(
-    categoryId: number,
-  ): Promise<number> {
-    const result = await db
-      .select({ total: sum(expense.estimatedCost) })
-      .from(expense)
-      .where(eq(expense.categoryId, categoryId));
-    return Number(result[0]?.total ?? 0);
-  }
-
-  static async getTotalScheduledPayments(expenseId: number): Promise<number> {
+  static async getTotalPendingPayments(expenseId: number): Promise<number> {
     const result = await db
       .select({ total: sum(payment.amount) })
       .from(payment)
       .where(eq(payment.expenseId, expenseId));
+    return Number(result[0]?.total ?? 0);
+  }
+
+  static async getTotalAllocatedAmountByCategory(
+    categoryId: number,
+  ): Promise<number> {
+    const result = await db
+      .select({ total: sum(expense.allocatedAmount) })
+      .from(expense)
+      .where(eq(expense.categoryId, categoryId));
     return Number(result[0]?.total ?? 0);
   }
 
@@ -336,27 +329,14 @@ class Budget {
         allocatedBudget: budget_category.allocatedBudget,
         categoryCreatedAt: budget_category.createdAt,
         categoryUpdatedAt: budget_category.updatedAt,
-
         expenseId: expense.id,
         expenseName: expense.name,
-        businessId: expense.businessId,
-        estimatedCost: expense.estimatedCost,
-        contractAmount: expense.contractAmount,
-        nextDueDate: expense.nextDueDate,
-        expenseNotes: expense.notes,
-        expenseCreatedAt: expense.createdAt,
-        expenseUpdatedAt: expense.updatedAt,
-
+        allocatedAmount: expense.allocatedAmount,
         paymentId: payment.id,
         paymentName: payment.name,
         paymentAmount: payment.amount,
-        paymentPaidOn: payment.paidOn,
-        paymentMode: payment.mode,
         paymentStatus: payment.status,
-        paymentNotes: payment.notes,
         paymentExpenseId: payment.expenseId,
-        paymentCreatedAt: payment.createdAt,
-        paymentUpdatedAt: payment.updatedAt,
       })
       .from(budget_category)
       .leftJoin(expense, eq(expense.categoryId, budget_category.id))
@@ -371,13 +351,10 @@ class Budget {
         categoryMap.set(row.categoryId, {
           id: row.categoryId,
           name: row.categoryName,
-          eventId: row.eventId,
           allocatedBudget: Number(row.allocatedBudget),
-          estimated: 0,
-          spend: 0,
+          allocated: 0,
+          spent: 0,
           remaining: 0,
-          createdAt: row.categoryCreatedAt,
-          updatedAt: row.categoryUpdatedAt,
           expenses: [],
         });
       }
@@ -389,26 +366,16 @@ class Budget {
           const expenseObj = {
             id: row.expenseId,
             categoryId: row.categoryId,
-            name: row.expenseName,
-            businessId: row.businessId,
-            estimatedCost: Number(row.estimatedCost),
-            contractAmount: row.contractAmount
-              ? Number(row.contractAmount)
-              : null,
-            spend: 0,
-            remaining: 0,
-            nextDueDate: row.nextDueDate,
-            notes: row.expenseNotes,
-            createdAt: row.expenseCreatedAt,
-            updatedAt: row.expenseUpdatedAt,
+            allocated: Number(row.allocatedAmount),
+            spent: 0,
+            balance: 0,
             payments: [],
           };
 
           expenseMap.set(row.expenseId, expenseObj);
           category.expenses.push(expenseObj);
 
-          // add to category estimated
-          category.estimated += expenseObj.estimatedCost;
+          category.allocated += expenseObj.allocated;
         }
 
         const expenseObj = expenseMap.get(row.expenseId);
@@ -424,7 +391,7 @@ class Budget {
           expenseObj.payments.push(paymentObj);
 
           if (row.paymentStatus === "cleared") {
-            expenseObj.spend += paymentObj.amount;
+            expenseObj.spent += paymentObj.amount;
           }
         }
       }
@@ -432,12 +399,9 @@ class Budget {
 
     for (const category of categoryMap.values()) {
       for (const expense of category.expenses) {
-        if (expense.contractAmount !== null) {
-          expense.remaining = expense.contractAmount - expense.spend;
-          category.remaining += expense.remaining;
-        }
-
-        category.spend += expense.spend;
+        expense.balance = expense.allocated - expense.spent;
+        category.spent += expense.spent;
+        category.remaining = category.allocated - category.spent;
       }
     }
 

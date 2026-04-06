@@ -15,12 +15,10 @@ import {
 } from "./resource";
 
 const withExpenseComputed = async (expenseData: any) => {
-  const spend = await Budget.getTotalClearedPayments(expenseData.id);
-  const contractAmount = expenseData.contractAmount
-    ? Number(expenseData.contractAmount)
-    : null;
-  const remaining = contractAmount !== null ? contractAmount - spend : null;
-  return ExpenseResource.toJson({ ...expenseData, spend, remaining });
+  const spent = await Budget.getTotalClearedPayments(expenseData.id);
+  const allocated = Number(expenseData.allocatedAmount);
+  const balance = allocated - spent;
+  return ExpenseResource.toJson({ ...expenseData, spent, balance });
 };
 
 const createBudgetCategory = async (
@@ -59,20 +57,21 @@ const getBudgetCategory = async (categoryId: number, userId: number) => {
       "You do not have permission to view this budget category.",
     );
 
-  const estimated = await Budget.getTotalEstimatedCostByCategory(categoryId);
+  const allocated = await Budget.getTotalAllocatedAmountByCategory(categoryId);
   const expenses = await Budget.getAllExpensesByCategory(categoryId);
-  const spend = await Promise.all(
+  const spent = await Promise.all(
     expenses.map((e) => Budget.getTotalClearedPayments(e.id)),
   );
-  const totalSpend = spend.reduce((a, s) => a + s, 0);
-  const pending = estimated - totalSpend;
+  const totalSpent = spent.reduce((a, s) => a + s, 0);
+  const pending = allocated - totalSpent;
+  const remaining = Number(category?.allocatedBudget) - allocated;
 
   return BudgetCategoryResource.toJson({
     ...category,
-    estimatedTotal: estimated,
-    spend: totalSpend,
+    allocated,
+    spent: totalSpent,
     pending,
-    budgetBalance: Number(category!.allocatedBudget) - estimated,
+    remaining,
   });
 };
 
@@ -87,20 +86,20 @@ const getAllBudgetCategories = async (eventId: number, userId: number) => {
 
   const result = await Promise.all(
     categories.map(async (cat) => {
-      const estimated = await Budget.getTotalEstimatedCostByCategory(cat.id);
+      const allocated = await Budget.getTotalAllocatedAmountByCategory(cat.id);
       const expenses = await Budget.getAllExpensesByCategory(cat.id);
       const spends = await Promise.all(
         expenses.map((e) => Budget.getTotalClearedPayments(e.id)),
       );
-      const totalSpend = spends.reduce((a, s) => a + s, 0);
-      const pending = estimated - totalSpend;
+      const totalSpent = spends.reduce((a, s) => a + s, 0);
+      const remaining = allocated - totalSpent;
 
       return BudgetCategoryResource.toJson({
         ...cat,
-        estimatedTotal: estimated,
-        spend: totalSpend,
-        pending,
-        budgetBalance: Number(cat.allocatedBudget) - estimated,
+        allocated,
+        spent: totalSpent,
+        pending: 0,
+        remaining,
       });
     }),
   );
@@ -139,11 +138,11 @@ const updateBudgetCategory = async (
         `New allocated budget exceeds remaining event budget. Remaining: ${info.remainingBudgetToAllocate}`,
       );
 
-    const totalEstimated =
-      await Budget.getTotalEstimatedCostByCategory(categoryId);
-    if (input.allocatedBudget < totalEstimated)
+    const totalAllocated =
+      await Budget.getTotalAllocatedAmountByCategory(categoryId);
+    if (input.allocatedBudget < totalAllocated)
       throwForbiddenError(
-        `Allocated budget cannot be less than total estimated expenses: ${totalEstimated}`,
+        `Allocated budget cannot be less than total allocated expenses: ${totalAllocated}`,
       );
   }
 
@@ -178,25 +177,22 @@ const getBudgetSummary = async (eventId: number, userId: number) => {
 
   const budgetInfo = await Budget.totalAllocatedAndRemainingBudget(eventId);
 
-  let totalEstimated = 0;
+  let totalAllocated = 0;
   let totalSpent = 0;
-  let totalPending = 0;
 
   categories.forEach((cat: any) => {
-    totalEstimated += cat.estimated;
-    totalSpent += cat.spend;
-    totalPending += cat.estimated - cat.spend;
+    totalAllocated += cat.allocated;
+    totalSpent += cat.spent;
   });
 
   return {
     summary: {
-      totalEstimated,
-      totalSpent,
-      totalPending,
+      allocated: totalAllocated,
+      totalSpend: totalSpent,
       totalBudget:
         budgetInfo.remainingBudgetToAllocate + budgetInfo.totalAllocated,
       totalAllocated: budgetInfo.totalAllocated,
-      totalRemaining: budgetInfo.remainingBudgetToAllocate,
+      remaining: budgetInfo.remainingBudgetToAllocate,
     },
     categories,
   };
@@ -219,17 +215,18 @@ const addExpenseToCategory = async (
       "You do not have permission to add an expense to this category.",
     );
 
-  const totalEstimated =
-    await Budget.getTotalEstimatedCostByCategory(categoryId);
+  const totalAllocated =
+    await Budget.getTotalAllocatedAmountByCategory(categoryId);
   const willExceedBudget =
-    totalEstimated + input.estimatedCost > Number(category!.allocatedBudget);
+    totalAllocated + input.allocatedAmount > Number(category!.allocatedBudget);
 
   const newExpense = await Budget.createExpense({ ...input, categoryId });
 
   return {
     expense: ExpenseResource.toJson({
       ...newExpense,
-      spend: 0,
+      spent: 0,
+      balance: Number(newExpense?.allocatedAmount),
     }),
     warning: willExceedBudget
       ? `This expense pushes the category over its allocated budget of ${category!.allocatedBudget}`
@@ -289,14 +286,6 @@ const updateExpense = async (
   if (!isAuthorized)
     throwForbiddenError("You do not have permission to update this expense.");
 
-  if (input.contractAmount) {
-    const totalScheduled = await Budget.getTotalScheduledPayments(expenseId);
-    if (input.contractAmount < totalScheduled)
-      throwForbiddenError(
-        `Contract amount cannot be less than total scheduled payments: ${totalScheduled}`,
-      );
-  }
-
   const updated = await Budget.updateExpense(expenseId, input);
   return await withExpenseComputed(updated);
 };
@@ -336,17 +325,6 @@ const addPaymentToExpense = async (
   if (!isAuthorized)
     throwForbiddenError(
       "You do not have permission to add a payment to this expense.",
-    );
-
-  if (!expenseData!.contractAmount)
-    throwForbiddenError(
-      "Set a contract amount on the expense before adding payments.",
-    );
-
-  const totalScheduled = await Budget.getTotalScheduledPayments(expenseId);
-  if (totalScheduled + input.amount > Number(expenseData!.contractAmount))
-    throwForbiddenError(
-      `Total payments would exceed contract amount of ${expenseData!.contractAmount}`,
     );
 
   if (input.status === "cleared" && input.paidOn > new Date())
@@ -414,18 +392,6 @@ const updatePayment = async (
   );
   if (!isAuthorized)
     throwForbiddenError("You do not have permission to update this payment.");
-
-  if (input.amount) {
-    const totalScheduled = await Budget.getTotalScheduledPayments(
-      paymentData!.expenseId,
-    );
-    const newTotal =
-      totalScheduled - Number(paymentData!.amount) + input.amount;
-    if (newTotal > Number(expenseData!.contractAmount))
-      throwForbiddenError(
-        `Updated amount would push total payments over contract amount of ${expenseData!.contractAmount}`,
-      );
-  }
 
   if (input.status === "cleared") {
     const dateToCheck = input.paidOn ?? new Date(paymentData!.paidOn);

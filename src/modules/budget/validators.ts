@@ -26,8 +26,7 @@ const addExpenseToCategorySchema = z.object({
   }),
   body: z.object({
     name: z.string().max(255),
-    estimatedCost: z.number().positive(),
-    contractAmount: z.number().positive().optional(),
+    allocatedAmount: z.number().positive(),
     nextDueDate: z.coerce.date().optional(),
     notes: z.string().max(999).optional(),
     businessId: z.coerce.number().positive().optional(),
@@ -40,8 +39,7 @@ const updateExpenseSchema = z.object({
   }),
   body: z.object({
     name: z.string().max(255).optional(),
-    estimatedCost: z.number().positive().optional(),
-    contractAmount: z.number().positive().optional(),
+    allocatedAmount: z.number().positive().optional(),
     nextDueDate: z.coerce.date().optional(),
     notes: z.string().max(999).optional(),
     businessId: z.coerce.number().positive().optional(),

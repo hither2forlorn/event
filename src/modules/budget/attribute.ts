@@ -49,11 +49,10 @@ const expenseAttributes = {
     .references(() => budget_category.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
   businessId: integer("vendor_id").references(() => buisness.id),
-  estimatedCost: numeric("estimated_cost", {
+  allocatedAmount: numeric("allocated_amount", {
     precision: 15,
     scale: 2,
   }).notNull(),
-  contractAmount: numeric("contract_amount", { precision: 15, scale: 2 }),
   nextDueDate: date("next_due_date"),
   notes: varchar("notes", { length: 999 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),

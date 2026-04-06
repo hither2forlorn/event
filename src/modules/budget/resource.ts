@@ -8,10 +8,10 @@ export interface BudgetCategoryColumn {
 }
 
 export interface BudgetCategoryWithComputed extends BudgetCategoryColumn {
-  estimatedTotal?: number;
-  spend?: number;
+  allocated?: number;
+  spent?: number;
   pending?: number;
-  budgetBalance?: number;
+  remaining?: number;
   expenses?: Partial<ExpenseColumn>[];
 }
 
@@ -25,13 +25,13 @@ class BudgetCategoryResource {
       name: category.name,
       eventId: category.eventId,
       allocatedBudget: Number(category.allocatedBudget),
-      ...(category.estimatedTotal !== undefined && {
-        estimatedTotal: category.estimatedTotal,
+      ...(category.allocated !== undefined && {
+        allocated: category.allocated,
       }),
-      ...(category.spend !== undefined && { spend: category.spend }),
+      ...(category.spent !== undefined && { spent: category.spent }),
       ...(category.pending !== undefined && { pending: category.pending }),
-      ...(category.budgetBalance !== undefined && {
-        budgetBalance: category.budgetBalance,
+      ...(category.remaining !== undefined && {
+        remaining: category.remaining,
       }),
       ...(category.expenses !== undefined && { expenses: category.expenses }),
       createdAt: category.createdAt,
@@ -49,8 +49,7 @@ export interface ExpenseColumn {
   categoryId: number;
   name: string;
   businessId: number | null;
-  estimatedCost: string | number;
-  contractAmount: string | number | null;
+  allocatedAmount: string | number;
   nextDueDate: string | null;
   notes: string | null;
   createdAt: Date | null;
@@ -59,8 +58,8 @@ export interface ExpenseColumn {
 }
 
 export interface ExpenseWithComputed extends ExpenseColumn {
-  spend?: number;
-  pending?: number;
+  spent?: number;
+  balance?: number;
 }
 
 class ExpenseResource {
@@ -73,17 +72,13 @@ class ExpenseResource {
       categoryId: expenseData.categoryId,
       name: expenseData.name,
       businessId: expenseData.businessId ?? null,
-      estimatedCost: Number(expenseData.estimatedCost),
-      contractAmount:
-        expenseData.contractAmount !== undefined
-          ? Number(expenseData.contractAmount)
-          : null,
+      allocatedAmount: Number(expenseData.allocatedAmount),
       nextDueDate: expenseData.nextDueDate ?? null,
       notes: expenseData.notes ?? null,
       // computed — only present if passed in
-      ...(expenseData.spend !== undefined && { spend: expenseData.spend }),
-      ...(expenseData.pending !== undefined && {
-        pending: expenseData.pending,
+      ...(expenseData.spent !== undefined && { spent: expenseData.spent }),
+      ...(expenseData.balance !== undefined && {
+        balance: expenseData.balance,
       }),
       ...(expenseData.payments !== undefined && {
         payments: expenseData.payments,
