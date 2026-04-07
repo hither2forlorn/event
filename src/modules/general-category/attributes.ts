@@ -1,7 +1,6 @@
 import { serial, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const tableName = "general_category";
-
 export const attributes = {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),

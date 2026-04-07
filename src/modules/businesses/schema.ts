@@ -6,19 +6,31 @@ import {
   vendorServicesAttribute,
   vendorServiceTableName,
 } from "./attributes";
-import { integer, pgTable } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, varchar, timestamp, text, index } from "drizzle-orm/pg-core";
 
-const schema = pgTable(tableName, businessesAttribute);
-const vendor_venue_schema = pgTable(vendorVenueTableName, venueAttribute);
-const vendor_services_schema = pgTable(vendorServiceTableName, vendorServicesAttribute);
+const schema = pgTable(tableName, businessesAttribute, (table) => [
+    index('business_id').on(table.id)
+]);
+const vendor_venue_schema = pgTable(vendorVenueTableName, venueAttribute, (table) => [
+  index("vendor_venues_business_id_idx").on(table.business_id),
+]);
+const vendor_services_schema = pgTable(vendorServiceTableName, vendorServicesAttribute, (table) => [
+  index("vendor_services_business_id_idx").on(table.business_id),
+]);
 
-const event_businesses = pgTable("event_business", {
-  eventid: integer("eventid"),
-  business_id: integer("business_id"),
+export const event_vendorTable = pgTable("event_vendor", {
+  id: serial("id").primaryKey(),
+  event_id: integer("event_id")
+    .notNull()
+    .references(() => schema.id),
+  vendor_buisness_id: text("vendor_buisness_id").notNull(),
+  acquired_by: integer("acquired_by"),
+  status: varchar("status", { length: 15 }),
+  notes: varchar("notes", { length: 200 }),
+  createdAt: timestamp("create_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+});
 
-}
 
-)
-
-export { vendor_venue_schema, vendor_services_schema, event_businesses };
+export { vendor_venue_schema, vendor_services_schema };
 export default schema;

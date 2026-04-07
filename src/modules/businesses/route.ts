@@ -62,6 +62,13 @@ const routes = [
     authorization: true,
     authCheckType: [role.user],
   },
+  {
+    method: "post",
+    controller: Controller.AddEventVendor,
+    path: "business/add",
+    authorization: true,
+    authCheckType: [role.user]
+  }
 ];
 
 export default routes;
