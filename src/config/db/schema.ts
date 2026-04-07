@@ -1,12 +1,13 @@
 import buisness, {
   vendor_venue_schema,
-  vendor_services_schema
+  vendor_services_schema,
 } from "@/modules/businesses/schema";
-import invitation from "@/modules/invitation/schema"
+import invitation from "@/modules/invitation/schema";
 import category from "@/modules/category/schema";
 import user from "@/modules/user/schema";
 import admin from "@/modules/admin/schema";
 import todo from "@/modules/todo/schema";
+import generalCategory from "@/modules/general-category/schema";
 import {
   event_member_schema,
   event_vendor_schema,
@@ -45,4 +46,5 @@ export {
   payment,
   paymentModeEnum,
   paymentStatusEnum,
+  generalCategory,
 };
