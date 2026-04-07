@@ -42,7 +42,6 @@ export default class Invitation {
       .leftJoin(family, eq(family.id, invitation.familyId))
       .where(eq(invitation.eventId, eventId));
 
-    console.log(event_guest);
     return event_guest;
   }
 
@@ -315,7 +314,8 @@ export default class Invitation {
     return deletedEvent_guest;
   }
   static async EventHotelManagent(eventId: number) {
-    const hotel_management = await db.select(repository.selectHotelManagement).from(invitation).leftJoin(user, eq(invitation.userId, user.id)).where(eq(invitation.eventId, eventId))
+    const hotel_management = await db.select(repository.selectHotelManagement).from(invitation).leftJoin(user, eq(invitation.userId, user.id)).where(and(eq(invitation.eventId, eventId), eq(invitation.isAccomodation, true), ne(invitation.status, invitationStatus.draft)));
+    console.log("this is the data in the hotel managemtn section", hotel_management);
     return hotel_management;
   }
 

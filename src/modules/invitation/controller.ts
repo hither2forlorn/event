@@ -57,7 +57,6 @@ const setResponce = async (req: IAuthRequest) => {
     const userId = req.user.id;
     const eventId = Number(req.params.id);
     const familyId = req?.user?.familyId;
-    console.log('settinm hjkjhkjsdhfjksdfhkljdfhlksdfhklsdfhklsdjfhklsdjfhsdjkfhsldkjfhsldkfjhsldkfjhsldkjfh', req.body)
     const service = await Service.setResponce(req.body, userId, familyId, eventId); // TODO:update the validaion in this line of the code 
     return service;
   } catch (err) {

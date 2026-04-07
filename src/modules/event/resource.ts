@@ -12,13 +12,13 @@ export interface EventColumn {
   attire: string | null;
   side: string | null;
   location: string | null;
-  status?: string | null; // Temp ui
+  status?: string | null;
   organizer: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-  role?: string | null; //Temp
-  date: string | null; //Temp
-  imageUrl: string | null; //Temp
+  role?: string | null;
+  date: string | null;
+  imageUrl: string | null;
 }
 export interface EventGuestColumn {
   user: User;
@@ -35,9 +35,7 @@ class Resource {
     const data: Partial<EventColumn> = {
       id: event.id,
       title: event.title,
-      description:
-        event.description ||
-        "Witness the World comming together, Be part of the celebration in wedding of Bishwas and Salena Gomez",
+      description: event.description,
       type: event.type,
       startDateTime: event.startDateTime,
       date: "Nov 12, 2023",
@@ -51,8 +49,7 @@ class Resource {
       organizer: event.organizer,
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
-      imageUrl:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAoqHk60jIeSNZ9ki1c8iJtQhNgAylhPNie7B-e6RbVhqxqPZYWqYOStnWl2heFJMQW4km9uazp2AJ27FMETIhQQO3tXxYSIvbPNLiMuyf2dg0b3qT3v_GGw5YsO8M3pcj5Bnk0kNmcSQKT1p6x0bsxOFgm0JL10HY5_xet3NtTFkdXUpZlZid6xWZ7LqikDKmn0bLoVzit5hQKLe7VmvXCaa50hemlczbPWpDQbXcqd7R368vilNmPfa2ysrPk64t5Wga7Wgb-EVU",
+      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAoqHk60jIeSNZ9ki1c8iJtQhNgAylhPNie7B-e6RbVhqxqPZYWqYOStnWl2heFJMQW4km9uazp2AJ27FMETIhQQO3tXxYSIvbPNLiMuyf2dg0b3qT3v_GGw5YsO8M3pcj5Bnk0kNmcSQKT1p6x0bsxOFgm0JL10HY5_xet3NtTFkdXUpZlZid6xWZ7LqikDKmn0bLoVzit5hQKLe7VmvXCaa50hemlczbPWpDQbXcqd7R368vilNmPfa2ysrPk64t5Wga7Wgb-EVU",
     };
     return data;
   }
@@ -62,7 +59,6 @@ class Resource {
   static event_guest_toJson(event_guest: Partial<EventGuestColumn>) {
     if (!event_guest) return null;
     return {
-      // same time as the partial data type
       ...event_guest,
     };
   }
