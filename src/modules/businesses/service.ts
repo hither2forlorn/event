@@ -1,8 +1,17 @@
 import { throwErrorOnValidation, throwForbiddenError, throwNotFoundError } from "@/utils/error";
 import Model from "./model";
-import { CreateBusinessSchema, CreateBusinessType, CreateVendorServiceDetailSchema, CreateVendorServiceDetailType, CreateVenueDetailSchema, CreateVenueDetailType } from "./validators";
+import {
+  CreateBusinessSchema,
+  CreateBusinessType,
+  CreateVendorServiceDetailSchema,
+  CreateVendorServiceDetailType,
+  CreateVenueDetailSchema,
+  CreateVenueDetailType,
+  PostEventVendorSchema,
+  PostEventVendorType,
+} from "./validators";
 import { VendorBusinessCategoryTypes } from "@/constant";
-
+import EventService from "@/modules/event/service";
 
 const create = async (params: CreateBusinessType, ownerId: number) => {
   try {
@@ -115,6 +124,58 @@ const addVenueDetail = async (params: CreateVenueDetailType & { business_id: num
     throw err;
   }
 }
+const getEventBusiness = async (eventId: number, userId: number) => {
+  try {
+    await EventService.checkAuthorized(eventId, userId);
+    const result = await Model.findEventVendor(eventId);
+    if (!result || result.length == 0) {
+      throwNotFoundError("No vendors found for the event");
+    }
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
+
+const postEventVendor = async (
+  eventId: number,
+  params: PostEventVendorType,
+  userId: number,
+) => {
+  try {
+    const { error, data } = PostEventVendorSchema.safeParse(params);
+    if (error || !data) {
+      return throwErrorOnValidation(error?.message || "Invalid payload");
+    }
+
+    await EventService.checkAuthorized(eventId, userId);
+
+    const business = await find(data.businessId);
+    if (!business?.business_information?.id) {
+      return throwNotFoundError("Business not found");
+    }
+
+    const exists = await Model.findEventVendorLink(eventId, data.businessId);
+    if (exists) {
+      return throwErrorOnValidation("Vendor business already linked to this event");
+    }
+
+    const result = await Model.createEventVendorLink({
+      event_id: eventId,
+      vendor_buisness_id: data.businessId,
+      acquired_by: userId,
+      status: data.status,
+      notes: data.notes,
+    });
+
+    if (!result) {
+      return throwErrorOnValidation("Failed to link vendor business to event");
+    }
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
 
 const find = async (id: number) => {
   try {
@@ -218,6 +279,8 @@ export default {
   addVenueDetail,
   udpateVendorServiceDetail,
   updateVendorVenueDetail,
+  getEventBusiness,
+  postEventVendor,
   update,
   find,
   updatebusinessInformation,

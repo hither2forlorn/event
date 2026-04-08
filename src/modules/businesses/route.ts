@@ -65,7 +65,14 @@ const routes = [
   {
     method: "post",
     controller: Controller.AddEventVendor,
-    path: "business/add",
+    path: "business/event/:eventId/vendor",
+    authorization: true,
+    authCheckType: [role.user]
+  },
+  {
+    method: "get",
+    controller: Controller.getEventBusiness,
+    path: "business/event/:eventId/vendor",
     authorization: true,
     authCheckType: [role.user]
   }

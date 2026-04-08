@@ -21,13 +21,41 @@ const create = async (req: IAuthRequest) => {
 };
 const AddEventVendor = async (req: IAuthRequest) => {
   try {
-    return "hello world "
+    const { eventId } = req.params;
+    const userId = req.user?.id;
+
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    return await Service.postEventVendor(Number(eventId), req.body, userId);
 
   } catch (err) {
     throw err;
 
   }
 }
+
+const getEventBusiness = async (req: IAuthRequest) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user?.id;
+
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    return await Service.getEventBusiness(Number(eventId), userId);
+  } catch (err) {
+    throw err;
+  }
+};
 
 const findOne = async (req: IAuthRequest) => {
   try {
@@ -111,4 +139,16 @@ const updateVendorServiceDetail = async (req: IAuthRequest) => {
   }
 };
 
-export default { list, create, findOne, update, remove, addVenueDetail, addVendorServiceDetail, updateVendorVenueDetail, updateVendorServiceDetail, AddEventVendor };
+export default {
+  list,
+  create,
+  findOne,
+  update,
+  remove,
+  addVenueDetail,
+  addVendorServiceDetail,
+  updateVendorVenueDetail,
+  updateVendorServiceDetail,
+  AddEventVendor,
+  getEventBusiness,
+};

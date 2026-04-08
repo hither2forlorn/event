@@ -58,6 +58,11 @@ export const CreateFullBusinessSchema = CreateBusinessSchema.extend({
   venue_detail: CreateVenueDetailSchema.optional(),
   artist_detail: CreateVendorServiceDetailSchema.optional(),
 });
+export const PostEventVendorSchema = z.object({
+  businessId: z.number().int().positive(),
+  notes: z.string().max(200).optional(),
+  status: z.string().max(15).optional(),
+});
 export const updateVenuevalidator = CreateVenueDetailSchema.partial();
 export const updateVendorServiceDetail = CreateVendorServiceDetailSchema.partial();
 
@@ -67,3 +72,4 @@ export type UpdateVendrorVenueDetail = z.infer<typeof CreateVenueDetailSchema>;
 export type CreateVenueDetailType = z.infer<typeof CreateVenueDetailSchema>;
 export type CreateVendorServiceDetailType = z.infer<typeof CreateVendorServiceDetailSchema>;
 export type CreateFullBusinessType = z.infer<typeof CreateFullBusinessSchema>;
+export type PostEventVendorType = z.infer<typeof PostEventVendorSchema>;
