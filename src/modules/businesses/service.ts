@@ -132,8 +132,10 @@ const getEventBusiness = async (eventId: number, userId: number) => {
       throwNotFoundError("No vendors found for the event");
     }
     return result;
+
   } catch (err) {
     throw err;
+
   }
 }
 
@@ -171,9 +173,12 @@ const postEventVendor = async (
     if (!result) {
       return throwErrorOnValidation("Failed to link vendor business to event");
     }
+
     return result;
+
   } catch (err) {
     throw err;
+
   }
 }
 

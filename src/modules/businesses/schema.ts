@@ -7,10 +7,10 @@ import {
   vendorServiceTableName,
 } from "./attributes";
 import event from "@/modules/event/schema";
-import { integer, pgTable, serial, varchar, timestamp, index, primaryKey } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, varchar, timestamp, index } from "drizzle-orm/pg-core";
 
 const schema = pgTable(tableName, businessesAttribute, (table) => [
-  index('business_id').on(table.id)
+    index('business_id').on(table.id)
 ]);
 const vendor_venue_schema = pgTable(vendorVenueTableName, venueAttribute, (table) => [
   index("vendor_venues_business_id_idx").on(table.business_id),
@@ -20,6 +20,7 @@ const vendor_services_schema = pgTable(vendorServiceTableName, vendorServicesAtt
 ]);
 
 export const event_vendorTable = pgTable("event_vendor", {
+  id: serial("id").primaryKey(),
   event_id: integer("event_id")
     .notNull()
     .references(() => event.id),
@@ -29,16 +30,7 @@ export const event_vendorTable = pgTable("event_vendor", {
   notes: varchar("notes", { length: 200 }),
   createdAt: timestamp("create_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
-}, (table) => {
-  pk: primaryKey({ columns: [table.event_id, table.vendor_business_id] }),
-
-    // 👇 Index on event_id — "yo event ma k k vendors cha?" query fast
-    eventIdIdx: index("event_vendor_event_id_idx").on(table.event_id),
-
-      // 👇 Index on vendor_business_id — "yo vendor kun kun events ma cha?" query fast
-      vendorIdIdx: index("event_vendor_vendor_id_idx").on(table.vendor_business_id),
-  }
-);
+});
 
 
 export { vendor_venue_schema, vendor_services_schema };

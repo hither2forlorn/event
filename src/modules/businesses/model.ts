@@ -135,7 +135,7 @@ class BusinessModel {
       .where(eq(vendor_services_schema.business_id, businessId));
     return rows;
   }
-  static async findEventVendor(eventId: number) {
+  static async findEventVendor(eventId:number){
     const eventVendor = event_vendorTable as any;
     const rows = await db.select(repository.businessSelectQuery).from(event_vendorTable).leftJoin(
       schema,
@@ -171,6 +171,7 @@ class BusinessModel {
       .insert(event_vendorTable)
       .values(params)
       .returning();
+
     return result[0] ?? null;
   }
 }
