@@ -1,6 +1,6 @@
 import { type IAuthRequest } from "@/routes/index";
 import Service from "./service"
-import { throwErrorOnValidation } from "@/utils/error";
+import { throwErrorOnValidation, throwForbiddenError } from "@/utils/error";
 
 const list = async (req: IAuthRequest) => {
   try {
@@ -39,7 +39,7 @@ const AddEventVendor = async (req: IAuthRequest) => {
   }
 }
 
-const getEventBusiness = async (req: IAuthRequest) => {
+const getEventVendor = async (req: IAuthRequest) => {
   try {
     const { eventId } = req.params;
     const userId = req.user?.id;
@@ -51,7 +51,7 @@ const getEventBusiness = async (req: IAuthRequest) => {
       throwErrorOnValidation("User not authenticated");
     }
 
-    return await Service.getEventBusiness(Number(eventId), userId);
+    return await Service.getEventVendor(Number(eventId), userId);
   } catch (err) {
     throw err;
   }
@@ -138,9 +138,30 @@ const updateVendorServiceDetail = async (req: IAuthRequest) => {
     throw err;
   }
 };
+const updateEventVendor = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.eventId);
+    const vendorId = Number(req.params.vendorId);
+    const userId = req.user.id;
+    if (isNaN(eventId) || isNaN(vendorId) || !userId) {
+      throwErrorOnValidation("Invdalid event id and the vendor id ");
+    }
+    if (!eventId || isNaN(Number(eventId))) throwErrorOnValidation("Invalid service ID");
+    const updated_data = await Service.updateEventVendor({
+      vendorId: vendorId,
+      eventId: eventId,
+      ownerId: userId,
+      params: req.body
+    });
+    return updated_data;
+  } catch (err) {
+    throw err;
+  }
+}
 
 export default {
   list,
+  updateEventVendor,
   create,
   findOne,
   update,
@@ -150,5 +171,5 @@ export default {
   updateVendorVenueDetail,
   updateVendorServiceDetail,
   AddEventVendor,
-  getEventBusiness,
+  getEventVendor,
 };

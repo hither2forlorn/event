@@ -25,56 +25,54 @@ const routes = [
     controller: Controller.update,
     path: "business/:id",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "delete",
     controller: Controller.remove,
     path: "business/:id",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "post",
     controller: Controller.addVenueDetail,
     path: "business/:id/venue",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "post",
     controller: Controller.addVendorServiceDetail,
     path: "business/:id/service",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "patch",
     controller: Controller.updateVendorVenueDetail,
     path: "business/venue/:venueId",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "patch",
     controller: Controller.updateVendorServiceDetail,
     path: "business/service/:serviceId",
     authorization: true,
-    authCheckType: [role.user],
   },
   {
     method: "post",
     controller: Controller.AddEventVendor,
-    path: "business/event/:eventId/vendor",
+    path: "vendor/event/:eventId",
     authorization: true,
-    authCheckType: [role.user]
+  },
+  {
+    method: "patch",
+    controller: Controller.updateEventVendor,
+    path: "vendor/:eventId/vendor/:vendorId",
+    authorization: true,
   },
   {
     method: "get",
-    controller: Controller.getEventBusiness,
-    path: "business/event/:eventId/vendor",
+    controller: Controller.getEventVendor,
+    path: "vendor/event/:eventId",
     authorization: true,
-    authCheckType: [role.user]
   }
 ];
 

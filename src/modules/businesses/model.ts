@@ -135,14 +135,6 @@ class BusinessModel {
       .where(eq(vendor_services_schema.business_id, businessId));
     return rows;
   }
-  static async findEventVendor(eventId:number){
-    const eventVendor = event_vendorTable as any;
-    const rows = await db.select(repository.businessSelectQuery).from(event_vendorTable).leftJoin(
-      schema,
-      eq(eventVendor.vendor_buisness_id, schema.id)
-    ).where(eq(eventVendor.event_id, eventId));
-    return rows;
-  }
 
   static async findEventVendorLink(eventId: number, businessId: number) {
     const eventVendor = event_vendorTable as any;
@@ -173,6 +165,20 @@ class BusinessModel {
       .returning();
 
     return result[0] ?? null;
+  }
+  static async updateEventVendor(params: any, eventId: number, businessId: number) {
+    const result = await db.update(event_vendorTable).set(params).where(and(eq(event_vendorTable.vendor_buisness_id, businessId), eq(event_vendorTable.event_id, eventId))).returning();
+    return result;
+  }
+  static async findEventVendor(eventId: number, businessId?: number) {
+    let conditions = [];
+    conditions.push(eq(event_vendorTable.event_id, eventId));
+    if (!!businessId) {
+      conditions.push(eq(event_vendorTable.vendor_buisness_id, businessId));
+    }
+    const result = await db.select(repository.businessSelectQuery).from(event_vendorTable).where(and(...conditions));
+    if (result.length == 0) return null;
+    return result;
   }
 }
 

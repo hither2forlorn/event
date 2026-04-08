@@ -124,7 +124,7 @@ const addVenueDetail = async (params: CreateVenueDetailType & { business_id: num
     throw err;
   }
 }
-const getEventBusiness = async (eventId: number, userId: number) => {
+const getEventVendor = async (eventId: number, userId: number) => {
   try {
     await EventService.checkAuthorized(eventId, userId);
     const result = await Model.findEventVendor(eventId);
@@ -132,10 +132,23 @@ const getEventBusiness = async (eventId: number, userId: number) => {
       throwNotFoundError("No vendors found for the event");
     }
     return result;
-
   } catch (err) {
     throw err;
 
+  }
+}
+const findEventVendor = async ({
+  eventId,
+  businessId
+}: { eventId: number, businessId?: number }) => {
+  try {
+    const eventVendor = await Model.findEventVendor(eventId, businessId);
+    if (!eventVendor) {
+      throwNotFoundError("No aquired vendor was found");
+    }
+    return eventVendor ? eventVendor[0] : null;
+  } catch (err) {
+    throw err;
   }
 }
 
@@ -179,6 +192,31 @@ const postEventVendor = async (
   } catch (err) {
     throw err;
 
+  }
+}
+
+const updateEventVendor = async ({
+  eventId, vendorId,
+  ownerId, params
+}: {
+  eventId: number, vendorId: number,
+  ownerId: number, params: any
+}) => {
+  try {
+    const event_vendor = await findEventVendor({
+      eventId: eventId,
+      businessId: vendorId
+    });
+    const event = await EventService.checkAuthorized(eventId, ownerId)
+    if (event_vendor?.owner_id != ownerId && !event.id) {
+      throwForbiddenError(" You are not authorized to change in this field")
+    }
+    const updated_data = await Model.updateEventVendor(
+      params, eventId, vendorId
+    );
+    return updated_data;
+  } catch (err) {
+    throw err;
   }
 }
 
@@ -284,9 +322,11 @@ export default {
   addVenueDetail,
   udpateVendorServiceDetail,
   updateVendorVenueDetail,
-  getEventBusiness,
+  getEventVendor,
+  updateEventVendor,
   postEventVendor,
   update,
+  findEventVendor,
   find,
   updatebusinessInformation,
   remove,
