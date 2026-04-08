@@ -1,6 +1,4 @@
-import { validate } from "@/middlewares/zodValidation";
 import Controller from "./controller";
-import { EventInvitation } from "./validators";
 const route = [
   {
     method: "get",

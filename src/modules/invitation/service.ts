@@ -253,7 +253,7 @@ const getEventHotelManagement = async (eventId: number, userId: number) => {
       );
     }
     const event_hotel_management = await Model.EventHotelManagent(eventId);
-    return Resource.toRoomCollection(event_hotel_management);
+    return Resource.toRoomCollection(event_hotel_management)
   }
   catch (err) {
     throw err;

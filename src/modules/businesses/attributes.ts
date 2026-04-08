@@ -10,10 +10,9 @@ export const tableName = "businesses";
 export const vendorVenueTableName = "vendor_venues_table";
 export const vendorServiceTableName = "vendor_services_table";
 import schema from "./schema"
-import { length } from "zod";
 
 export const businessesAttribute = {
-  id: serial("id").primaryKey(),
+  id: serial("id").notNull().primaryKey(),
   business_name: varchar("business_name", { length: 100 }).notNull(),
   type: varchar("type", { length: 50 }),
   category: varchar("category", { length: 100 }),

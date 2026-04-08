@@ -19,6 +19,15 @@ const create = async (req: IAuthRequest) => {
     throw err;
   }
 };
+const AddEventVendor = async (req: IAuthRequest) => {
+  try {
+    return "hello world "
+
+  } catch (err) {
+    throw err;
+
+  }
+}
 
 const findOne = async (req: IAuthRequest) => {
   try {
@@ -102,4 +111,4 @@ const updateVendorServiceDetail = async (req: IAuthRequest) => {
   }
 };
 
-export default { list, create, findOne, update, remove, addVenueDetail, addVendorServiceDetail, updateVendorVenueDetail, updateVendorServiceDetail };
+export default { list, create, findOne, update, remove, addVenueDetail, addVendorServiceDetail, updateVendorVenueDetail, updateVendorServiceDetail, AddEventVendor };
