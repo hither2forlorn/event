@@ -1,6 +1,6 @@
 import { type IAuthRequest } from "@/routes/index";
 import Service from "./service"
-import { throwErrorOnValidation } from "@/utils/error";
+import { throwErrorOnValidation, throwForbiddenError } from "@/utils/error";
 
 const list = async (req: IAuthRequest) => {
   try {
@@ -21,13 +21,41 @@ const create = async (req: IAuthRequest) => {
 };
 const AddEventVendor = async (req: IAuthRequest) => {
   try {
-    return "hello world "
+    const { eventId } = req.params;
+    const userId = req.user?.id;
+
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    return await Service.postEventVendor(Number(eventId), req.body, userId);
 
   } catch (err) {
     throw err;
 
   }
 }
+
+const getEventVendor = async (req: IAuthRequest) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user?.id;
+
+    if (!eventId || isNaN(Number(eventId))) {
+      throwErrorOnValidation("Invalid event ID");
+    }
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    return await Service.getEventVendor(Number(eventId), userId);
+  } catch (err) {
+    throw err;
+  }
+};
 
 const findOne = async (req: IAuthRequest) => {
   try {
@@ -110,5 +138,38 @@ const updateVendorServiceDetail = async (req: IAuthRequest) => {
     throw err;
   }
 };
+const updateEventVendor = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.eventId);
+    const vendorId = Number(req.params.vendorId);
+    const userId = req.user.id;
+    if (isNaN(eventId) || isNaN(vendorId) || !userId) {
+      throwErrorOnValidation("Invdalid event id and the vendor id ");
+    }
+    if (!eventId || isNaN(Number(eventId))) throwErrorOnValidation("Invalid service ID");
+    const updated_data = await Service.updateEventVendor({
+      vendorId: vendorId,
+      eventId: eventId,
+      ownerId: userId,
+      params: req.body
+    });
+    return updated_data;
+  } catch (err) {
+    throw err;
+  }
+}
 
-export default { list, create, findOne, update, remove, addVenueDetail, addVendorServiceDetail, updateVendorVenueDetail, updateVendorServiceDetail, AddEventVendor };
+export default {
+  list,
+  updateEventVendor,
+  create,
+  findOne,
+  update,
+  remove,
+  addVenueDetail,
+  addVendorServiceDetail,
+  updateVendorVenueDetail,
+  updateVendorServiceDetail,
+  AddEventVendor,
+  getEventVendor,
+};

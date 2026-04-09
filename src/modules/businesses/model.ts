@@ -1,6 +1,6 @@
 import db from "@/config/db";
-import { eq, sql, or } from "drizzle-orm";
-import schema, { vendor_venue_schema, vendor_services_schema } from "./schema";
+import { eq, or, and, sql } from "drizzle-orm";
+import schema, { vendor_venue_schema, vendor_services_schema, event_vendorTable } from "./schema";
 import repository from "./repository";
 import { CreateBusinessType, CreateVenueDetailType } from "./validators";
 import { VendorBusinessCategoryTypes } from "@/constant";
@@ -16,7 +16,7 @@ class BusinessModel {
   static async createVenueDetail(params: CreateVenueDetailType & { business_id: number }) {
     const result = await db
       .insert(vendor_venue_schema)
-      .values(params)
+      .values(params as any)
       .returning();
     return result[0] ?? null;
   }
@@ -134,6 +134,51 @@ class BusinessModel {
       )
       .where(eq(vendor_services_schema.business_id, businessId));
     return rows;
+  }
+
+  static async findEventVendorLink(eventId: number, businessId: number) {
+    const eventVendor = event_vendorTable as any;
+    const rows = await db
+      .select({ id: eventVendor.id })
+      .from(event_vendorTable)
+      .where(
+        and(
+          eq(eventVendor.event_id, eventId),
+          eq(eventVendor.vendor_buisness_id, businessId),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  }
+
+  static async createEventVendorLink(params: {
+    event_id: number;
+    vendor_buisness_id: number;
+    acquired_by?: number;
+    status?: string;
+    notes?: string;
+  }) {
+    const result = await db
+      .insert(event_vendorTable)
+      .values(params)
+      .returning();
+
+    return result[0] ?? null;
+  }
+  static async updateEventVendor(params: any, eventId: number, businessId: number) {
+    const result = await db.update(event_vendorTable).set(params).where(and(eq(event_vendorTable.vendor_buisness_id, businessId), eq(event_vendorTable.event_id, eventId))).returning();
+    return result;
+  }
+  static async findEventVendor(eventId: number, businessId?: number) {
+    let conditions = [];
+    conditions.push(eq(event_vendorTable.event_id, eventId));
+    if (!!businessId) {
+      conditions.push(eq(event_vendorTable.vendor_buisness_id, businessId));
+    }
+    const result = await db.select(repository.businessSelectQuery).from(event_vendorTable).where(and(...conditions));
+    if (result.length == 0) return null;
+    return result;
   }
 }
 

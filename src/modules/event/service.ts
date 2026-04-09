@@ -272,5 +272,6 @@ export default {
   checkAuthorized,
   getUserRelatedToEvent,
   getEventVendor,
+  checkAuthorized,
   getSubEventOfEvent,
 };
