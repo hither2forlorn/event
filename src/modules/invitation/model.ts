@@ -1,5 +1,5 @@
 import { eq, and, sql, or, isNull, ne } from "drizzle-orm";
-import invitation from "./schema";
+import invitation, { guest_category_schema } from "./schema";
 import family from "@/modules/family/schema";
 import event from "@/modules/event/schema";
 import db from "@/config/db";
@@ -276,18 +276,18 @@ export default class Invitation {
 
       const clearedResponseFields = shouldClearResponseDetails
         ? {
-            notes: null,
-            arrival_date_time: null,
-            departure_date_time: null,
-            isAccomodation: null,
-            isArrivalPickupRequired: false,
-            isDeparturePickupRequired: false,
-            assigned_room: null,
-            arrival_info: null,
-            departure_info: null,
-            responded_by: null,
-            responded_at: null,
-          }
+          notes: null,
+          arrival_date_time: null,
+          departure_date_time: null,
+          isAccomodation: null,
+          isArrivalPickupRequired: false,
+          isDeparturePickupRequired: false,
+          assigned_room: null,
+          arrival_info: null,
+          departure_info: null,
+          responded_by: null,
+          responded_at: null,
+        }
         : {};
 
       const updated = await db
@@ -345,5 +345,28 @@ export default class Invitation {
     console.log("this is the data in the hotel managemtn section", hotel_management);
     return hotel_management;
   }
+  static async getGuestCategory(eventId: number) {
+    const guest_category = await db.select().from(guest_category_schema).where(eq(guest_category_schema.eventId, eventId));
+    return guest_category;
+  }
 
+  static async findGuestCategory(id: number) {
+    const result = await db.select().from(guest_category_schema).where(eq(guest_category_schema.id, id)).limit(1);
+    return result[0] || null;
+  }
+
+  static async addGuestCategory(params: any, eventId: number) {
+    const result = await db.insert(guest_category_schema).values({ ...params, eventId }).returning();
+    return result[0];
+  }
+
+  static async updateGuestCategory(params: any, id: number) {
+    const result = await db.update(guest_category_schema).set({ ...params, updatedAt: new Date() }).where(eq(guest_category_schema.id, id)).returning();
+    return result[0];
+  }
+
+  static async removeGuestCategory(id: number) {
+    const result = await db.delete(guest_category_schema).where(eq(guest_category_schema.id, id)).returning();
+    return result;
+  }
 }

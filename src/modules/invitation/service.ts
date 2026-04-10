@@ -135,11 +135,7 @@ const setResponce = async (
     if (invitations && userId !== data.userId && familyId !== null) {
       params = {
         ...data,
-        category: invitations.category as
-          | "friend"
-          | "family"
-          | "colleague"
-          | "vvip",
+        category: invitations.category as string,
         invitation_name: invitations.invitation_name,
       };
     } else {
@@ -172,6 +168,15 @@ const inviteGuest = async (
       );
     }
     await EventService.checkAuthorized(eventId, userId);
+
+    const geteventCategory = await getEventGuestCategory(eventId, userId);
+    const categoryExists = geteventCategory.some(
+      (cat) => cat.category_title === input.category,
+    );
+
+    if (!categoryExists) {
+      return throwErrorOnValidation("The category is not in the event");
+    }
 
     const { fullName, email, phone, isFamily, relation } = input;
     let guestUser;
@@ -281,6 +286,53 @@ const remove_invitation = async (
   }
 };
 
+const getEventGuestCategory = async (eventId: number, userId: number) => {
+  try {
+    const isAllowed = await EventService.checkAuthorized(eventId, userId);
+    if (!isAllowed) {
+      return throwUnauthorizedError(
+        "User with the details cannot get the information of the guest ",
+      );
+    }
+    return await Model.getGuestCategory(eventId);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const createGuestCategory = async (body: any, eventId: number, userId: number) => {
+  try {
+    await EventService.checkAuthorized(eventId, userId);
+    return await Model.addGuestCategory(body, eventId);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const updateGuestCategory = async (body: any, id: number, userId: number) => {
+  try {
+    const category = await Model.findGuestCategory(id);
+    if (!category) return throwNotFoundError("Guest category not found");
+    if (!category.eventId) return throwErrorOnValidation("Category is not associated with an event");
+    await EventService.checkAuthorized(category.eventId, userId);
+    return await Model.updateGuestCategory(body, id);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const delete_guest_category = async (id: number, userId: number) => {
+  try {
+    const category = await Model.findGuestCategory(id);
+    if (!category) return throwNotFoundError("Guest category not found");
+    if (!category.eventId) return throwErrorOnValidation("Category is not associated with an event");
+    await EventService.checkAuthorized(category.eventId, userId);
+    return await Model.removeGuestCategory(id);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   setResponce,
   inviteGuest,
@@ -289,4 +341,8 @@ export default {
   getEventHotelManagement,
   listinvitationsResponce,
   remove_invitation,
+  getEventGuestCategory,
+  createGuestCategory,
+  updateGuestCategory,
+  delete_guest_category,
 };

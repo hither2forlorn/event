@@ -7,7 +7,7 @@ const validationRSVP = z.object({
   userId: z.number(),
   invited_by: z.number().optional(),
   familyId: z.number().optional(),
-  category: z.enum(["friend", "family", "colleague", "vvip"]),
+  category: z.string(),
 });
 const invitationStatusValidation = z.enum([
   invitationStatus.draft,
@@ -34,7 +34,7 @@ const EventInvitation = z.object({
   invitation_name: z.string().min(1, "Invitation name is required").max(50),
   relation: z.string().optional(),
   isFamily: z.boolean().default(false),
-  category: z.enum(["friend", "family", "colleague", "vvip"]).nonoptional(),
+  category: z.string().nonoptional(),
 });
 const setResponcevalidation = z.object({
   invited_by: z.number().int().positive().optional(),
@@ -51,11 +51,25 @@ const setResponcevalidation = z.object({
   arrival_info: z.string().max(200).optional().nullable(),
   departure_info: z.string().max(200).optional().nullable(),
   assigned_room: z.string().max(150).optional().nullable(),
-  category: z.enum(["friend", "family", "colleague", "vvip"]).optional(),
+  category: z.string().optional(),
 });
 const removeInvitationValidation = z.object({
   userId: z.number().nonoptional(),
 });
+
+const guestCategoryValidation = z.object({
+  category_title: z.string().min(1).max(100),
+  priority: z.number().int().optional(),
+});
+
+const updateGuestCategoryValidation = z.object({
+  category_title: z.string().min(1).max(100).optional(),
+  priority: z.number().int().optional(),
+});
+
+type GuestCategoryType = z.infer<typeof guestCategoryValidation>;
+type UpdateGuestCategoryType = z.infer<typeof updateGuestCategoryValidation>;
+
 type EventInvitationRemoveType = z.infer<typeof removeInvitationValidation>;
 type EventInvitationType = z.infer<typeof EventInvitation>;
 type setResponcevalidationType = z.infer<typeof setResponcevalidation>;
@@ -69,4 +83,8 @@ export {
   invitationStatusValidation,
   EventInvitation,
   EventInvitationType,
+  guestCategoryValidation,
+  updateGuestCategoryValidation,
+  GuestCategoryType,
+  UpdateGuestCategoryType,
 };

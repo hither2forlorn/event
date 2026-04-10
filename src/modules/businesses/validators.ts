@@ -58,7 +58,7 @@ export const CreateFullBusinessSchema = CreateBusinessSchema.extend({
   artist_detail: CreateVendorServiceDetailSchema.optional(),
 });
 export const PostEventVendorSchema = z.object({
-  businessId: z.number().int().positive(),
+  vendorId: z.number().int().positive(),
   notes: z.string().max(200).optional(),
   status: z.string().max(15).optional(),
 });
