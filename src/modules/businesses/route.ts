@@ -4,6 +4,12 @@ import Controller from "./controller";
 const routes = [
   {
     method: "get",
+    controller: Controller.getEventOfMyBusiness,
+    path: "business/events",
+    authorization: true,
+  },
+  {
+    method: "get",
     controller: Controller.list,
     path: "business",
     authorization: true,
@@ -79,7 +85,7 @@ const routes = [
     controller: Controller.getVendorEvents,
     path: "vendor/event/:vendorId",
     authorization: true,
-  }
+  },
 ];
 
 export default routes;

@@ -37,7 +37,8 @@ export const CreateVenueDetailSchema = z.object({
   is_outDoor: z.boolean().optional(),
   price_per_hour: z.number().int().optional(),
   parking: z.boolean().optional(),
-  rooms_available: z.number().int().optional(), valet_available: z.boolean().optional(),
+  rooms_available: z.number().int().optional(),
+  valet_available: z.boolean().optional(),
   alcohol_allowed: z.boolean().optional(),
   sound_limit_db: z.number().int().optional(),
 });
@@ -66,15 +67,20 @@ export const UpdateVendorSchema = z.object({
   notes: z.string().optional(),
   estimated_guest: z.number().optional(),
   note: z.string().optional(),
-})
+});
 export const updateVenuevalidator = CreateVenueDetailSchema.partial();
-export const updateVendorServiceDetail = CreateVendorServiceDetailSchema.partial();
+export const updateVendorServiceDetail =
+  CreateVendorServiceDetailSchema.partial();
 
-export type UpdateEventVendorType = z.infer<typeof UpdateVendorSchema>
+export type UpdateEventVendorType = z.infer<typeof UpdateVendorSchema>;
 export type CreateBusinessType = z.infer<typeof CreateBusinessSchema>;
-export type UpdateVendorServiceDetail = z.infer<typeof updateVendorServiceDetail>;
+export type UpdateVendorServiceDetail = z.infer<
+  typeof updateVendorServiceDetail
+>;
 export type UpdateVendrorVenueDetail = z.infer<typeof CreateVenueDetailSchema>;
 export type CreateVenueDetailType = z.infer<typeof CreateVenueDetailSchema>;
-export type CreateVendorServiceDetailType = z.infer<typeof CreateVendorServiceDetailSchema>;
+export type CreateVendorServiceDetailType = z.infer<
+  typeof CreateVendorServiceDetailSchema
+>;
 export type CreateFullBusinessType = z.infer<typeof CreateFullBusinessSchema>;
 export type PostEventVendorType = z.infer<typeof PostEventVendorSchema>;
