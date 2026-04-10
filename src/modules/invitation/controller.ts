@@ -103,6 +103,46 @@ const getHotelManegemt = async (req: IAuthRequest) => {
   }
 }
 
+const getEventGuestCategory = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.id);
+    const userId = req.user.id;
+    return await Service.getEventGuestCategory(eventId, userId);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const createGuestCategory = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.id);
+    const userId = req.user.id;
+    return await Service.createGuestCategory(req.body, eventId, userId);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const updateGuestCategory = async (req: IAuthRequest) => {
+  try {
+    const id = Number(req.params.id);
+    const userId = req.user.id;
+    return await Service.updateGuestCategory(req.body, id, userId);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const deleteGuestCategory = async (req: IAuthRequest) => {
+  try {
+    const id = Number(req.params.id);
+    const userId = req.user.id;
+    return await Service.delete_guest_category(id, userId);
+  } catch (err) {
+    throw err;
+  }
+}
+
 export default {
   setResponce,
   getHotelManegemt,
@@ -110,6 +150,9 @@ export default {
   sendInvitation,
   getInvitations,
   getInvitationResponse,
-  getEventGuest
-
+  getEventGuest,
+  getEventGuestCategory,
+  createGuestCategory,
+  updateGuestCategory,
+  deleteGuestCategory
 };

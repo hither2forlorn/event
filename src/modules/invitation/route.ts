@@ -47,6 +47,30 @@ const route = [
     controller: Controller.getHotelManegemt,
     path: "event/:id/hotel-management",
     authorization: true,
+  },
+  {
+    method: "get",
+    controller: Controller.getEventGuestCategory,
+    path: "event/:id/guest-category",
+    authorization: true,
+  },
+  {
+    method: "post",
+    controller: Controller.createGuestCategory,
+    path: "event/:id/guest-category",
+    authorization: true,
+  },
+  {
+    method: "patch",
+    controller: Controller.updateGuestCategory,
+    path: "guest-category/:id",
+    authorization: true,
+  },
+  {
+    method: "delete",
+    controller: Controller.deleteGuestCategory,
+    path: "guest-category/:id",
+    authorization: true,
   }
 ];
 export default route;

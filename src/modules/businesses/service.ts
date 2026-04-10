@@ -175,22 +175,21 @@ const postEventVendor = async (
     if (error || !data) {
       return throwErrorOnValidation(error?.message || "Invalid payload");
     }
-
     await EventService.checkAuthorized(eventId, userId);
 
-    const business = await find(data.businessId);
+    const business = await find(data.vendorId);
     if (!business?.business_information?.id) {
       return throwNotFoundError("Business not found");
     }
 
-    const exists = await Model.findEventVendorLink(eventId, data.businessId);
+    const exists = await Model.findEventVendorLink(eventId, data.vendorId);
     if (exists) {
       return throwErrorOnValidation("Vendor business already linked to this event");
     }
 
     const result = await Model.createEventVendorLink({
       event_id: eventId,
-      vendor_buisness_id: data.businessId,
+      vendor_buisness_id: data.vendorId,
       acquired_by: userId,
       status: data.status,
       notes: data.notes,
