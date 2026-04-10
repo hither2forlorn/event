@@ -394,6 +394,15 @@ const listEventOfMyBusiness = async (businessIds: number[], status: string) => {
   }
 };
 
+const getMyBusinesses = async (userId: number) => {
+  try {
+    const businesses = await Model.getMyBusinesses(userId);
+    return businesses;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   create,
   createVendorDetail,
@@ -412,4 +421,5 @@ export default {
   getVendorEvent,
   list,
   listEventOfMyBusiness,
+  getMyBusinesses,
 };

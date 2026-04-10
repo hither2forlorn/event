@@ -191,18 +191,19 @@ const getVendorEvents = async (req: IAuthRequest) => {
 
 const getEventOfMyBusiness = async (req: IAuthRequest) => {
   try {
-    const businessIds = req.query.businessIds;
+    const { businessIds } = req.params;
+    console.log(businessIds);
     const status = req.query.status as string;
 
-    console.log(businessIds);
     if (!businessIds) {
-      throwErrorOnValidation("businessIds query parameter is required");
+      throwErrorOnValidation("businessIds param is required");
     }
-    const parsedBusinessIds = Array.isArray(businessIds)
-      ? businessIds.map((id) => Number(id))
-      : [Number(businessIds)];
 
-    if (parsedBusinessIds.some((id) => isNaN(id))) {
+    const parsedBusinessIds = businessIds
+      .split(",")
+      .map((id: string) => Number(id));
+
+    if (parsedBusinessIds.some((id: any) => isNaN(id))) {
       throwErrorOnValidation("All business IDs must be valid numbers");
     }
 
@@ -210,7 +211,22 @@ const getEventOfMyBusiness = async (req: IAuthRequest) => {
       parsedBusinessIds,
       status,
     );
+
     return events;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getMyBusinesses = async (req: IAuthRequest) => {
+  try {
+    const userId = req.user.id;
+    console.log(userId);
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const businesses = await Service.getMyBusinesses(userId);
+    return businesses;
   } catch (err) {
     throw err;
   }
@@ -231,4 +247,5 @@ export default {
   getVendorEvents,
   getEventVendor,
   getEventOfMyBusiness,
+  getMyBusinesses,
 };

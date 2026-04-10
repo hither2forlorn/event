@@ -243,6 +243,14 @@ class BusinessModel {
 
     return result;
   }
+
+  static async getMyBusinesses(userId: number) {
+    const result = await db
+      .select(repository.businessSelectQuery)
+      .from(schema)
+      .where(eq(schema.owner_id, userId));
+    return result;
+  }
 }
 
 export default BusinessModel;

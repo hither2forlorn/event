@@ -1,5 +1,5 @@
 import logger from "@/config/logger";
-import UserService from "@/modules/user/service"
+import UserService from "@/modules/user/service";
 import Token from "../utils/token";
 import { throwForbiddenError } from "@/utils/error";
 const checkSpecificRole = async (user: any, allowTo: string[]) => {
@@ -35,9 +35,11 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
     } else {
       //Check the user in the system make the each req check
       if (decoded) {
-        console.log(`This is the decoded in the system ${JSON.stringify(decoded)}`);
+        console.log(
+          `This is the decoded in the system ${JSON.stringify(decoded)}`,
+        );
         if (decoded.role == "user") {
-          const userdb = await UserService.find({ id: decoded.id })
+          const userdb = await UserService.find({ id: decoded.id });
           let user = decoded;
           user.familyId = userdb?.familyId;
           request.user = user;
@@ -55,6 +57,7 @@ const checkAuthentication = async (request: any, allowTo: string[]) => {
           throw new Error(err.message || "Unauthorized");
         }
       }
+      console.log("pass");
       return;
     }
   } catch (err: any) {
