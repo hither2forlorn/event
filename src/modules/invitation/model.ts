@@ -67,29 +67,49 @@ export default class Invitation {
     const whereCondition = invitationConditions.length
       ? and(...invitationConditions)
       : undefined;
-    //Yesma eventId ko max id bhako invitation ra event euta row banera CTE banxa
-    const distinctEventInvitations = db
+
+    const hasAccepted = sql<boolean>`BOOL_OR(${invitation.status} = ${invitationStatus.accepted})`;
+    const hasRejected = sql<boolean>`BOOL_OR(${invitation.status} = ${invitationStatus.rejected})`;
+    
+    const aggregatedFamilyStatus = db
       .select({
         eventId: invitation.eventId,
-        latestInvitationId: sql<number>`max(${invitation.id})`.as(
-          "latestInvitationId",
-        ),
+        familyId: invitation.familyId,
+        hasAccepted: hasAccepted.as("hasAccepted"),
+        hasRejected: hasRejected.as("hasRejected"),
+        latestInvitationId: sql<number>`max(${invitation.id})`.as("latestInvitationId"),
       })
       .from(invitation)
       .where(and(whereCondition, ne(invitation.status, invitationStatus.draft)))
-      .groupBy(invitation.eventId)
-      .as("distinct_event_invitations");
-    //Tyo pako CTE table bata eventId ani , invitation ko detail hamlai tannera chaini kura linxa
+      .groupBy(invitation.eventId, invitation.familyId)
+      .as("aggregated_family_status");
+
     const result = await db
       .select(repository.selectInvitationEvent)
-      .from(distinctEventInvitations)
+      .from(aggregatedFamilyStatus)
       .leftJoin(
         invitation,
-        eq(invitation.id, distinctEventInvitations.latestInvitationId),
+        eq(invitation.id, aggregatedFamilyStatus.latestInvitationId),
       )
-      .leftJoin(event, eq(event.id, distinctEventInvitations.eventId))
+      .leftJoin(event, eq(event.id, aggregatedFamilyStatus.eventId))
       .limit(limit)
       .offset(offset);
+
+    const enrichedResult = result.map((row: any) => {
+      if (row.familyId) {
+        const hasAccepted = row.hasAccepted;
+        const hasRejected = row.hasRejected;
+        
+        if (hasAccepted) {
+          return { ...row, invitation_status: invitationStatus.accepted };
+        } else if (hasRejected) {
+          return { ...row, invitation_status: invitationStatus.rejected };
+        } else {
+          return { ...row, invitation_status: invitationStatus.pending };
+        }
+      }
+      return row;
+    });
 
     let countQuery = db
       .select({ count: sql<number>`count(distinct ${invitation.eventId})` })
@@ -102,7 +122,7 @@ export default class Invitation {
     const [{ count }]: any = await countQuery;
 
     return {
-      items: Resource.invitationeventCollection(result as any),
+      items: Resource.invitationeventCollection(enrichedResult as any),
       page,
       totalItems: parseInt(count.toString(), 10),
       totalPages: Math.ceil(count / limit),
