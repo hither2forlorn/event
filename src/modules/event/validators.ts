@@ -2,6 +2,7 @@ import { z } from "zod";
 const EventValidationSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
+  dressCode: z.string().optional(),
   imageUrl: z
     .string()
     .optional()

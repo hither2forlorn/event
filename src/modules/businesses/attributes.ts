@@ -14,7 +14,6 @@ import schema from "./schema"
 export const businessesAttribute = {
   id: serial("id").notNull().primaryKey(),
   business_name: varchar("business_name", { length: 100 }).notNull(),
-  type: varchar("type", { length: 50 }),
   category: varchar("category", { length: 100 }),
   avatar: text("avatar"),
   cover: text("cover"),
@@ -31,6 +30,7 @@ export const businessesAttribute = {
   service_area: varchar("service_area", { length: 255 }),
   contact_person_name: varchar("contact_person_name", { length: 120 }),
   contact_phone: varchar("contact_phone", { length: 20 }),
+  email: varchar("email", { length: 60 }),
   website_url: text("website_url"),
   instagram_url: text("instagram_url"),
   whatsapp_number: varchar("whatsapp_number", { length: 20 }),

@@ -74,7 +74,10 @@ const login = async (input: loginType) => {
       );
     }
 
-    const user = await Model.find({ phone: input.phone }, { includePassword: true })
+    const user = await Model.find(
+      { phone: input.phone },
+      { includePassword: true },
+    );
     if (!user || !user.id) {
       throwErrorOnValidation("Invalid credentials");
     }
@@ -102,8 +105,10 @@ const login = async (input: loginType) => {
 
 const find = async (data: Partial<UserColumn>) => {
   try {
+    console.log(data);
     if (!!data.email) {
       const user = await Model.find({ email: data.email });
+
       if (!user || user == null) {
         return throwNotFoundError("User with the email was not found ");
       }
@@ -111,26 +116,29 @@ const find = async (data: Partial<UserColumn>) => {
     }
     if (!!data.phone) {
       const user = await Model.find({ phone: data.phone });
+
       if (!user || user == null) {
         return throwNotFoundError("User with the phone was not found ");
       }
       return Resource.toJson(user as any);
-
     }
     if (!!data.id) {
       const user = await Model.find({ id: data.id });
+
       if (!user || user == null) {
         throwNotFoundError("User with the id was not found");
       }
       return Resource.toJson(user as any);
     }
-
   } catch (error) {
     throw error;
   }
 };
 
-const changePassword = async (input: { currentPassword: string, newPassword: string }, id: number) => {
+const changePassword = async (
+  input: { currentPassword: string; newPassword: string },
+  id: number,
+) => {
   try {
     const result = changePasswordValidationSchema.safeParse(input);
     if (!result.success) {
@@ -161,12 +169,18 @@ const changePassword = async (input: { currentPassword: string, newPassword: str
     throw error;
   }
 };
-const resetPassword = async (input: { newPassword: string }, userId: number) => {
+const resetPassword = async (
+  input: { newPassword: string },
+  userId: number,
+) => {
   try {
-    const user = await Model.update({
-      password: await hashPassword(input.newPassword),
-      isActivated: true
-    }, userId)
+    const user = await Model.update(
+      {
+        password: await hashPassword(input.newPassword),
+        isActivated: true,
+      },
+      userId,
+    );
     const tokenPayload = {
       id: user!.id,
       role: role.user,
@@ -176,12 +190,10 @@ const resetPassword = async (input: { newPassword: string }, userId: number) => 
     const token = await Token.sign(tokenPayload, "30d");
     console.log("the user with the information was", user);
     return { token, user: Resource.toJson(user as any) };
-
-
   } catch (err) {
     throw err;
   }
-}
+};
 
 const updateProfile = async (input: updateProfileType, id: number) => {
   try {
@@ -242,20 +254,22 @@ const update = async (params: Partial<UserColumn>, userId: number) => {
   } catch (err) {
     throw err;
   }
-}
+};
 const UserGeneratorWithPhoneOrEmail = async ({
   fullName,
   email,
   phone,
-  relation
+  relation,
 }: {
-  fullName: string,
-  email: string | undefined,
-  phone: string,
-  relation: string
+  fullName: string;
+  email: string | undefined;
+  phone: string;
+  relation: string;
 }) => {
   const randomPassword = crypto.randomBytes(8).toString("hex");
-  const placeholderEmail = email || `guest_${Date.now()}_${Math.floor(Math.random() * 1000)}@khumbaya.com`;
+  const placeholderEmail =
+    email ||
+    `guest_${Date.now()}_${Math.floor(Math.random() * 1000)}@khumbaya.com`;
   const placeholderPhone = phone || `+977${Date.now()}`;
 
   const user = await create({
@@ -266,9 +280,10 @@ const UserGeneratorWithPhoneOrEmail = async ({
     relation: relation,
     phone: placeholderPhone,
   });
-  if (!user || user.id == undefined) throw new Error("Error while making the user ")
+  if (!user || user.id == undefined)
+    throw new Error("Error while making the user ");
   return user;
-}
+};
 export default {
   list,
   update,
@@ -280,5 +295,5 @@ export default {
   changePassword,
   updateProfile,
   remove,
-  resetPassword
+  resetPassword,
 };

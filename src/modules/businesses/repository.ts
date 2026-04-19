@@ -1,9 +1,13 @@
-import schema, { vendor_venue_schema, vendor_services_schema } from "./schema";
+import { event } from "@/config/db/schema";
+import schema, {
+  vendor_venue_schema,
+  vendor_services_schema,
+  event_vendorTable,
+} from "./schema";
 
 const businessSelectQuery = {
   id: schema.id,
   business_name: schema.business_name,
-  type: schema.type,
   category: schema.category,
   avatar: schema.avatar,
   cover: schema.cover,
@@ -19,6 +23,7 @@ const businessSelectQuery = {
   team_size: schema.team_size,
   service_area: schema.service_area,
   contact_person_name: schema.contact_person_name,
+  email: schema.email,
   contact_phone: schema.contact_phone,
   website_url: schema.website_url,
   instagram_url: schema.instagram_url,
@@ -29,7 +34,6 @@ const businessSelectQuery = {
   createdAt: schema.createdAt,
   updatedAt: schema.updatedAt,
 };
-
 
 const venueSelectQuery = {
   venue_id: vendor_venue_schema.id,
@@ -63,19 +67,30 @@ const vendor_services_select_query = {
   portfolio_link: vendor_services_schema.portfolio_link,
   available_for_destination: vendor_services_schema.available_for_destination,
   business_id: vendor_services_schema.business_id,
-}
+};
 
 const selectWithBusiness = {
   business_information: businessSelectQuery,
   venue_information: venueSelectQuery,
-  vendor_services_information: vendor_services_select_query
-}
+  vendor_services_information: vendor_services_select_query,
+};
 
-
+const eventVendorWithBusiness = {
+  id: event_vendorTable.id,
+  event_id: event_vendorTable.event_id,
+  vendor_business_id: event_vendorTable.vendor_buisness_id,
+  event_title: event.title,
+  event_location: event.location,
+  event_startDateTime: event.startDateTime,
+  event_endDateTime: event.endDateTime,
+  event_image: event.imageUrl,
+  business_name: businessSelectQuery.business_name,
+};
 
 export default {
   selectWithBusiness,
   businessSelectQuery,
   venueSelectQuery,
-  vendor_services_select_query
+  vendor_services_select_query,
+  eventVendorWithBusiness,
 };

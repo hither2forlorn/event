@@ -18,6 +18,7 @@ const attributes = {
     .default("Family name"),
   status: varchar("status", { length: 10 }), // accepted, declined, pending
   notes: varchar("notes", { length: 150 }),
+  organizer_note: varchar("organizer_note", { length: 150 }),
   role: varchar("role", { length: 16 }).notNull().default("Guest"), // Guest , Singer and maybe more role in the future
   category: varchar("category", { length: 10 }).notNull(), //  friend  , colleague , VVIP, family
   eventId: integer("event_id")

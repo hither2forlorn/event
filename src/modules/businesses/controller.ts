@@ -1,5 +1,5 @@
 import { type IAuthRequest } from "@/routes/index";
-import Service from "./service"
+import Service from "./service";
 import { throwErrorOnValidation, throwForbiddenError } from "@/utils/error";
 
 const list = async (req: IAuthRequest) => {
@@ -32,12 +32,10 @@ const AddEventVendor = async (req: IAuthRequest) => {
     }
 
     return await Service.postEventVendor(Number(eventId), req.body, userId);
-
   } catch (err) {
     throw err;
-
   }
-}
+};
 
 const getEventVendor = async (req: IAuthRequest) => {
   try {
@@ -95,9 +93,13 @@ const addVenueDetail = async (req: IAuthRequest) => {
   try {
     const { id: businessId } = req.params;
     const ownerId = req.user?.id;
-    if (!businessId || isNaN(Number(businessId))) throwErrorOnValidation("Invalid business ID");
+    if (!businessId || isNaN(Number(businessId)))
+      throwErrorOnValidation("Invalid business ID");
     if (!ownerId) throwErrorOnValidation("User not authenticated");
-    return await Service.addVenueDetail({ ...req.body, business_id: Number(businessId) }, ownerId);
+    return await Service.addVenueDetail(
+      { ...req.body, business_id: Number(businessId) },
+      ownerId,
+    );
   } catch (err) {
     throw err;
   }
@@ -107,9 +109,13 @@ const addVendorServiceDetail = async (req: IAuthRequest) => {
   try {
     const { id: businessId } = req.params;
     const ownerId = req.user?.id;
-    if (!businessId || isNaN(Number(businessId))) throwErrorOnValidation("Invalid business ID");
+    if (!businessId || isNaN(Number(businessId)))
+      throwErrorOnValidation("Invalid business ID");
     if (!ownerId) throwErrorOnValidation("User not authenticated");
-    return await Service.createVendorDetail({ ...req.body, businessesId: Number(businessId) }, ownerId);
+    return await Service.createVendorDetail(
+      { ...req.body, businessesId: Number(businessId) },
+      ownerId,
+    );
   } catch (err) {
     throw err;
   }
@@ -119,9 +125,14 @@ const updateVendorVenueDetail = async (req: IAuthRequest) => {
   try {
     const { venueId } = req.params;
     const ownerId = req.user?.id;
-    if (!venueId || isNaN(Number(venueId))) throwErrorOnValidation("Invalid venue ID");
+    if (!venueId || isNaN(Number(venueId)))
+      throwErrorOnValidation("Invalid venue ID");
     if (!ownerId) throwErrorOnValidation("User not authenticated");
-    return await Service.updateVendorVenueDetail(req.body, Number(venueId), ownerId);
+    return await Service.updateVendorVenueDetail(
+      req.body,
+      Number(venueId),
+      ownerId,
+    );
   } catch (err) {
     throw err;
   }
@@ -131,9 +142,14 @@ const updateVendorServiceDetail = async (req: IAuthRequest) => {
   try {
     const { serviceId } = req.params;
     const ownerId = req.user?.id;
-    if (!serviceId || isNaN(Number(serviceId))) throwErrorOnValidation("Invalid service ID");
+    if (!serviceId || isNaN(Number(serviceId)))
+      throwErrorOnValidation("Invalid service ID");
     if (!ownerId) throwErrorOnValidation("User not authenticated");
-    return await Service.udpateVendorServiceDetail(req.body, Number(serviceId), ownerId);
+    return await Service.udpateVendorServiceDetail(
+      req.body,
+      Number(serviceId),
+      ownerId,
+    );
   } catch (err) {
     throw err;
   }
@@ -146,22 +162,23 @@ const updateEventVendor = async (req: IAuthRequest) => {
     if (isNaN(eventId) || isNaN(vendorId) || !userId) {
       throwErrorOnValidation("Invdalid event id and the vendor id ");
     }
-    if (!eventId || isNaN(Number(eventId))) throwErrorOnValidation("Invalid service ID");
+    if (!eventId || isNaN(Number(eventId)))
+      throwErrorOnValidation("Invalid service ID");
     const updated_data = await Service.updateEventVendor({
       vendorId: vendorId,
       eventId: eventId,
       ownerId: userId,
-      params: req.body
+      params: req.body,
     });
     return updated_data;
   } catch (err) {
     throw err;
   }
-}
+};
 const getVendorEvents = async (req: IAuthRequest) => {
   try {
     const vendorId = req.params.vendorId;
-    const userId = req?.user.id
+    const userId = req?.user.id;
     if (isNaN(Number(vendorId))) {
       throwErrorOnValidation("invalid businesstype");
     }
@@ -170,7 +187,49 @@ const getVendorEvents = async (req: IAuthRequest) => {
   } catch (err) {
     throw err;
   }
-}
+};
+
+const getEventOfMyBusiness = async (req: IAuthRequest) => {
+  try {
+    const { businessIds } = req.params;
+    console.log(businessIds);
+    const status = req.query.status as string;
+
+    if (!businessIds) {
+      throwErrorOnValidation("businessIds param is required");
+    }
+
+    const parsedBusinessIds = businessIds
+      .split(",")
+      .map((id: string) => Number(id));
+
+    if (parsedBusinessIds.some((id: any) => isNaN(id))) {
+      throwErrorOnValidation("All business IDs must be valid numbers");
+    }
+
+    const events = await Service.listEventOfMyBusiness(
+      parsedBusinessIds,
+      status,
+    );
+
+    return events;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getMyBusinesses = async (req: IAuthRequest) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+    const businesses = await Service.getMyBusinesses(userId);
+    return businesses;
+  } catch (err) {
+    throw err;
+  }
+};
 
 export default {
   list,
@@ -186,4 +245,6 @@ export default {
   AddEventVendor,
   getVendorEvents,
   getEventVendor,
+  getEventOfMyBusiness,
+  getMyBusinesses,
 };

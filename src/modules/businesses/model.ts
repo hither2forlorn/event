@@ -1,12 +1,17 @@
 import db from "@/config/db";
-import businessSchema from "@/modules/businesses/schema"
-import eventSchema from "@/modules/event/schema"
-import { eq, or, and, sql } from "drizzle-orm";
-import EventRepository from "@/modules/event/repository"
-import schema, { vendor_venue_schema, vendor_services_schema, event_vendorTable } from "./schema";
+import businessSchema from "@/modules/businesses/schema";
+import eventSchema from "@/modules/event/schema";
+import { eq, or, and, sql, inArray } from "drizzle-orm";
+import EventRepository from "@/modules/event/repository";
+import schema, {
+  vendor_venue_schema,
+  vendor_services_schema,
+  event_vendorTable,
+} from "./schema";
 import repository from "./repository";
 import { CreateBusinessType, CreateVenueDetailType } from "./validators";
 import { VendorBusinessCategoryTypes } from "@/constant";
+import event from "@/modules/event/schema";
 
 class BusinessModel {
   static async create(params: CreateBusinessType & { owner_id: number }) {
@@ -16,7 +21,9 @@ class BusinessModel {
       .returning();
     return result[0] ?? null;
   }
-  static async createVenueDetail(params: CreateVenueDetailType & { business_id: number }) {
+  static async createVenueDetail(
+    params: CreateVenueDetailType & { business_id: number },
+  ) {
     const result = await db
       .insert(vendor_venue_schema)
       .values(params as any)
@@ -31,14 +38,22 @@ class BusinessModel {
     return result[0] ?? null;
   }
   static async udpatevendorService(params: any, vendorServiceId: number) {
-    const result = await db.update(vendor_services_schema).set(params).where(eq(vendor_services_schema.id, vendorServiceId)).returning();
+    const result = await db
+      .update(vendor_services_schema)
+      .set(params)
+      .where(eq(vendor_services_schema.id, vendorServiceId))
+      .returning();
     return result;
   }
   static async updatevenueservice(id: number, params: any) {
-    const result = await db.update(vendor_venue_schema).set(params).where(eq(vendor_venue_schema.id, id)).returning();
+    const result = await db
+      .update(vendor_venue_schema)
+      .set(params)
+      .where(eq(vendor_venue_schema.id, id))
+      .returning();
     return result;
   }
-  static async findAll(params: any,) {
+  static async findAll(params: any) {
     const { page = 1, limit = 10, userId } = params;
     const offset = (Number(page) - 1) * Number(limit);
     let condition = [];
@@ -49,8 +64,8 @@ class BusinessModel {
     const items = await db
       .select(repository.businessSelectQuery)
       .from(schema)
-      .limit(Number(limit))
-      .where(or(...condition))
+      //.limit(Number(limit))
+      //.where(or(...condition))
       .offset(offset);
 
     const [{ count }]: any = await db
@@ -75,26 +90,22 @@ class BusinessModel {
     if (business[0].category == VendorBusinessCategoryTypes.Venue) {
       const venues = await db
         .select(repository.venueSelectQuery)
-        .from(vendor_venue_schema).leftJoin(
-          schema,
-          eq(vendor_venue_schema.business_id, schema.id)
-        )
+        .from(vendor_venue_schema)
+        .leftJoin(schema, eq(vendor_venue_schema.business_id, schema.id))
         .where(eq(vendor_venue_schema.business_id, id));
       return {
         business_information: business[0],
-        venue_information: venues
-      }
+        venue_information: venues,
+      };
     } else {
       const services = await db
         .select(repository.vendor_services_select_query)
-        .from(vendor_services_schema).leftJoin(
-          schema,
-          eq(vendor_services_schema.business_id, schema.id)
-        )
+        .from(vendor_services_schema)
+        .leftJoin(schema, eq(vendor_services_schema.business_id, schema.id))
         .where(eq(vendor_services_schema.business_id, id));
       return {
         business_information: business[0],
-        services
+        services,
       };
     }
   }
@@ -109,32 +120,31 @@ class BusinessModel {
   }
 
   static async destroy(id: number) {
-    const result = await db
-      .delete(schema)
-      .where(eq(schema.id, id))
-      .returning();
+    const result = await db.delete(schema).where(eq(schema.id, id)).returning();
     return result;
   }
 
   static async listBusinessVenueDetail(businessId: number) {
-    console.log('This is the business id that is being searched in the thing ', businessId);
+    console.log(
+      "This is the business id that is being searched in the thing ",
+      businessId,
+    );
     const rows = await db
       .select(repository.venueSelectQuery)
-      .from(vendor_venue_schema).leftJoin(
-        schema,
-        eq(vendor_venue_schema.business_id, schema.id),
-      )
+      .from(vendor_venue_schema)
+      .leftJoin(schema, eq(vendor_venue_schema.business_id, schema.id))
       .where(eq(vendor_venue_schema.id, businessId));
-    console.log("this is the rowz in the data that is in the mnodel for the finfing the thing in the backend in thei", rows);
+    console.log(
+      "this is the rowz in the data that is in the mnodel for the finfing the thing in the backend in thei",
+      rows,
+    );
     return rows;
   }
   static async listBusinessVendorService(businessId: number) {
     const rows = await db
       .select(repository.vendor_services_select_query)
-      .from(vendor_services_schema).leftJoin(
-        schema,
-        eq(vendor_services_schema.business_id, schema.id),
-      )
+      .from(vendor_services_schema)
+      .leftJoin(schema, eq(vendor_services_schema.business_id, schema.id))
       .where(eq(vendor_services_schema.business_id, businessId));
     return rows;
   }
@@ -169,9 +179,21 @@ class BusinessModel {
 
     return result[0] ?? null;
   }
-  static async updateEventVendor(params: any, eventId: number, businessId: number) {
-    console.log(params, eventId, businessId);
-    const result = await db.update(event_vendorTable).set(params).where(and(eq(event_vendorTable.vendor_buisness_id, businessId), eq(event_vendorTable.event_id, eventId))).returning();
+  static async updateEventVendor(
+    params: any,
+    eventId: number,
+    businessId: number,
+  ) {
+    const result = await db
+      .update(event_vendorTable)
+      .set(params)
+      .where(
+        and(
+          eq(event_vendorTable.vendor_buisness_id, businessId),
+          eq(event_vendorTable.event_id, eventId),
+        ),
+      )
+      .returning();
     return result;
   }
   static async findEventVendor(eventId: number, businessId?: number) {
@@ -192,14 +214,43 @@ class BusinessModel {
     return result;
   }
   static async findVendorEvent(vendorId: number) {
-    const result = await db.select(EventRepository.baseSelectQuery).from(event_vendorTable).innerJoin(eventSchema, eq(event_vendorTable.event_id, eventSchema.id)).where(eq(event_vendorTable.vendor_buisness_id, vendorId));
+    const result = await db
+      .select(EventRepository.baseSelectQuery)
+      .from(event_vendorTable)
+      .innerJoin(eventSchema, eq(event_vendorTable.event_id, eventSchema.id))
+      .where(eq(event_vendorTable.vendor_buisness_id, vendorId));
     if (!result || result.length == 0) {
-      return null
+      return null;
     }
     return result;
+  }
 
+  static async getEventOfMyBusiness(businessIds: number[], status: string) {
+    const whereCondition = [];
+    whereCondition.push(
+      inArray(event_vendorTable.vendor_buisness_id, businessIds),
+    );
+    if (status) {
+      whereCondition.push(eq(event_vendorTable.status, status));
+    }
+    const result = await db
+      .select(repository.eventVendorWithBusiness)
+      .from(event_vendorTable)
+      .leftJoin(schema, eq(event_vendorTable.vendor_buisness_id, schema.id))
+      .leftJoin(event, eq(event_vendorTable.event_id, event.id))
+      .where(and(...whereCondition))
+      .orderBy(event.startDateTime);
 
+    return result;
+  }
 
+  static async getMyBusinesses(userId: number) {
+    const result = await db
+      .select(repository.businessSelectQuery)
+      .from(schema)
+      .where(eq(schema.owner_id, userId));
+
+    return result;
   }
 }
 

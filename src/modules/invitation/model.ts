@@ -7,10 +7,18 @@ import repository from "./repository";
 import Resource from "./resource";
 import { InvitationColumn } from "./resource";
 import user from "@/modules/user/schema";
-import { invitationStatus } from "@/constant"
+import { invitationStatus } from "@/constant";
 import { setResponcevalidationType } from "./validators";
+import { status } from "drizzle/schema";
 
 export default class Invitation {
+  static readonly DEFAULT_GUEST_CATEGORIES = [
+    "friend",
+    "family",
+    "colleague",
+    "vvip",
+  ] as const;
+
   static async list(params: any) {
     const { page, limit } = params;
     const offset = (page - 1) * limit;
@@ -269,25 +277,23 @@ export default class Invitation {
 
     if (existingGuest[0]?.id) {
       const nextStatus = params.status;
-      const shouldClearResponseDetails =
-        existingGuest[0].status === invitationStatus.accepted &&
-        (nextStatus === invitationStatus.pending ||
-          nextStatus === invitationStatus.rejected);
+      const shouldClearResponseDetails =nextStatus === invitationStatus.rejected
 
       const clearedResponseFields = shouldClearResponseDetails
         ? {
-          notes: null,
-          arrival_date_time: null,
-          departure_date_time: null,
-          isAccomodation: null,
-          isArrivalPickupRequired: false,
-          isDeparturePickupRequired: false,
-          assigned_room: null,
-          arrival_info: null,
-          departure_info: null,
-          responded_by: null,
-          responded_at: null,
-        }
+            notes: null,
+            arrival_date_time: null,
+            departure_date_time: null,
+            isAccomodation: null,
+            isArrivalPickupRequired: false,
+            isDeparturePickupRequired: false,
+            assigned_room: null,
+            arrival_info: null,
+            departure_info: null,
+            responded_by: null,
+            status:invitationStatus.rejected,
+            responded_at: null,
+          }
         : {};
 
       const updated = await db
@@ -341,32 +347,93 @@ export default class Invitation {
     return deletedEvent_guest;
   }
   static async EventHotelManagent(eventId: number) {
-    const hotel_management = await db.select(repository.selectHotelManagement).from(invitation).leftJoin(user, eq(invitation.userId, user.id)).where(and(eq(invitation.eventId, eventId), eq(invitation.isAccomodation, true), ne(invitation.status, invitationStatus.draft)));
-    console.log("this is the data in the hotel managemtn section", hotel_management);
+    const hotel_management = await db
+      .select(repository.selectHotelManagement)
+      .from(invitation)
+      .leftJoin(user, eq(invitation.userId, user.id))
+      .where(
+        and(
+          eq(invitation.eventId, eventId),
+          eq(invitation.isAccomodation, true),
+          ne(invitation.status, invitationStatus.draft),
+        ),
+      );
+    console.log(
+      "this is the data in the hotel managemtn section",
+      hotel_management,
+    );
     return hotel_management;
   }
   static async getGuestCategory(eventId: number) {
-    const guest_category = await db.select().from(guest_category_schema).where(eq(guest_category_schema.eventId, eventId));
+    const guest_category = await db
+      .select()
+      .from(guest_category_schema)
+      .where(eq(guest_category_schema.eventId, eventId));
     return guest_category;
   }
 
   static async findGuestCategory(id: number) {
-    const result = await db.select().from(guest_category_schema).where(eq(guest_category_schema.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(guest_category_schema)
+      .where(eq(guest_category_schema.id, id))
+      .limit(1);
     return result[0] || null;
   }
 
   static async addGuestCategory(params: any, eventId: number) {
-    const result = await db.insert(guest_category_schema).values({ ...params, eventId }).returning();
+    const result = await db
+      .insert(guest_category_schema)
+      .values({ ...params, eventId })
+      .returning();
     return result[0];
   }
 
+  static async seedDefaultGuestCategories(eventId: number) {
+    const existingCategories = await db
+      .select({ category_title: guest_category_schema.category_title })
+      .from(guest_category_schema)
+      .where(eq(guest_category_schema.eventId, eventId));
+
+    const existingCategorySet = new Set(
+      existingCategories
+        .map((item) => item.category_title?.toLowerCase().trim())
+        .filter(Boolean),
+    );
+
+    const categoriesToInsert = Invitation.DEFAULT_GUEST_CATEGORIES.filter(
+      (category) => !existingCategorySet.has(category),
+    ).map((category, index) => ({
+      eventId,
+      category_title: category,
+      priority: index + 1,
+     
+    }));
+
+    if (categoriesToInsert.length === 0) {
+      return [];
+    }
+
+    return db
+      .insert(guest_category_schema)
+      .values(categoriesToInsert)
+      .returning();
+  }
+
   static async updateGuestCategory(params: any, id: number) {
-    const result = await db.update(guest_category_schema).set({ ...params, updatedAt: new Date() }).where(eq(guest_category_schema.id, id)).returning();
+    const result = await db
+      .update(guest_category_schema)
+      .set({ ...params, updatedAt: new Date() })
+      .where(eq(guest_category_schema.id, id))
+      .returning();
     return result[0];
   }
 
   static async removeGuestCategory(id: number) {
-    const result = await db.delete(guest_category_schema).where(eq(guest_category_schema.id, id)).returning();
+    const result = await db
+      .delete(guest_category_schema)
+      .where(eq(guest_category_schema.id, id))
+      .returning();
     return result;
   }
 }
