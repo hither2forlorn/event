@@ -3,6 +3,7 @@ export interface EventColumn {
   id?: number;
   title: string | null;
   description: string | null;
+  dressCode: string | null;
   type: any;
   budget: number | null;
   theme: string | null;
@@ -35,6 +36,7 @@ class Resource {
     const data: Partial<EventColumn> = {
       id: event.id,
       title: event.title,
+      dressCode: event.dressCode,
       description: event.description,
       type: event.type,
       startDateTime: event.startDateTime,

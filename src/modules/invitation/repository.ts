@@ -40,6 +40,7 @@ const selectInvitationEvent = {
   familyId: invitation.familyId,
   userId: invitation.userId,
   invitation_status: invitation.status,
+  organizer_note: invitation.organizer_note,
   role: invitation.category,
   category: invitation.category,
   invitation_name: invitation.invitation_name,

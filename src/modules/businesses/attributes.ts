@@ -14,7 +14,6 @@ import schema from "./schema"
 export const businessesAttribute = {
   id: serial("id").notNull().primaryKey(),
   business_name: varchar("business_name", { length: 100 }).notNull(),
-  type: varchar("type", { length: 50 }),
   category: varchar("category", { length: 100 }),
   avatar: text("avatar"),
   cover: text("cover"),

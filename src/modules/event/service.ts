@@ -1,6 +1,7 @@
 import Model from "./model";
 import UserService from "@/modules/user/service";
 import TodoService from "@/modules/todo/service";
+import InvitationModel from "@/modules/invitation/model";
 import Resource from "./resource";
 import logger from "@/config/logger";
 import {
@@ -80,13 +81,9 @@ const create = async (input: any, userId: number) => {
     if (data == undefined || eventMember == undefined) {
       throw new Error("Something went wrong ");
     }
-    await TodoService.populateDefaultChecklist(
-      data.id,
-      {
-        weddingDate: data.startDateTime,
-      },
-      userId,
-    );
+
+    await InvitationModel.seedDefaultGuestCategories(data.id);
+
     return { ...Resource.toJson(data), ownerShipId: eventMember.id };
   } catch (err: any) {
     logger.error("Error in Event creation:", err);
@@ -272,6 +269,5 @@ export default {
   checkAuthorized,
   getUserRelatedToEvent,
   getEventVendor,
-  checkAuthorized,
   getSubEventOfEvent,
 };

@@ -249,6 +249,7 @@ class BusinessModel {
       .select(repository.businessSelectQuery)
       .from(schema)
       .where(eq(schema.owner_id, userId));
+
     return result;
   }
 }

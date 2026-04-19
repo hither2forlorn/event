@@ -14,6 +14,7 @@ export interface InvitationColumn {
   departure_date_time: Date | null;
   joined_at: Date | null;
   notes: string | null;
+  organizer_note: string | null;
   respondedAt: string | null;
   updatedAt: Date | null;
   createdAt: Date;
@@ -27,6 +28,7 @@ export interface FamilyInvitationResponseColumn {
     familyId: number | null;
     invited_by: number;
     role: string | null;
+    organizer_note: string | null;
     status: string | null;
     notes: string | null;
     arrival_date_time: Date | null;

@@ -9,8 +9,16 @@ import { InvitationColumn } from "./resource";
 import user from "@/modules/user/schema";
 import { invitationStatus } from "@/constant";
 import { setResponcevalidationType } from "./validators";
+import { status } from "drizzle/schema";
 
 export default class Invitation {
+  static readonly DEFAULT_GUEST_CATEGORIES = [
+    "friend",
+    "family",
+    "colleague",
+    "vvip",
+  ] as const;
+
   static async list(params: any) {
     const { page, limit } = params;
     const offset = (page - 1) * limit;
@@ -269,10 +277,7 @@ export default class Invitation {
 
     if (existingGuest[0]?.id) {
       const nextStatus = params.status;
-      const shouldClearResponseDetails =
-        existingGuest[0].status === invitationStatus.accepted &&
-        (nextStatus === invitationStatus.pending ||
-          nextStatus === invitationStatus.rejected);
+      const shouldClearResponseDetails =nextStatus === invitationStatus.rejected
 
       const clearedResponseFields = shouldClearResponseDetails
         ? {
@@ -286,6 +291,7 @@ export default class Invitation {
             arrival_info: null,
             departure_info: null,
             responded_by: null,
+            status:invitationStatus.rejected,
             responded_at: null,
           }
         : {};
@@ -381,6 +387,37 @@ export default class Invitation {
       .values({ ...params, eventId })
       .returning();
     return result[0];
+  }
+
+  static async seedDefaultGuestCategories(eventId: number) {
+    const existingCategories = await db
+      .select({ category_title: guest_category_schema.category_title })
+      .from(guest_category_schema)
+      .where(eq(guest_category_schema.eventId, eventId));
+
+    const existingCategorySet = new Set(
+      existingCategories
+        .map((item) => item.category_title?.toLowerCase().trim())
+        .filter(Boolean),
+    );
+
+    const categoriesToInsert = Invitation.DEFAULT_GUEST_CATEGORIES.filter(
+      (category) => !existingCategorySet.has(category),
+    ).map((category, index) => ({
+      eventId,
+      category_title: category,
+      priority: index + 1,
+     
+    }));
+
+    if (categoriesToInsert.length === 0) {
+      return [];
+    }
+
+    return db
+      .insert(guest_category_schema)
+      .values(categoriesToInsert)
+      .returning();
   }
 
   static async updateGuestCategory(params: any, id: number) {

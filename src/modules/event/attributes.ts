@@ -31,6 +31,7 @@ const eventAttribute = {
     onDelete: "cascade",
   }),
   parentId: integer("parentid"),
+  dressCode: varchar("dress_code"),
   budget: integer("budget"),
   rsvp_deadline: varchar("rsvp_deadline"),
   visiblity: varchar("visiblity"),

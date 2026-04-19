@@ -8,7 +8,6 @@ import schema, {
 const businessSelectQuery = {
   id: schema.id,
   business_name: schema.business_name,
-  type: schema.type,
   category: schema.category,
   avatar: schema.avatar,
   cover: schema.cover,
