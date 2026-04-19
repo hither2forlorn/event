@@ -24,7 +24,7 @@ export const event_vendorTable = pgTable("event_vendor", {
   event_id: integer("event_id")
     .notNull()
     .references(() => event.id),
-  vendor_buisness_id: integer("vendor_buisness_id").references(() => schema.id),
+  vendor_buisness_id: integer("vendor_buisness_id").references(() => schema.id, { onDelete: "cascade" }),
   acquired_by: integer("acquired_by"),
   estimated_guest: integer("estimated_guest"),
   status: varchar("status", { length: 15 }),
