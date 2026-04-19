@@ -331,7 +331,7 @@ const updatebusinessInformation = async (
       return throwForbiddenError("User cannot update the business");
     }
     if (
-      business_data.business_information.type ==
+      business_data.business_information.category ==
       VendorBusinessCategoryTypes.Venue
     ) {
       const result = await Model.updatevenueservice(id, params);
