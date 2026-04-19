@@ -119,16 +119,16 @@ const checkAuthorized = async (id: number, userId?: number) => {
   if (
     event.organizer === userId ||
     eventMember.some((member: any) => {
-      return member.user.id === userId
+      return member.user.id === userId;
     })
   ) {
-    return event;
+    return true;
   }
   if (event.organizer !== userId) {
     throw new Error("Unauthorized: You are not the organizer of this event");
   }
 
-  return event;
+  return true;
 };
 
 const update = async (id: number, input: updateEventType, userId?: number) => {
