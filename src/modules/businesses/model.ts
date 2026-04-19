@@ -64,8 +64,8 @@ class BusinessModel {
     const items = await db
       .select(repository.businessSelectQuery)
       .from(schema)
-      .limit(Number(limit))
-      .where(or(...condition))
+      //.limit(Number(limit))
+      //.where(or(...condition))
       .offset(offset);
 
     const [{ count }]: any = await db
