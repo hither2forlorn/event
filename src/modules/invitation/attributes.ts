@@ -38,6 +38,8 @@ const attributes = {
   isDeparturePickupRequired: boolean("is_departure_pickup_required").default(
     false,
   ),
+  hasCheckedIn: boolean("has_checked_in").default(false),
+  hasCheckedOut: boolean("has_checked_out").default(false),
   isAccomodation: boolean("is_accomodation"),
   joined_at: timestamp("joined_at", { withTimezone: true }).defaultNow(),
   responded_at: timestamp("responded_at", { withTimezone: true }),
