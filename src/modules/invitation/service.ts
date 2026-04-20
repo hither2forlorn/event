@@ -18,6 +18,8 @@ import {
   setResponcevalidationType,
   setResponcevalidation,
   EventInvitationRemoveType,
+  checkInValidation,
+  CheckInValidationType,
 } from "./validators";
 
 //list of the event with the event detail and the user id in the header
@@ -333,6 +335,23 @@ const delete_guest_category = async (id: number, userId: number) => {
   }
 };
 
+const checkIn = async (body: CheckInValidationType, userId: number) => {
+  try {
+    const { error, data } = checkInValidation.safeParse(body);
+    if (error) {
+      return throwErrorOnValidation(error.message);
+    }
+    const invitation = await Model.find({ id: data.invitationId });
+    if (!invitation) {
+      return throwNotFoundError("Invitation not found");
+    }
+    await EventService.checkAuthorized(invitation.eventId, userId);
+    return await Model.checkIn(data.invitationId, data.has_checkedin);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   setResponce,
   inviteGuest,
@@ -345,4 +364,5 @@ export default {
   createGuestCategory,
   updateGuestCategory,
   delete_guest_category,
+  checkIn,
 };

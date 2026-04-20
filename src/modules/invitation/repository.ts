@@ -22,6 +22,7 @@ const select = {
   assigned_room: invitation.assigned_room,
   arrival_info: invitation.arrival_info,
   departure_info: invitation.departure_info,
+  has_checkedin: invitation.has_checkedin,
   createdAt: invitation.createdAt,
   updatedAt: invitation.updatedAt,
 };

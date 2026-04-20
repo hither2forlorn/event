@@ -143,6 +143,15 @@ const deleteGuestCategory = async (req: IAuthRequest) => {
   }
 }
 
+const checkIn = async (req: IAuthRequest) => {
+  try {
+    const userId = req.user.id;
+    return await Service.checkIn(req.body, userId);
+  } catch (err) {
+    throw err;
+  }
+}
+
 export default {
   setResponce,
   getHotelManegemt,
@@ -154,5 +163,6 @@ export default {
   getEventGuestCategory,
   createGuestCategory,
   updateGuestCategory,
-  deleteGuestCategory
+  deleteGuestCategory,
+  checkIn,
 };

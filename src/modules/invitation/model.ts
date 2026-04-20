@@ -9,7 +9,7 @@ import { InvitationColumn } from "./resource";
 import user from "@/modules/user/schema";
 import { invitationStatus } from "@/constant";
 import { setResponcevalidationType } from "./validators";
-import { status } from "drizzle/schema";
+// import { status } from "drizzle/schema";
 
 export default class Invitation {
   static readonly DEFAULT_GUEST_CATEGORIES = [
@@ -435,5 +435,14 @@ export default class Invitation {
       .where(eq(guest_category_schema.id, id))
       .returning();
     return result;
+  }
+
+  static async checkIn(id: number, has_checkedin: boolean) {
+    const result = await db
+      .update(invitation)
+      .set({ has_checkedin, updatedAt: new Date() })
+      .where(eq(invitation.id, id))
+      .returning();
+    return result[0];
   }
 }
