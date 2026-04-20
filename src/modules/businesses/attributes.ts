@@ -44,7 +44,7 @@ export const businessesAttribute = {
 
 export const venueAttribute = {
   id: serial("id").primaryKey(),
-  business_id: integer("business_id").notNull().references(() => schema.id),
+  business_id: integer("business_id").notNull().references(() => schema.id, { onDelete: "cascade" }),
   venue_name: varchar("venue_name", { length: 100 }),
   venue_type: varchar("venue_type", { length: 100 }),
   capacity: integer("capacity"),
@@ -66,7 +66,7 @@ export const venueAttribute = {
 
 export const vendorServicesAttribute = {
   id: serial("id").primaryKey(),
-  business_id: integer("business_id").notNull().references(() => schema.id),
+  business_id: integer("business_id").notNull().references(() => schema.id, { onDelete: "cascade" }),
   artist_type: varchar("artist_type", { length: 100 }),
   styles_specialized: varchar("styles_specialized", { length: 255 }),
   max_bookings_per_day: integer("max_bookings_per_day"),
