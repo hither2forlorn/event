@@ -333,6 +333,27 @@ const delete_guest_category = async (id: number, userId: number) => {
   }
 };
 
+const toggleCheckInOut = async (
+  invitationId: number,
+  action: "checkIn" | "checkOut",
+  userId: number,
+) => {
+  try {
+    const invitation = await Model.find({ id: invitationId });
+    if (!invitation) return throwNotFoundError("Invitation not found");
+    
+    await EventService.checkAuthorized(invitation.eventId, userId);
+    
+    const field = action === "checkIn" ? "hasCheckedIn" : "hasCheckedOut";
+    const value = !invitation[field as keyof typeof invitation];
+    
+    const result = await Model.update({ [field]: value }, invitationId);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   setResponce,
   inviteGuest,
@@ -345,4 +366,5 @@ export default {
   createGuestCategory,
   updateGuestCategory,
   delete_guest_category,
+  toggleCheckInOut,
 };

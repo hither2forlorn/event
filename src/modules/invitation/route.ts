@@ -71,6 +71,12 @@ const route = [
     controller: Controller.deleteGuestCategory,
     path: "guest-category/:id",
     authorization: true,
+  },
+  {
+    method: "patch",
+    controller: Controller.toggleCheckInOut,
+    path: "invitation/:id/check-status",
+    authorization: true,
   }
 ];
 export default route;

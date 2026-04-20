@@ -143,6 +143,25 @@ const deleteGuestCategory = async (req: IAuthRequest) => {
   }
 }
 
+const toggleCheckInOut = async (req: IAuthRequest) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body;
+    const userId = req.user.id;
+    
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Valid invitation id is required");
+    }
+    if (!action || !["checkIn", "checkOut"].includes(action)) {
+      throwErrorOnValidation("Action must be 'checkIn' or 'checkOut'");
+    }
+    
+    return await Service.toggleCheckInOut(Number(id), action, userId);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   setResponce,
   getHotelManegemt,
@@ -154,5 +173,6 @@ export default {
   getEventGuestCategory,
   createGuestCategory,
   updateGuestCategory,
-  deleteGuestCategory
+  deleteGuestCategory,
+  toggleCheckInOut,
 };
