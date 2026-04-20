@@ -42,6 +42,8 @@ const setResponcevalidation = z.object({
   userId: z.number().int().positive(),
   invitation_name: z.string().min(1).max(50).optional(),
   notes: z.string().max(40).optional().nullable(),
+  hasCheckedIn: z.boolean(),
+  hasCheckedOut: z.boolean(),
   status: z.string().min(1).max(10).optional().nullable(),
   arrival_date_time: z.coerce.date().optional().nullable(),
   departure_date_time: z.coerce.date().optional().nullable(),
