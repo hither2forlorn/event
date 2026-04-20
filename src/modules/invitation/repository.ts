@@ -6,6 +6,8 @@ import User from "@/modules/user/repository";
 const select = {
   id: invitation.id,
   userId: invitation.userId,
+  hasCheckedIn: invitation.hasCheckedIn,
+  hasCheckedOut: invitation.hasCheckedOut,
   eventId: invitation.eventId,
   familyId: invitation.familyId,
   invited_by: invitation.invited_by,
