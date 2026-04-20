@@ -7,6 +7,8 @@ export interface InvitationColumn {
   userId: number | null;
   responded_by: number | null;
   status: string | null;
+  hasCheckedIn: boolean | null;
+  hasCheckedOut: boolean | null;
   isArrivalPickupRequired: boolean | null;
   isDeparturePickupRequired: boolean | null;
   isAccomodation: boolean | null;
