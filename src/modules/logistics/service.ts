@@ -1,7 +1,8 @@
 import Model from "./model";
-import { createVehicleValidation } from "./validators";
+import { createVehicleValidation, assignVehicleValidation } from "./validators";
 import Resource from "./resource";
 import EventService from "@/modules/event/service";
+import InvitationModel from "@/modules/invitation/model";
 import logger from "@/config/logger";
 import { throwErrorOnValidation } from "@/utils/error";
 
@@ -12,10 +13,12 @@ import { throwErrorOnValidation } from "@/utils/error";
 const listVehicles = async (eventId: number, userId: number) => {
   try {
     await EventService.checkAuthorized(eventId, userId);
+
     const data = await Model.findAllVehicle({ eventId });
+    console.log(data);
     const result = Resource.vehicleCollection(data);
-    logger.debug(result);
     return result;
+
   } catch (err: any) {
     logger.error("Error in listVehicles:", err);
     throw err;
@@ -90,13 +93,29 @@ const deleteVehicle = async (id: number, userId: number) => {
 
 const assignVehicle = async (input: any, userId: number) => {
   try {
-    const vehicle = await Model.find({ id: input.vehicleId });
+    const parsedInput = assignVehicleValidation.safeParse(input);
+    if (!parsedInput.success || !parsedInput.data) {
+      return throwErrorOnValidation("Invalid assignment payload");
+    }
+
+    const vehicle = await Model.find({ id: parsedInput.data.vehicleId });
     if (!vehicle || !vehicle.eventId) throw new Error("Vehicle not found");
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
     // TODO: Logical dilemma - Should we check if the invitation belongs to the same event?
 
-    const data = await Model.assign_vehicle(input);
+    const assignmentPayload = {
+      ...parsedInput.data,
+      pickupLocation: "assigned",
+      dropoffLocation: "assigned",
+    };
+
+    const data = await Model.assign_vehicle(assignmentPayload);
+    await InvitationModel.update(
+      { arrival_info: "assigned", departure_info: "assigned" },
+      parsedInput.data.invitationId,
+    );
+
     return Resource.assignmentToJson(data);
   } catch (err: any) {
     logger.error("Error in assignVehicle:", err);
@@ -125,6 +144,11 @@ const removeAssignment = async (vehicleId: number, invitationId: number, userId:
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
     const data = await Model.remove_assigned_vehicle(vehicleId, invitationId);
+    await InvitationModel.update(
+      { arrival_info: null, departure_info: null },
+      invitationId,
+    );
+
     return Resource.assignmentToJson(data);
   } catch (err: any) {
     logger.error("Error in removeAssignment:", err);
@@ -139,7 +163,8 @@ const listAssignmentsByVehicle = async (vehicleId: number, userId: number) => {
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
     const data = await Model.listAllAssignedVehicle({ vehicleId });
-    return Resource.assignmentCollection(data);
+
+    return data;
   } catch (err: any) {
     logger.error("Error in listAssignmentsByVehicle:", err);
     throw err;

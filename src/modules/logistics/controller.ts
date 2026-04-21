@@ -1,5 +1,6 @@
 import { type IAuthRequest } from "@/routes/index";
 import Service from "./service";
+import logger from "@/config/logger";
 import { throwErrorOnValidation } from "@/utils/error";
 
 const listVehicles = async (req: IAuthRequest) => {
@@ -94,7 +95,28 @@ const assignVehicle = async (req: IAuthRequest) => {
     if (!userId) {
       throwErrorOnValidation("User not authenticated");
     }
+    logger.debug("Trying to assign the vehicle");
     const data = await Service.assignVehicle(req.body, userId);
+    return data;
+  } catch (err: any) {
+    throw err;
+  }
+};
+
+const getAssignmentsByVehicle = async (req: IAuthRequest) => {
+  try {
+    const { vehicleId } = req.params;
+    const userId = req.user?.id;
+
+    if (!vehicleId || isNaN(Number(vehicleId))) {
+      throwErrorOnValidation("Invalid Vehicle ID");
+    }
+
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
+
+    const data = await Service.listAssignmentsByVehicle(Number(vehicleId), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -142,6 +164,7 @@ export default {
   update,
   deleteVehicle,
   assignVehicle,
+  getAssignmentsByVehicle,
   updateAssignment,
   removeAssignment,
 };

@@ -1,4 +1,5 @@
 import LogisticSchema from "@/modules/logistics/schema";
+import UserRepository from "@/modules/user/repository"
 
 const selectVehicle = {
   id: LogisticSchema.vehicle_schema.id,
@@ -16,6 +17,18 @@ const selectVehicle = {
 const selectAssignedVehicle = {
   vehicleId: LogisticSchema.assigned_vehicle.vehicleId,
   invitationId: LogisticSchema.assigned_vehicle.invitationId,
+  invited_user: UserRepository.selectQuery,
+  pickupTime: LogisticSchema.assigned_vehicle.pickupTime,
+  dropoffTime: LogisticSchema.assigned_vehicle.dropoffTime,
+  pickupLocation: LogisticSchema.assigned_vehicle.pickupLocation,
+  dropoffLocation: LogisticSchema.assigned_vehicle.dropoffLocation,
+  createdAt: LogisticSchema.assigned_vehicle.createdAt,
+  updatedAt: LogisticSchema.assigned_vehicle.updatedAt,
+};
+
+const selectAssignedVehicleFields = {
+  vehicleId: LogisticSchema.assigned_vehicle.vehicleId,
+  invitationId: LogisticSchema.assigned_vehicle.invitationId,
   pickupTime: LogisticSchema.assigned_vehicle.pickupTime,
   dropoffTime: LogisticSchema.assigned_vehicle.dropoffTime,
   pickupLocation: LogisticSchema.assigned_vehicle.pickupLocation,
@@ -26,7 +39,8 @@ const selectAssignedVehicle = {
 
 const selectWithAssigned = {
   vehicle: selectVehicle,
-  assigned_vehicle: selectAssignedVehicle,
+  assigned_vehicle: selectAssignedVehicleFields,
+  invited_user: UserRepository.selectQuery,
 };
 
-export default { selectVehicle, selectAssignedVehicle, selectWithAssigned };
+export default { selectVehicle, selectAssignedVehicle, selectWithAssigned  };

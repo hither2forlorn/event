@@ -448,7 +448,8 @@ export default class Invitation {
             eq(invitation.isArrivalPickupRequired, true),
             eq(invitation.isDeparturePickupRequired, true),
           ),
-          ne(invitation.status, invitationStatus.draft)
+          ne(invitation.status, invitationStatus.draft),
+          sql`(COALESCE(${invitation.arrival_info}, '') != 'assigned' OR COALESCE(${invitation.departure_info}, '') != 'assigned')`,
         ),
       );
     return data;

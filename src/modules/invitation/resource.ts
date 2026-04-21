@@ -16,6 +16,8 @@ export interface InvitationColumn {
   departure_date_time: Date | null;
   joined_at: Date | null;
   notes: string | null;
+  arrival_info: string | null;
+  departure_info: string | null;
   organizer_note: string | null;
   respondedAt: string | null;
   updatedAt: Date | null;

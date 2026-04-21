@@ -1,6 +1,8 @@
 import db from "@/config/db";
 import { eq, and } from "drizzle-orm";
 import LogisticSchema from "@/modules/logistics/schema";
+import UserSchema from "@/modules/user/schema"
+import Invitation from "@/modules/invitation/schema"
 import repository from "./repository";
 import { CreateVehicleType } from "@/modules/logistics/validators"
 
@@ -21,6 +23,8 @@ class Logistic {
         LogisticSchema.assigned_vehicle,
         eq(LogisticSchema.vehicle_schema.id, LogisticSchema.assigned_vehicle.vehicleId)
       )
+      .leftJoin(Invitation, eq(LogisticSchema.assigned_vehicle.invitationId, Invitation.id))
+      .leftJoin(UserSchema, eq(Invitation.userId, UserSchema.id))
       .where(eq(LogisticSchema.vehicle_schema.eventId, params.eventId));
     return result;
   }
@@ -29,6 +33,8 @@ class Logistic {
     const result = await db
       .select(repository.selectAssignedVehicle)
       .from(LogisticSchema.assigned_vehicle)
+      .leftJoin(Invitation, eq(LogisticSchema.assigned_vehicle.invitationId, Invitation.id))
+      .leftJoin(UserSchema, eq(Invitation.userId, UserSchema.id))
       .where(
         and(
           eq(LogisticSchema.assigned_vehicle.vehicleId, params.vehicleId),
@@ -40,8 +46,10 @@ class Logistic {
 
   static async listAllAssignedVehicle(params: { vehicleId: number }) {
     const result = await db
-      .select(repository.selectAssignedVehicle)
-      .from(LogisticSchema.assigned_vehicle)
+      .select(repository.selectWithAssigned)
+      .from(LogisticSchema.assigned_vehicle).leftJoin(Invitation, eq(LogisticSchema.assigned_vehicle.invitationId, Invitation.id)).
+      leftJoin(LogisticSchema.vehicle_schema, eq(LogisticSchema.assigned_vehicle.vehicleId, LogisticSchema.vehicle_schema.id))
+      .leftJoin(UserSchema, eq(Invitation.userId, UserSchema.id))
       .where(eq(LogisticSchema.assigned_vehicle.vehicleId, params.vehicleId));
     return result;
   }

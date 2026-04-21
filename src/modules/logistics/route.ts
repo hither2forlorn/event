@@ -10,9 +10,16 @@ const routes = [
     authCheckType: [role.user],
   },
   {
+    method: "get",
+    controller: Controller.getAssignmentsByVehicle,
+    path: "vehicle/assign/:vehicleId",
+    authorization: true
+
+  },
+  {
     method: "post",
     controller: Controller.create,
-    path: "vehicle/:eventId",
+    path: "vehicle",
     authorization: true,
     authCheckType: [role.user],
   },

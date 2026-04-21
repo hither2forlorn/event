@@ -1,3 +1,5 @@
+import type { UserColumn } from "@/modules/user/resource";
+
 export interface EventVehicle {
     id: number | undefined;
     vehicleName: string ;
@@ -20,6 +22,12 @@ export interface AssignedVehicle {
     dropoffLocation: string | undefined |null;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+}
+
+export interface VehicleWithAssignment {
+    vehicle: Partial<EventVehicle> | null;
+    assigned_vehicle: Partial<AssignedVehicle> | null;
+    invited_user: Partial<UserColumn> | null;
 }
 
 class Resource {
@@ -57,8 +65,19 @@ class Resource {
         };
     }
 
-    static assignmentCollection(assignments: (Partial<AssignedVehicle> | null | undefined)[]) {
-        return assignments.map(a => this.assignmentToJson(a)).filter((a): a is Partial<AssignedVehicle> => a !== null);
+    static assignmentWithVehicleToJson(assignment: Partial<VehicleWithAssignment> | null | undefined): Partial<VehicleWithAssignment> | null {
+        if (!assignment) return null;
+        return {
+            vehicle: this.vehicleToJson(assignment.vehicle),
+            assigned_vehicle: this.assignmentToJson(assignment.assigned_vehicle),
+            invited_user: assignment.invited_user ?? null,
+        };
+    }
+
+    static assignmentCollection(assignments: (Partial<VehicleWithAssignment> | null | undefined)[]) {
+        return assignments
+            .map(a => this.assignmentWithVehicleToJson(a))
+            .filter((a): a is Partial<VehicleWithAssignment> => a !== null);
     }
 }
 
