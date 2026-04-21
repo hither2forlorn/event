@@ -6,12 +6,15 @@ const listVehicles = async (req: IAuthRequest) => {
   try {
     const { eventId } = req.params;
     const userId = req.user?.id;
+
     if (!eventId || isNaN(Number(eventId))) {
       throwErrorOnValidation("Invalid Event ID");
     }
+
     if (!userId) {
       throwErrorOnValidation("User not authenticated");
     }
+
     const data = await Service.listVehicles(Number(eventId), userId);
     return data;
   } catch (err: any) {
