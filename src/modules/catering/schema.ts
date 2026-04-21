@@ -8,7 +8,7 @@ import {
 import { attributes, tableName } from "./attributes";
 
 const schema = pgTable(tableName, attributes);
-const menuSchema = pgTable("menu", {
+export const menuSchema = pgTable("menu", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: varchar("description", { length: 255 }).notNull(),
@@ -21,4 +21,4 @@ const menuSchema = pgTable("menu", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
-export default { schema, menuSchema };
+export default schema;
