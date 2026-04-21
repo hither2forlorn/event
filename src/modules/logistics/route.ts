@@ -19,7 +19,7 @@ const routes = [
   {
     method: "post",
     controller: Controller.create,
-    path: "vehicle",
+    path: "vehicle/:eventId",
     authorization: true,
     authCheckType: [role.user],
   },
