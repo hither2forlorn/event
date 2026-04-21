@@ -143,6 +143,19 @@ const deleteGuestCategory = async (req: IAuthRequest) => {
   }
 }
 
+const getGuestTransportationList = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.id);
+    const userId = req.user.id;
+    if (!eventId) {
+      throwErrorOnValidation("eventId is required");
+    }
+    return await Service.getGuestTransportationList(eventId, userId);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
   setResponce,
   getHotelManegemt,
@@ -154,5 +167,6 @@ export default {
   getEventGuestCategory,
   createGuestCategory,
   updateGuestCategory,
-  deleteGuestCategory
+  deleteGuestCategory,
+  getGuestTransportationList,
 };
