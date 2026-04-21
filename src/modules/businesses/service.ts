@@ -205,9 +205,6 @@ const findEventVendor = async ({
 }) => {
   try {
     const eventVendor = await Model.findEventVendor(eventId, businessId);
-    if (!eventVendor) {
-      throwNotFoundError("No aquired vendor was found");
-    }
     return eventVendor ? eventVendor[0] : null;
   } catch (err) {
     throw err;

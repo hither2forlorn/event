@@ -8,9 +8,11 @@ interface RouteModule {
 }
 export const routeConfig = [
   "admin",
+
   "businesses",
   "category",
   "user",
+  "logistics",
   "event",
   "family",
   "invitation",
