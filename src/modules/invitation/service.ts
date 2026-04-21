@@ -337,15 +337,18 @@ const toggleCheckInOut = async (
   try {
     const invitation = await Model.find({ id: invitationId });
     if (!invitation) return throwNotFoundError("Invitation not found");
-    
+
     await EventService.checkAuthorized(invitation.eventId, userId);
-    
+
     const field = action === "checkIn" ? "hasCheckedIn" : "hasCheckedOut";
     const value = !invitation[field as keyof typeof invitation];
-    
+
     const result = await Model.update({ [field]: value }, invitationId);
     return result;
   } catch (err) {
+    throw err;
+  }
+}
 const getGuestTransportationList = async (eventId: number, userId: number) => {
   try {
     await EventService.checkAuthorized(eventId, userId);
