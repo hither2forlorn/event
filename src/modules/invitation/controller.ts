@@ -143,6 +143,20 @@ const deleteGuestCategory = async (req: IAuthRequest) => {
   }
 }
 
+const toggleCheckInOut = async (req: IAuthRequest) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body;
+    const userId = req.user.id;
+    
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Valid invitation id is required");
+    }
+    if (!action || !["checkIn", "checkOut"].includes(action)) {
+      throwErrorOnValidation("Action must be 'checkIn' or 'checkOut'");
+    }
+    
+    return await Service.toggleCheckInOut(Number(id), action, userId);
 const getGuestTransportationList = async (req: IAuthRequest) => {
   try {
     const eventId = Number(req.params.id);
@@ -168,5 +182,6 @@ export default {
   createGuestCategory,
   updateGuestCategory,
   deleteGuestCategory,
+  toggleCheckInOut,
   getGuestTransportationList,
 };
