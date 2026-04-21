@@ -1,5 +1,5 @@
 import db from "@/config/db";
-import catering from "./schema";
+import catering, { menuSchema } from "./schema";
 import Repository from "./repository";
 import { eq, sql, desc } from "drizzle-orm";
 import type { CateringColumn, MenuItemColumn } from "./resource";
@@ -9,8 +9,9 @@ class Catering {
     params: Partial<CateringColumn> & { eventId: number },
   ) {
     try {
+      console.log(params);
       const result = await db
-        .insert(catering.schema)
+        .insert(catering)
         .values(params as any)
         .returning();
       return result[0] ?? null;
@@ -31,16 +32,16 @@ class Catering {
 
       const items = await db
         .select(Repository.cateringSelectQuery)
-        .from(catering.schema)
-        .where(eq(catering.schema.eventId, params.eventId))
-        .orderBy(desc(catering.schema.createdAt))
+        .from(catering)
+        .where(eq(catering.eventId, params.eventId))
+        .orderBy(desc(catering.createdAt))
         .limit(Number(limit))
         .offset(offset);
 
       const countResult = await db
         .select({ count: sql<number>`count(*)` })
-        .from(catering.schema)
-        .where(eq(catering.schema.eventId, params.eventId));
+        .from(catering)
+        .where(eq(catering.eventId, params.eventId));
 
       const count = Number(countResult[0]?.count ?? 0);
 
@@ -59,8 +60,8 @@ class Catering {
     try {
       const result = await db
         .select(Repository.cateringSelectQuery)
-        .from(catering.schema)
-        .where(eq(catering.schema.id, id));
+        .from(catering)
+        .where(eq(catering.id, id));
       return result[0] ?? null;
     } catch (error) {
       throw error;
@@ -73,9 +74,9 @@ class Catering {
   ): Promise<CateringColumn | null> {
     try {
       const result = await db
-        .update(catering.schema)
+        .update(catering)
         .set({ ...params, updatedAt: new Date() } as any)
-        .where(eq(catering.schema.id, id))
+        .where(eq(catering.id, id))
         .returning();
       return result[0] ?? null;
     } catch (error) {
@@ -86,8 +87,8 @@ class Catering {
   static async deleteCatering(id: number) {
     try {
       const result = await db
-        .delete(catering.schema)
-        .where(eq(catering.schema.id, id))
+        .delete(catering)
+        .where(eq(catering.id, id))
         .returning();
       return result;
     } catch (error) {
@@ -100,7 +101,7 @@ class Catering {
   ): Promise<MenuItemColumn | null> {
     try {
       const result = await db
-        .insert(catering.menuSchema)
+        .insert(menuSchema)
         .values(params as any)
         .returning();
       return result[0] ?? null;
@@ -113,9 +114,9 @@ class Catering {
     try {
       const result = await db
         .select(Repository.menuSelectQuery)
-        .from(catering.menuSchema)
-        .where(eq(catering.menuSchema.cateringId, cateringId))
-        .orderBy(desc(catering.menuSchema.createdAt));
+        .from(menuSchema)
+        .where(eq(menuSchema.cateringId, cateringId))
+        .orderBy(desc(menuSchema.createdAt));
       return result;
     } catch (error) {
       throw error;
@@ -126,8 +127,8 @@ class Catering {
     try {
       const result = await db
         .select(Repository.menuSelectQuery)
-        .from(catering.menuSchema)
-        .where(eq(catering.menuSchema.id, id));
+        .from(menuSchema)
+        .where(eq(menuSchema.id, id));
       return result[0] ?? null;
     } catch (error) {
       throw error;
@@ -140,9 +141,9 @@ class Catering {
   ): Promise<MenuItemColumn | null> {
     try {
       const result = await db
-        .update(catering.menuSchema)
+        .update(menuSchema)
         .set({ ...params, updatedAt: new Date() } as any)
-        .where(eq(catering.menuSchema.id, id))
+        .where(eq(menuSchema.id, id))
         .returning();
       return result[0] ?? null;
     } catch (error) {
@@ -153,8 +154,8 @@ class Catering {
   static async deleteMenuItem(id: number) {
     try {
       const result = await db
-        .delete(catering.menuSchema)
-        .where(eq(catering.menuSchema.id, id))
+        .delete(menuSchema)
+        .where(eq(menuSchema.id, id))
         .returning();
       return result;
     } catch (error) {

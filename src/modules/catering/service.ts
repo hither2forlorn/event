@@ -71,6 +71,7 @@ const createCatering = async (
   userId: number,
 ) => {
   try {
+    console.log(input);
     const authorized = await isAuthorized(eventId, null, userId);
     if (!authorized) {
       return throwForbiddenError(
@@ -84,6 +85,7 @@ const createCatering = async (
 
     const catering = await Model.createCatering({
       ...input,
+      vendorId: input.vendorId ?? null,
       eventId,
     });
 
@@ -183,28 +185,6 @@ const createMenuItem = async (
   userId: number,
 ) => {
   try {
-    // Validate input
-    const { error, data } = await z
-      .object({
-        name: z
-          .string()
-          .min(1, "Menu item name is required")
-          .max(255, "Name cannot exceed 255 characters"),
-        description: z
-          .string()
-          .min(1, "Description is required")
-          .max(255, "Description cannot exceed 255 characters"),
-        type: z.string().min(1, "Menu type is required").max(255),
-        isVegetarian: z.boolean().default(false),
-      })
-      .safeParseAsync(input);
-
-    if (!data) {
-      return throwErrorOnValidation(
-        error?.issues.map((issue) => issue.message).join(", "),
-      );
-    }
-
     const catering = await Model.findCateringById(cateringId);
     if (!catering) {
       return throwNotFoundError("Catering not found");
@@ -218,7 +198,7 @@ const createMenuItem = async (
     }
 
     const menuItem = await Model.createMenuItem({
-      ...data,
+      ...input,
       cateringId,
     });
 

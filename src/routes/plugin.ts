@@ -18,6 +18,7 @@ export const routeConfig = [
   "budget",
   "general-category",
   "logistics",
+  "catering",
 ];
 class RouteLoader {
   private loadedRoutes: RouteModule[] = [];

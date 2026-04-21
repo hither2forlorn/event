@@ -1,23 +1,23 @@
 import { z } from "zod";
 
 export const CreateCateringSchema = z.object({
-  body: z
-    .object({
-      name: z
-        .string()
-        .min(1, "Catering name is required")
-        .max(255, "Name cannot exceed 255 characters"),
-      per_plate_price: z
-        .string()
-        .regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
-      startDateTime: z.coerce
-        .date()
-        .min(new Date(), "Start date must be in future"),
-      endDateTime: z.coerce.date(),
-      vendorId: z.number().int().positive().optional().nullable(),
-    })
-    .strict(),
-  params: z.object({}).optional(),
+  body: z.object({
+    name: z
+      .string()
+      .min(1, "Catering name is required")
+      .max(255, "Name cannot exceed 255 characters"),
+    per_plate_price: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
+    startDateTime: z.coerce
+      .date()
+      .min(new Date(), "Start date must be in future"),
+    endDateTime: z.coerce.date(),
+    vendorId: z.number().int().positive().optional().nullable(),
+  }),
+  params: z.object({
+    eventId: z.coerce.number().int().positive("Valid event ID required"),
+  }),
   query: z.object({}).optional(),
 });
 

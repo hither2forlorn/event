@@ -1,4 +1,4 @@
-import { serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { serial, timestamp, varchar, integer } from "drizzle-orm/pg-core";
 import event from "@/modules/event/schema";
 import business from "@/modules/businesses/schema";
 
@@ -13,7 +13,7 @@ const attributes = {
   eventId: serial("event_id")
     .notNull()
     .references(() => event.id, { onDelete: "cascade" }),
-  vendorId: serial("vendor_id").references(() => business.id),
+  vendorId: integer("vendor_id").references(() => business.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 };
