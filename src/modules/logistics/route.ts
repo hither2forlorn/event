@@ -17,13 +17,6 @@ const routes = [
 
   },
   {
-    method: "post",
-    controller: Controller.create,
-    path: "vehicle/:eventId",
-    authorization: true,
-    authCheckType: [role.user],
-  },
-  {
     method: "get",
     controller: Controller.findOne,
     path: "vehicle/:id",
@@ -62,6 +55,14 @@ const routes = [
     method: "delete",
     controller: Controller.removeAssignment,
     path: "vehicle/assign/:vehicleId/:invitationId",
+    authorization: true,
+    authCheckType: [role.user],
+  },
+
+  {
+    method: "post",
+    controller: Controller.create,
+    path: "vehicle/:eventId",
     authorization: true,
     authCheckType: [role.user],
   },
