@@ -288,12 +288,7 @@ const remove_invitation = async (
 
 const getEventGuestCategory = async (eventId: number, userId: number) => {
   try {
-    const isAllowed = await EventService.checkAuthorized(eventId, userId);
-    if (!isAllowed) {
-      return throwUnauthorizedError(
-        "User with the details cannot get the information of the guest ",
-      );
-    }
+    await EventService.checkAuthorized(eventId, userId);
     return await Model.getGuestCategory(eventId);
   } catch (err) {
     throw err;
@@ -325,7 +320,8 @@ const delete_guest_category = async (id: number, userId: number) => {
   try {
     const category = await Model.findGuestCategory(id);
     if (!category) return throwNotFoundError("Guest category not found");
-    if (!category.eventId) return throwErrorOnValidation("Category is not associated with an event");
+    if (!category.eventId)
+      return throwErrorOnValidation("Category is not associated with an event");
     await EventService.checkAuthorized(category.eventId, userId);
     return await Model.removeGuestCategory(id);
   } catch (err) {
@@ -350,6 +346,15 @@ const toggleCheckInOut = async (
     const result = await Model.update({ [field]: value }, invitationId);
     return result;
   } catch (err) {
+const getGuestTransportationList = async (eventId: number, userId: number) => {
+  try {
+    await EventService.checkAuthorized(eventId, userId);
+    const data = await Model.getGuestTransportationList(eventId);
+    return data;
+  } catch (err: any) {
+    logger.error(
+      `Error fetching guest transportation list for event ${eventId}: ${err.message}`,
+    );
     throw err;
   }
 };
@@ -367,4 +372,5 @@ export default {
   updateGuestCategory,
   delete_guest_category,
   toggleCheckInOut,
+  getGuestTransportationList,
 };

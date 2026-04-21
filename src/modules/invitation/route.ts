@@ -50,6 +50,12 @@ const route = [
   },
   {
     method: "get",
+    controller: Controller.getGuestTransportationList,
+    path: "event/:id/transportation",
+    authorization: true,
+  },
+  {
+    method: "get",
     controller: Controller.getEventGuestCategory,
     path: "event/:id/guest-category",
     authorization: true,

@@ -157,6 +157,14 @@ const toggleCheckInOut = async (req: IAuthRequest) => {
     }
     
     return await Service.toggleCheckInOut(Number(id), action, userId);
+const getGuestTransportationList = async (req: IAuthRequest) => {
+  try {
+    const eventId = Number(req.params.id);
+    const userId = req.user.id;
+    if (!eventId) {
+      throwErrorOnValidation("eventId is required");
+    }
+    return await Service.getGuestTransportationList(eventId, userId);
   } catch (err) {
     throw err;
   }
@@ -175,4 +183,5 @@ export default {
   updateGuestCategory,
   deleteGuestCategory,
   toggleCheckInOut,
+  getGuestTransportationList,
 };

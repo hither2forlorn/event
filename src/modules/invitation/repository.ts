@@ -58,9 +58,24 @@ const selectHotelManagement = {
   user_room: select.assigned_room,
   category: select.category,
 };
+
+const selectTransportation = {
+  id: invitation.id,
+  invitation_name: invitation.invitation_name,
+  isArrivalPickupRequired: invitation.isArrivalPickupRequired,
+  isDeparturePickupRequired: invitation.isDeparturePickupRequired,
+  arrival_date_time: invitation.arrival_date_time,
+  departure_date_time: invitation.departure_date_time,
+  arrival_info: invitation.arrival_info,
+  departure_info: invitation.departure_info,
+  isAccomodation: invitation.isAccomodation,
+  eventId: invitation.eventId,
+};
+
 export default {
   selectHotelManagement,
   select,
   selectInvitationEvent,
   selectInvitationResponse,
+  selectTransportation,
 };

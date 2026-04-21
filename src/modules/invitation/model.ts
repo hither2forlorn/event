@@ -436,4 +436,22 @@ export default class Invitation {
       .returning();
     return result;
   }
+
+  static async getGuestTransportationList(eventId: number) {
+    const data = await db
+      .select(repository.selectTransportation)
+      .from(invitation)
+      .where(
+        and(
+          eq(invitation.eventId, eventId),
+          or(
+            eq(invitation.isArrivalPickupRequired, true),
+            eq(invitation.isDeparturePickupRequired, true),
+          ),
+          ne(invitation.status, invitationStatus.draft),
+          sql`(COALESCE(${invitation.arrival_info}, '') != 'assigned' OR COALESCE(${invitation.departure_info}, '') != 'assigned')`,
+        ),
+      );
+    return data;
+  }
 }

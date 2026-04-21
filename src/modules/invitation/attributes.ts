@@ -12,7 +12,7 @@ import family from "@/modules/family/schema";
 
 const tableName = "invitation";
 const attributes = {
-  id: serial("id"),
+  id: serial("id").notNull().unique().primaryKey(),
   invitation_name: varchar("invitation_name", { length: 50 })
     .notNull()
     .default("Family name"),

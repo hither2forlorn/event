@@ -106,6 +106,7 @@ class BusinessModel {
       return {
         business_information: business[0],
         services,
+        owner_id: business[0].owner_id,
       };
     }
   }
