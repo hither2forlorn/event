@@ -17,7 +17,7 @@ export interface IRoute {
   method: "get" | "post" | "put" | "delete" | "patch";
   path: string;
   controller: (req: IAuthRequest) => Promise<any>;
-authorization?: boolean;
+  authorization?: boolean;
   authCheckType?: string[];
   validation?: any;
 }
@@ -61,7 +61,6 @@ const routesInit = async (app: any) => {
         validation,
       } = route as IRoute | any;
       const routeHandler = createRouteHandler(controller, path);
-      console.log("route handler", routeHandler);
 
       let middlewares = [];
 
