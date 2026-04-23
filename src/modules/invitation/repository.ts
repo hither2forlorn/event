@@ -56,7 +56,10 @@ const selectInvitationResponse = {
 const selectHotelManagement = {
   user_detail: User.selectQuery,
   user_room: select.assigned_room,
+  hasCheckedIn: select.hasCheckedIn,
+  hasCheckedOut: select.hasCheckedOut,
   category: select.category,
+  invitationId: select.id
 };
 
 const selectTransportation = {

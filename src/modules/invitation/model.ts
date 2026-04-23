@@ -1,4 +1,5 @@
 import { eq, and, sql, or, isNull, ne } from "drizzle-orm";
+import logger from "@/config/logger"
 import invitation, { guest_category_schema } from "./schema";
 import family from "@/modules/family/schema";
 import event from "@/modules/event/schema";
@@ -277,24 +278,25 @@ export default class Invitation {
 
     if (existingGuest[0]?.id) {
       const nextStatus = params.status;
-      const shouldClearResponseDetails =nextStatus === invitationStatus.rejected
+      const shouldClearResponseDetails = nextStatus === invitationStatus.rejected
 
       const clearedResponseFields = shouldClearResponseDetails
         ? {
-            notes: null,
-            arrival_date_time: null,
-            departure_date_time: null,
-            isAccomodation: null,
-            isArrivalPickupRequired: false,
-            isDeparturePickupRequired: false,
-            assigned_room: null,
-            arrival_info: null,
-            departure_info: null,
-            responded_by: null,
-            status:invitationStatus.rejected,
-            responded_at: null,
-          }
+          notes: null,
+          arrival_date_time: null,
+          departure_date_time: null,
+          isAccomodation: null,
+          isArrivalPickupRequired: false,
+          isDeparturePickupRequired: false,
+          assigned_room: null,
+          arrival_info: null,
+          departure_info: null,
+          responded_by: null,
+          status: invitationStatus.rejected,
+          responded_at: null,
+        }
         : {};
+      logger.debug("This is the params", params);
 
       const updated = await db
         .update(invitation)
@@ -407,7 +409,7 @@ export default class Invitation {
       eventId,
       category_title: category,
       priority: index + 1,
-     
+
     }));
 
     if (categoriesToInsert.length === 0) {

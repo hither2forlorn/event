@@ -66,6 +66,9 @@ export interface Hotel_responce {
   user_detail: UserColumn | null;
   user_room: string | null;
   category: string | null;
+  invitationId: number;
+  hasCheckedIn: boolean;
+  hasCheckedOut: boolean;
 }
 class Resource {
   static toJson(invitation: InvitationColumn) {
@@ -119,6 +122,10 @@ class Resource {
       user_detail: hotel_responce.user_detail,
       user_room: hotel_responce.user_room,
       category: hotel_responce.category,
+      invitationId: hotel_responce.invitationId,
+      hasCheckedIn: hotel_responce.hasCheckedIn,
+      hasCheckedOut: hotel_responce.hasCheckedOut
+
     };
   }
   static toRoomCollection(hotel_responce: Hotel_responce[]): Hotel_responce[] {
