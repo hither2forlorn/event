@@ -8,6 +8,7 @@ const cateringSelectQuery = {
   endDateTime: schema.endDateTime,
   eventId: schema.eventId,
   vendorId: schema.vendorId,
+  meal_type: schema.meal_type,
   createdAt: schema.createdAt,
   updatedAt: schema.updatedAt,
 };
@@ -17,7 +18,7 @@ const menuSelectQuery = {
   name: menuSchema.name,
   description: menuSchema.description,
   type: menuSchema.type,
-  isVegetarian: menuSchema.isVegetarian,
+  menuType: menuSchema.menuType,
   cateringId: menuSchema.cateringId,
   createdAt: menuSchema.createdAt,
   updatedAt: menuSchema.updatedAt,

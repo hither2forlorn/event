@@ -6,6 +6,7 @@ export interface CateringColumn {
   per_plate_price: string;
   startDateTime: Date;
   endDateTime: Date;
+  meal_type: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -16,7 +17,7 @@ export interface MenuItemColumn {
   description: string;
   cateringId: number;
   type: string;
-  isVegetarian: boolean;
+  menuType: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -35,6 +36,7 @@ class Resource {
       per_plate_price: catering.per_plate_price,
       startDateTime: catering.startDateTime,
       endDateTime: catering.endDateTime,
+      meal_type: catering.meal_type,
       createdAt: catering.createdAt,
       updatedAt: catering.updatedAt,
     };
@@ -53,7 +55,7 @@ class Resource {
       description: menuItem.description,
       cateringId: menuItem.cateringId,
       type: menuItem.type,
-      isVegetarian: menuItem.isVegetarian,
+      menuType: menuItem.menuType,
       createdAt: menuItem.createdAt,
       updatedAt: menuItem.updatedAt,
     };

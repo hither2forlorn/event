@@ -1,10 +1,4 @@
-import {
-  boolean,
-  pgTable,
-  serial,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 import { attributes, tableName } from "./attributes";
 
 const schema = pgTable(tableName, attributes);
@@ -16,7 +10,7 @@ export const menuSchema = pgTable("menu", {
     .notNull()
     .references(() => schema.id, { onDelete: "cascade" }),
   type: varchar("type", { length: 255 }).notNull(),
-  isVegetarian: boolean("is_vegetarian").notNull(),
+  menuType: varchar("menu_type", { length: 255 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

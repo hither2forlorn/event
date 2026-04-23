@@ -13,6 +13,7 @@ const attributes = {
   eventId: serial("event_id")
     .notNull()
     .references(() => event.id, { onDelete: "cascade" }),
+  meal_type: varchar("meal_type", { length: 255 }).notNull(),
   vendorId: integer("vendor_id").references(() => business.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

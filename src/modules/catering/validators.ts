@@ -13,6 +13,10 @@ export const CreateCateringSchema = z.object({
       .date()
       .min(new Date(), "Start date must be in future"),
     endDateTime: z.coerce.date(),
+    meal_type: z
+      .string()
+      .min(1, "Meal type is required")
+      .max(255, "Meal type cannot exceed 255 characters"),
     vendorId: z.number().int().positive().optional().nullable(),
   }),
   params: z.object({
@@ -35,6 +39,11 @@ export const UpdateCateringSchema = z.object({
         .optional(),
       startDateTime: z.coerce.date().optional(),
       endDateTime: z.coerce.date().optional(),
+      meal_type: z
+        .string()
+        .min(1, "Meal type is required")
+        .max(255, "Meal type cannot exceed 255 characters")
+        .optional(),
       vendorId: z.number().int().positive().optional().nullable(),
     })
     .strict(),
@@ -84,7 +93,7 @@ export const CreateMenuItemSchema = z.object({
         .min(1, "Description is required")
         .max(255, "Description cannot exceed 255 characters"),
       type: z.string().min(1, "Menu type is required").max(255),
-      isVegetarian: z.boolean().default(false),
+      menuType: z.string().min(1, "Menu type is required").max(255),
     })
     .strict(),
   params: z.object({
@@ -107,7 +116,7 @@ export const UpdateMenuItemSchema = z.object({
         .max(255, "Description cannot exceed 255 characters")
         .optional(),
       type: z.string().min(1, "Menu type is required").max(255).optional(),
-      isVegetarian: z.boolean().optional(),
+      menuType: z.string().min(1, "Menu type is required").max(255).optional(),
     })
     .strict(),
   params: z.object({
