@@ -107,7 +107,7 @@ class User {
     if (id !== undefined) {
       conditions.push(eq(users.id, id));
     }
-    if (email !== undefined) {
+    if (email !== undefined && email !== null) {
       conditions.push(eq(users.email, email));
     }
 

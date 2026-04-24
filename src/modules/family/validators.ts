@@ -47,17 +47,14 @@ const addMemberValidation = z.object({
     id: z.coerce.number().int().positive("Family ID must be a positive number"),
   }),
   body: z.object({
-    email: z.preprocess(
-      (val) => val || `${generateRandomNumber(5)}@gmail.com`,
-      z.string().email("Invalid email address")
-    ),
+    email: z.string().email("Invalid email address").optional(),
     username: z.string().min(2, "Name must be at least 2 characters long").optional(),
     relation: z.string().min(2).nullable().optional(),
     dob: dateSchema.nonoptional(),
     foodPreference: z.string().min(2).nullable().optional(),
     phone: z.preprocess(
       (val) => val || generateRandomNumber(10).toString(),
-      z.string().length(10)
+      z.string().min(10).max(20)
     ),
   }),
 });
