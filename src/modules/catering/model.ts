@@ -9,7 +9,6 @@ class Catering {
     params: Partial<CateringColumn> & { eventId: number },
   ) {
     try {
-      console.log(params);
       const result = await db
         .insert(catering)
         .values(params as any)

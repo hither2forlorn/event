@@ -1,5 +1,4 @@
 import logger from "@/config/logger";
-import z from "zod";
 import Model from "./model";
 import Resource from "./resource";
 import {
@@ -43,11 +42,14 @@ const isAuthorized = async (
   }
 };
 
-const listCaterings = async (params: any) => {
+const listCaterings = async (params: { eventId: number; page?: number; limit?: number; userId: number }) => {
   try {
-    const { page, limit, eventId } = params;
+    const { page, limit, eventId, userId } = params;
 
-    await EventService.find(Number(eventId));
+    const authorized = await isAuthorized(Number(eventId), null, userId);
+    if (!authorized) {
+      return throwForbiddenError("You do not have permission to view caterings for this event");
+    }
 
     const caterings = await Model.listCaterings({
       page: Number(page) || 1,
@@ -71,16 +73,9 @@ const createCatering = async (
   userId: number,
 ) => {
   try {
-    console.log(input);
     const authorized = await isAuthorized(eventId, null, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to add catering to this event",
-      );
-    }
-
-    if (input.endDateTime <= input.startDateTime) {
-      return throwErrorOnValidation("End date must be after start date");
+      return throwForbiddenError("You do not have permission to add catering to this event");
     }
 
     const catering = await Model.createCatering({
@@ -101,12 +96,18 @@ const createCatering = async (
   }
 };
 
-const findCateringById = async (cateringId: number) => {
+const findCateringById = async (id: number, userId: number) => {
   try {
-    const catering = await Model.findCateringById(cateringId);
+    const catering = await Model.findCateringById(id);
     if (!catering) {
       return throwNotFoundError("Catering not found");
     }
+
+    const authorized = await isAuthorized(catering.eventId, catering.id, userId);
+    if (!authorized) {
+      return throwForbiddenError("You do not have permission to view this catering");
+    }
+
     return Resource.toJson(catering);
   } catch (error: any) {
     logger.error(`Error finding catering: ${error.message}`);
@@ -127,20 +128,7 @@ const updateCatering = async (
 
     const authorized = await isAuthorized(catering.eventId, cateringId, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to update this catering",
-      );
-    }
-
-    if (input.startDateTime || input.endDateTime) {
-      const startDateTime = new Date(
-        input.startDateTime || catering.startDateTime,
-      );
-      const endDateTime = new Date(input.endDateTime || catering.endDateTime);
-
-      if (endDateTime <= startDateTime) {
-        return throwErrorOnValidation("End date must be after start date");
-      }
+      return throwForbiddenError("You do not have permission to update this catering");
     }
 
     const updatedCatering = await Model.updateCatering(cateringId, input);
@@ -165,9 +153,7 @@ const deleteCatering = async (cateringId: number, userId: number) => {
 
     const authorized = await isAuthorized(catering.eventId, cateringId, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to delete this catering",
-      );
+      return throwForbiddenError("You do not have permission to delete this catering");
     }
 
     await Model.deleteCatering(cateringId);
@@ -192,9 +178,7 @@ const createMenuItem = async (
 
     const authorized = await isAuthorized(catering.eventId, cateringId, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to add menu items to this catering",
-      );
+      return throwForbiddenError("You do not have permission to add menu items to this catering");
     }
 
     const menuItem = await Model.createMenuItem({
@@ -214,11 +198,16 @@ const createMenuItem = async (
   }
 };
 
-const listMenuItems = async (cateringId: number) => {
+const listMenuItems = async (cateringId: number, userId: number) => {
   try {
     const catering = await Model.findCateringById(cateringId);
     if (!catering) {
       return throwNotFoundError("Catering not found");
+    }
+
+    const authorized = await isAuthorized(catering.eventId, cateringId, userId);
+    if (!authorized) {
+      return throwForbiddenError("You do not have permission to view menu items for this catering");
     }
 
     const menuItems = await Model.listMenuItems(cateringId);
@@ -245,15 +234,9 @@ const updateMenuItem = async (
       return throwNotFoundError("Catering not found");
     }
 
-    const authorized = await isAuthorized(
-      catering.eventId,
-      catering.id,
-      userId,
-    );
+    const authorized = await isAuthorized(catering.eventId, catering.id, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to update this menu item",
-      );
+      return throwForbiddenError("You do not have permission to update this menu item");
     }
 
     const updatedMenuItem = await Model.updateMenuItem(menuItemId, input);
@@ -281,15 +264,9 @@ const deleteMenuItem = async (menuItemId: number, userId: number) => {
       return throwNotFoundError("Catering not found");
     }
 
-    const authorized = await isAuthorized(
-      catering.eventId,
-      catering.id,
-      userId,
-    );
+    const authorized = await isAuthorized(catering.eventId, catering.id, userId);
     if (!authorized) {
-      return throwForbiddenError(
-        "You do not have permission to delete this menu item",
-      );
+      return throwForbiddenError("You do not have permission to delete this menu item");
     }
 
     await Model.deleteMenuItem(menuItemId);

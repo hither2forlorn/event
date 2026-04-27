@@ -33,6 +33,13 @@ const routes = [
     validation: validate(CreateCateringSchema),
   },
   {
+    method: "post" as const,
+    controller: Controller.create,
+    path: "catering/event/:eventId",
+    authorization: true,
+    validation: validate(CreateCateringSchema),
+  },
+  {
     method: "patch" as const,
     controller: Controller.update,
     path: "catering/:id",
@@ -41,12 +48,11 @@ const routes = [
   },
   {
     method: "delete" as const,
-    controller: Controller.deleteModule,
+    controller: Controller.remove,
     path: "catering/:id",
     authorization: true,
     validation: validate(DeleteCateringSchema),
   },
-
   {
     method: "post" as const,
     controller: Controller.createMenuItem,

@@ -1,12 +1,13 @@
-import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, serial, timestamp, varchar, integer } from "drizzle-orm/pg-core";
 import { attributes, tableName } from "./attributes";
 
 const schema = pgTable(tableName, attributes);
+
 export const menuSchema = pgTable("menu", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: varchar("description", { length: 255 }).notNull(),
-  cateringId: serial("catering_id")
+  cateringId: integer("catering_id")
     .notNull()
     .references(() => schema.id, { onDelete: "cascade" }),
   type: varchar("type", { length: 255 }).notNull(),

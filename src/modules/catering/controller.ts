@@ -1,15 +1,14 @@
 import { type IAuthRequest } from "@/routes/index";
 import * as Service from "./service";
-import CateringModel from "./model";
 import { throwErrorOnValidation } from "@/utils/error";
 
 const get = async (req: IAuthRequest) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-    const data = await Service.listCaterings({ ...req?.query });
+    const data = await Service.listCaterings({ ...req.query, userId });
     return data;
   } catch (err: any) {
     throw err;
@@ -19,10 +18,14 @@ const get = async (req: IAuthRequest) => {
 const findOne = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
-    if (!id || isNaN(Number(id))) {
-      return throwErrorOnValidation("Invalid catering ID");
+    const userId = req.user?.id;
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
     }
-    const data = await Service.findCateringById(Number(id));
+    if (!id || isNaN(Number(id))) {
+      throwErrorOnValidation("Invalid catering ID");
+    }
+    const data = await Service.findCateringById(Number(id), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -34,21 +37,14 @@ const create = async (req: IAuthRequest) => {
     const userId = req.user?.id;
     const { eventId } = req.params;
 
-    console.log("🚀🚀🚀🚀🚀🚀", eventId, req.params);
-
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!eventId || isNaN(Number(eventId))) {
-      return throwErrorOnValidation("Invalid event ID");
+      throwErrorOnValidation("Invalid event ID");
     }
 
-    const data = await Service.createCatering(
-      req.body,
-      Number(eventId),
-      userId,
-    );
+    const data = await Service.createCatering(req.body, Number(eventId), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -61,16 +57,10 @@ const update = async (req: IAuthRequest) => {
     const userId = req.user?.id;
 
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!id || isNaN(Number(id))) {
-      return throwErrorOnValidation("Invalid catering ID");
-    }
-
-    const catering = await CateringModel.findCateringById(Number(id));
-    if (!catering) {
-      return throwErrorOnValidation("Catering not found");
+      throwErrorOnValidation("Invalid catering ID");
     }
 
     const data = await Service.updateCatering(Number(id), req.body, userId);
@@ -80,22 +70,16 @@ const update = async (req: IAuthRequest) => {
   }
 };
 
-const deleteModule = async (req: IAuthRequest) => {
+const remove = async (req: IAuthRequest) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
 
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!id || isNaN(Number(id))) {
-      return throwErrorOnValidation("Invalid catering ID");
-    }
-
-    const catering = await CateringModel.findCateringById(Number(id));
-    if (!catering) {
-      return throwErrorOnValidation("Catering not found");
+      throwErrorOnValidation("Invalid catering ID");
     }
 
     const data = await Service.deleteCatering(Number(id), userId);
@@ -111,23 +95,13 @@ const createMenuItem = async (req: IAuthRequest) => {
     const { cateringId } = req.params;
 
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!cateringId || isNaN(Number(cateringId))) {
-      return throwErrorOnValidation("Invalid catering ID");
+      throwErrorOnValidation("Invalid catering ID");
     }
 
-    const catering = await CateringModel.findCateringById(Number(cateringId));
-    if (!catering) {
-      return throwErrorOnValidation("Catering not found");
-    }
-
-    const data = await Service.createMenuItem(
-      req.body,
-      Number(cateringId),
-      userId,
-    );
+    const data = await Service.createMenuItem(req.body, Number(cateringId), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -137,12 +111,16 @@ const createMenuItem = async (req: IAuthRequest) => {
 const getMenuItems = async (req: IAuthRequest) => {
   try {
     const { cateringId } = req.params;
+    const userId = req.user?.id;
 
+    if (!userId) {
+      throwErrorOnValidation("User not authenticated");
+    }
     if (!cateringId || isNaN(Number(cateringId))) {
-      return throwErrorOnValidation("Invalid catering ID");
+      throwErrorOnValidation("Invalid catering ID");
     }
 
-    const data = await Service.listMenuItems(Number(cateringId));
+    const data = await Service.listMenuItems(Number(cateringId), userId);
     return data;
   } catch (err: any) {
     throw err;
@@ -155,21 +133,10 @@ const updateMenuItem = async (req: IAuthRequest) => {
     const userId = req.user?.id;
 
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!id || isNaN(Number(id))) {
-      return throwErrorOnValidation("Invalid menu item ID");
-    }
-
-    const menuItem = await CateringModel.findMenuItemById(Number(id));
-    if (!menuItem) {
-      return throwErrorOnValidation("Menu item not found");
-    }
-
-    const catering = await CateringModel.findCateringById(menuItem.cateringId);
-    if (!catering) {
-      return throwErrorOnValidation("Catering not found");
+      throwErrorOnValidation("Invalid menu item ID");
     }
 
     const data = await Service.updateMenuItem(Number(id), req.body, userId);
@@ -185,21 +152,10 @@ const deleteMenuItem = async (req: IAuthRequest) => {
     const userId = req.user?.id;
 
     if (!userId) {
-      return throwErrorOnValidation("User not authenticated");
+      throwErrorOnValidation("User not authenticated");
     }
-
     if (!id || isNaN(Number(id))) {
-      return throwErrorOnValidation("Invalid menu item ID");
-    }
-
-    const menuItem = await CateringModel.findMenuItemById(Number(id));
-    if (!menuItem) {
-      return throwErrorOnValidation("Menu item not found");
-    }
-
-    const catering = await CateringModel.findCateringById(menuItem.cateringId);
-    if (!catering) {
-      return throwErrorOnValidation("Catering not found");
+      throwErrorOnValidation("Invalid menu item ID");
     }
 
     const data = await Service.deleteMenuItem(Number(id), userId);
@@ -214,7 +170,7 @@ export default {
   findOne,
   create,
   update,
-  deleteModule,
+  remove,
   createMenuItem,
   getMenuItems,
   updateMenuItem,

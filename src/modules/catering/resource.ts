@@ -3,7 +3,7 @@ export interface CateringColumn {
   eventId: number;
   vendorId: number | null;
   name: string;
-  per_plate_price: string;
+  per_plate_price: number;
   startDateTime: Date;
   endDateTime: Date;
   meal_type: string;
