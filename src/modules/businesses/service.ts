@@ -301,7 +301,7 @@ const find = async (id: number) => {
 
 const update = async (id: number, params: any, ownerId: number) => {
   try {
-    const { error, data } = CreateBusinessSchema.safeParse(params);
+    const { error, data } = CreateBusinessSchema.partial().safeParse(params);
     if (error || data == undefined) {
       return throwErrorOnValidation(error.message);
     }
