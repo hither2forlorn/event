@@ -3,7 +3,7 @@ export interface UserColumn {
   username: string;
   info: any | null;
   dob: string | null | Date | undefined;
-  email: string;
+  email: string | null;
   city: string | null;
   zip: string | null;
   address: string | null;

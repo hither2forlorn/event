@@ -63,7 +63,7 @@ const create = async (input: CreateFamilyValidation["body"], user: number) => {
 
     await Model.addMemberIfUser(result.id, user, {
       username: userDetail.username || userDetail.email,
-      dob: userDetail?.dob ?? undefined,
+      dob: userDetail?.dob ? new Date(userDetail.dob) : null,
       email: userDetail.email,
       phone: userDetail.phone,
       relation: "self",
@@ -163,7 +163,7 @@ const addMember = async (
       throwForbiddenError("Only family members can add members");
     }
 
-    const user = await userModel.find({ email: input.email, phone: input.phone });
+    const user = await userModel.find({ phone: input.phone });
 
     let userId;
     if (user) {
@@ -180,7 +180,7 @@ const addMember = async (
       const newUser = await UserService.create({
         username: input.username ?? "Member",
         password: `${new Date()}_User`,
-        email: input.email,
+        email: input.email as string,
         dob: input.dob ?? null,
         phone: input.phone,
         relation: input.relation ?? "Family member"
