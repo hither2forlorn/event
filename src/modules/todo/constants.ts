@@ -4,7 +4,7 @@ export interface WeddingTodoTemplateItem {
   monthsBeforeWedding?: number;
   dayOffset?: number;
   reminderDaysBefore?: number;
-  status?: "pending" | "in_progress" | "done";
+  status?: "pending"
 }
 
 export const DEFAULT_WEDDING_TODO_TEMPLATE: WeddingTodoTemplateItem[] = [

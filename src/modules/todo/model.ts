@@ -1,5 +1,5 @@
 import db from "@/config/db";
-import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import user from "@/modules/user/schema"
 import todo from "./schema";
 import repository from "./repository";
@@ -17,7 +17,7 @@ class Todo {
     }
 
     if (params?.assigned_to !== undefined) {
-      conditions.push(eq(todo.assigned_to, Number(params.assigned_to)));
+      conditions.push(eq(todo.assignedTo, Number(params.assigned_to)));
     }
     if (params?.parentId !== undefined) {
       conditions.push(eq(todo.parentId, Number(params.parentId)));
@@ -36,7 +36,7 @@ class Todo {
     const baseQuery = db
       .select(repository.selectQuery)
       .from(todo)
-      .leftJoin(user, eq(todo.assigned_to, user.id))
+      .leftJoin(user, eq(todo.assignedTo, user.id))
       .orderBy(asc(todo.isDone), asc(todo.dueDate))
     const result = whereClause
       ? await baseQuery.where(whereClause)
@@ -63,8 +63,8 @@ class Todo {
     if (params?.eventId != null) {
       conditions.push(eq(todo.eventId, params.eventId));
     }
-    if (params?.assigned_to != null) {
-      conditions.push(eq(todo.assigned_to, params.assigned_to));
+    if (params?.assignedTo != null) {
+      conditions.push(eq(todo.assignedTo, params.assignedTo));
     }
     if (params?.parentId != null) {
       conditions.push(eq(todo.parentId, params.parentId));
@@ -74,7 +74,7 @@ class Todo {
 
     const result = await db
       .select(repository.selectQuery)
-      .from(todo).leftJoin(user, eq(todo.assigned_to, user.id))
+      .from(todo).leftJoin(user, eq(todo.assignedTo, user.id))
       .where(and(...conditions));
 
     return result[0] || null;

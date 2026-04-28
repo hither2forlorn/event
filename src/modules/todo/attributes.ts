@@ -7,14 +7,14 @@ export const todoAttribute = {
   eventId: integer("event_id").references(() => eventSchema.id).notNull(),
   task: varchar('task', { length: 200 }),
   isDone: boolean("is_done").default(false),
-  assigned_to: integer("assigned_to").references(() => user.id),
+  assignedTo: integer("assigned_to").references(() => user.id),
   title: varchar("title", { length: 255 }),
   parentId: integer("parentId"),
   category: varchar("category", { length: 100 }),
   dueDate: timestamp("due_date").defaultNow(),
   status: varchar("status", { length: 30 }),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
 }
 
 export default todoAttribute; 

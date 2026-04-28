@@ -4,8 +4,8 @@ export interface TodoColumn {
   eventId: number | null;
   task: string | null;
   isDone: boolean | null;
-  assigned_to?: number | null;
-  assigned_user?: UserResource | null;
+  assignedTo?: number | null;
+  assignedUser?: UserResource | null;
   title: string | null;
   parentId: number | null;
   category: string | null;
@@ -24,8 +24,8 @@ class Resource {
       category: todo.category,
       task: todo.task,
       isDone: todo.isDone,
-      assigned_to: todo.assigned_to,
-      assigned_user: todo.assigned_user,
+      assignedTo: todo.assignedTo,
+      assignedUser: todo.assignedUser,
       title: todo.title,
       parentId: todo.parentId,
       dueDate: todo.dueDate,
