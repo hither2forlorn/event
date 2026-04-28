@@ -6,14 +6,14 @@ export const CreateCateringSchema = z.object({
       .string()
       .min(1, "Catering name is required")
       .max(255, "Name cannot exceed 255 characters"),
-    per_plate_price: z
+    perPlateprice: z
       .string()
       .regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
     startDateTime: z.coerce
       .date()
       .min(new Date(), "Start date must be in future"),
     endDateTime: z.coerce.date(),
-    meal_type: z
+    mealType: z
       .string()
       .min(1, "Meal type is required")
       .max(255, "Meal type cannot exceed 255 characters"),
@@ -33,13 +33,13 @@ export const UpdateCateringSchema = z.object({
         .min(1, "Catering name is required")
         .max(255, "Name cannot exceed 255 characters")
         .optional(),
-      per_plate_price: z
+      perPlateprice: z
         .string()
         .regex(/^\d+(\.\d{1,2})?$/, "Invalid price format")
         .optional(),
       startDateTime: z.coerce.date().optional(),
       endDateTime: z.coerce.date().optional(),
-      meal_type: z
+      mealType: z
         .string()
         .min(1, "Meal type is required")
         .max(255, "Meal type cannot exceed 255 characters")

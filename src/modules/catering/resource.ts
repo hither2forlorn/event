@@ -1,12 +1,13 @@
 export interface CateringColumn {
   id: number;
-  eventId: number;
-  vendorId: number | null;
   name: string;
-  per_plate_price: string;
+  perPlateprice: string;
   startDateTime: Date;
   endDateTime: Date;
-  meal_type: string;
+  eventId: number;
+  mealType: string;
+  isVeg: boolean;
+  vendorId: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -17,7 +18,6 @@ export interface MenuItemColumn {
   description: string;
   cateringId: number;
   type: string;
-  menuType: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -27,16 +27,16 @@ class Resource {
     catering: Partial<CateringColumn>,
   ): Partial<CateringColumn> | null {
     if (!catering) return null;
-
     const data: Partial<CateringColumn> = {
       id: catering.id,
       eventId: catering.eventId,
       vendorId: catering.vendorId,
+      isVeg: catering.isVeg,
       name: catering.name,
-      per_plate_price: catering.per_plate_price,
+      perPlateprice: catering.perPlateprice,
       startDateTime: catering.startDateTime,
       endDateTime: catering.endDateTime,
-      meal_type: catering.meal_type,
+      mealType: catering.mealType,
       createdAt: catering.createdAt,
       updatedAt: catering.updatedAt,
     };
@@ -55,7 +55,6 @@ class Resource {
       description: menuItem.description,
       cateringId: menuItem.cateringId,
       type: menuItem.type,
-      menuType: menuItem.menuType,
       createdAt: menuItem.createdAt,
       updatedAt: menuItem.updatedAt,
     };

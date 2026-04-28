@@ -9,8 +9,7 @@ export const menuSchema = pgTable("menu", {
   cateringId: serial("catering_id")
     .notNull()
     .references(() => schema.id, { onDelete: "cascade" }),
-  type: varchar("type", { length: 255 }).notNull(),
-  menuType: varchar("menu_type", { length: 255 }).notNull(),
+  type: varchar("type", { length: 255 }).notNull(),// eg : starter , apetizer etc
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
