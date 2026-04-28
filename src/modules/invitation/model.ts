@@ -1,16 +1,13 @@
-import { eq, and, sql, or, isNull, ne } from "drizzle-orm";
-import logger from "@/config/logger"
-import invitation, { guest_category_schema } from "./schema";
-import family from "@/modules/family/schema";
-import event from "@/modules/event/schema";
 import db from "@/config/db";
-import repository from "./repository";
-import Resource from "./resource";
-import { InvitationColumn } from "./resource";
-import user from "@/modules/user/schema";
 import { invitationStatus } from "@/constant";
+import event from "@/modules/event/schema";
+import family from "@/modules/family/schema";
+import user from "@/modules/user/schema";
+import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
+import repository from "./repository";
+import Resource, { InvitationColumn } from "./resource";
+import invitation, { guest_category_schema } from "./schema";
 import { setResponcevalidationType } from "./validators";
-import { status } from "drizzle/schema";
 
 export default class Invitation {
   static readonly DEFAULT_GUEST_CATEGORIES = [
@@ -164,7 +161,7 @@ export default class Invitation {
   static async update(params: Partial<InvitationColumn>, id: number) {
     const result = await db
       .update(invitation)
-      .set(params as any)
+      .set(params )
       .where(eq(invitation.id, id))
       .returning();
     return result[0];
@@ -253,13 +250,13 @@ export default class Invitation {
   static async makeEventGuest({
     eventId,
     guestId,
-    invited_by,
+    invitedBy,
     familyId,
     params,
   }: {
     eventId: number;
     guestId: number;
-    invited_by: number;
+    invitedBy: number;
     params: setResponcevalidationType;
     familyId?: number | null;
   }) {
@@ -276,35 +273,57 @@ export default class Invitation {
       )
       .limit(1);
 
+    const baseData = {
+      status: params.status,
+      notes: params.notes,
+      invitationName: params.invitationName,
+      arrivalDatetime: params.arrivalDatetime,
+      departureDatetime: params.departureDatetime,
+      isAccomodation: params.isAccomodation,
+      isArrivalPickupRequired: params.isArrivalPickupRequired,
+      isDeparturePickupRequired: params.isDeparturePickupRequired,
+      organizerNote: params.organizerNote,
+      arrivalLocation: params.arrivalLocation,
+      departureLocation: params.departureLocation,
+      arrivalInfo: params.arrivalInfo,
+      departureInfo: params.departureInfo,
+      assignedRoom: params.assignedRoom,
+      category: params.category,
+      hasCheckedIn: params.hasCheckedIn,
+      hasCheckedOut: params.hasCheckedOut,
+      userId: guestId,
+      eventId,
+      familyId: familyId ?? null,
+      invitedBy: params.invitedBy ?? invitedBy,
+    };
+
     if (existingGuest[0]?.id) {
       const nextStatus = params.status;
-      const shouldClearResponseDetails = nextStatus === invitationStatus.rejected
+      const shouldClearResponseDetails =
+        nextStatus === invitationStatus.rejected;
 
       const clearedResponseFields = shouldClearResponseDetails
         ? {
           notes: null,
-          arrival_date_time: null,
-          departure_date_time: null,
+          arrivalDatetime: null,
+          departureDatetime: null,
           isAccomodation: null,
           isArrivalPickupRequired: false,
           isDeparturePickupRequired: false,
-          assigned_room: null,
-          arrival_info: null,
-          departure_info: null,
-          responded_by: null,
+          assignedRoom: null,
+          arrivalInfo: null,
+          departureInfo: null,
+          respondedBy: null,
           status: invitationStatus.rejected,
-          responded_at: null,
+          respondedAt: null,
         }
         : {};
-      logger.debug("This is the params", params);
 
       const updated = await db
         .update(invitation)
         .set({
-          ...params,
+          ...baseData,
           ...clearedResponseFields,
-          userId: guestId,
-          eventId,
           updatedAt: new Date(),
         })
         .where(eq(invitation.id, existingGuest[0].id))
@@ -315,15 +334,13 @@ export default class Invitation {
     const inserted = await db
       .insert(invitation)
       .values({
-        ...params,
+        ...baseData,
         category: params.category!,
-        eventId,
-        userId: guestId,
-        familyId: params.familyId ?? familyId ?? null,
-        invited_by: invited_by,
+        eventId: eventId,
+        invitedBy: invitedBy,
       })
       .returning();
-    return inserted;
+    return inserted[0] ?? null;
   }
 
   static async removeEventGuestWhileRemovingFamilyMember(
@@ -360,10 +377,6 @@ export default class Invitation {
           ne(invitation.status, invitationStatus.draft),
         ),
       );
-    console.log(
-      "this is the data in the hotel managemtn section",
-      hotel_management,
-    );
     return hotel_management;
   }
   static async getGuestCategory(eventId: number) {
@@ -440,20 +453,28 @@ export default class Invitation {
   }
 
   static async getGuestTransportationList(eventId: number) {
-    const data = await db
-      .select(repository.selectTransportation)
-      .from(invitation)
-      .where(
+   const data = await db
+  .select(repository.selectTransportation)
+  .from(invitation)
+  .leftJoin(user, eq(user.id, invitation.userId))
+  .where(
+    and(
+      eq(invitation.eventId, eventId),
+      ne(invitation.status, invitationStatus.draft),
+      or(
+        // Arrival pickup needed but not yet assigned
         and(
-          eq(invitation.eventId, eventId),
-          or(
-            eq(invitation.isArrivalPickupRequired, true),
-            eq(invitation.isDeparturePickupRequired, true),
-          ),
-          ne(invitation.status, invitationStatus.draft),
-          sql`(COALESCE(${invitation.arrival_info}, '') != 'assigned' OR COALESCE(${invitation.departure_info}, '') != 'assigned')`,
+          eq(invitation.isArrivalPickupRequired, true),
+          sql`COALESCE(${invitation.arrivalInfo}, '') != 'assigned'`
         ),
-      );
+        // Departure pickup needed but not yet assigned
+        and(
+          eq(invitation.isDeparturePickupRequired, true),
+          sql`COALESCE(${invitation.departureInfo}, '') != 'assigned'`
+        ),
+      ),
+    ),
+  );
     return data;
   }
 }

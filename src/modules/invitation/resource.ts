@@ -1,54 +1,40 @@
 import { UserColumn } from "../user/resource";
 export interface InvitationColumn {
   id: number;
-  eventId: number;
-  familyId: number | null;
-  invited_by: number;
   userId: number | null;
-  responded_by: number | null;
-  status: string | null;
   hasCheckedIn: boolean | null;
   hasCheckedOut: boolean | null;
+  eventId: number;
+  familyId: number | null;
+  respondedBy: number | null;
+  respondedAt: Date | null;
+  invitedBy: number;
+  role: string;
+  status: string | null;
+  notes: string | null;
+  category: string;
   isArrivalPickupRequired: boolean | null;
   isDeparturePickupRequired: boolean | null;
+  organizerNote: string | null;
+  arrivalDatetime: Date | null;
+  departureDatetime: Date | null;
   isAccomodation: boolean | null;
-  arrival_date_time: Date | null;
-  departure_date_time: Date | null;
-  joined_at: Date | null;
-  notes: string | null;
-  arrival_info: string | null;
-  departure_info: string | null;
-  organizer_note: string | null;
-  respondedAt: string | null;
+  joinedAt: Date | null;
+  assignedRoom: string | null;
+  arrivalInfo: string | null;
+  departureInfo: string | null;
   updatedAt: Date | null;
   createdAt: Date;
 }
 export interface FamilyInvitationResponseColumn {
-  user_detail: UserColumn;
-  event_guest: {
-    id: number;
-    userId: number;
-    eventId: number;
-    familyId: number | null;
-    invited_by: number;
-    role: string | null;
-    organizer_note: string | null;
-    status: string | null;
-    notes: string | null;
-    arrival_date_time: Date | null;
-    departure_date_time: Date | null;
-    isAccomodation: boolean | null;
-    isArrivalPickupRequired: boolean | null;
-    isDeparturePickupRequired: boolean | null;
-    joined_at: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  } | null;
+  user: UserColumn;
+  eventGuest: InvitationColumn | null;
+  familyName: string;
 }
 
 export interface Invitation_Event {
   id: number;
-  event_detail: {
+  event: {
     id: number;
     title: string | null;
     startDateTime: Date | string;
@@ -63,18 +49,18 @@ export interface Invitation_Event {
   role?: string | null;
 }
 export interface Hotel_responce {
-  user_detail: UserColumn | null;
-  user_room: string | null;
+  user: UserColumn | null;
+  room: string | null;
+  hasCheckedIn: boolean | null;
+  hasCheckedOut: boolean | null;
   category: string | null;
   invitationId: number;
-  hasCheckedIn: boolean;
-  hasCheckedOut: boolean;
 }
 class Resource {
   static toJson(invitation: InvitationColumn) {
     const data = {
       id: invitation.id,
-      responded_by: invitation.responded_by,
+      respondedBy: invitation.respondedBy,
       notes: invitation.notes,
       status: invitation.status,
       respondedAt: invitation.respondedAt,
@@ -90,7 +76,7 @@ class Resource {
   static toEventJson(invitation: Invitation_Event) {
     const data: Partial<Invitation_Event> = {
       id: invitation.id,
-      event_detail: invitation.event_detail,
+      event: invitation.event,
       invitation_status: invitation.invitation_status,
       invited_by: invitation.invited_by,
       familyId: invitation.familyId,
@@ -103,8 +89,9 @@ class Resource {
     data: FamilyInvitationResponseColumn,
   ): FamilyInvitationResponseColumn {
     return {
-      user_detail: data.user_detail,
-      event_guest: data.event_guest,
+      user: data.user,
+      eventGuest: data.eventGuest,
+      familyName: data.familyName
     };
   }
 
@@ -119,8 +106,8 @@ class Resource {
   }
   static toRoomJson(hotel_responce: Hotel_responce): Hotel_responce {
     return {
-      user_detail: hotel_responce.user_detail,
-      user_room: hotel_responce.user_room,
+      user: hotel_responce.user,
+      room: hotel_responce.room,
       category: hotel_responce.category,
       invitationId: hotel_responce.invitationId,
       hasCheckedIn: hotel_responce.hasCheckedIn,
@@ -130,6 +117,28 @@ class Resource {
   }
   static toRoomCollection(hotel_responce: Hotel_responce[]): Hotel_responce[] {
     return hotel_responce.map(this.toRoomJson);
+  }
+  static toRoomGroupCollection(hotel_responce: Hotel_responce[]) {
+    const grouped = new Map<string, any[]>();
+
+    hotel_responce.forEach((item) => {
+      const room = item.room || "Unassigned";
+      if (!grouped.has(room)) {
+        grouped.set(room, []);
+      }
+      grouped.get(room)?.push({
+        user: item.user,
+        category: item.category,
+        invitationId: item.invitationId,
+        hasCheckedIn: item.hasCheckedIn,
+        hasCheckedOut: item.hasCheckedOut,
+      });
+    });
+
+    return Array.from(grouped.entries()).map(([room, users]) => ({
+      room,
+      eachuser: users,
+    }));
   }
 }
 export default Resource;

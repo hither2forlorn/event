@@ -107,7 +107,7 @@ const setResponce = async (
       const isOrganizer = eventMembers.some(
         (user) => user?.user?.id === userId,
       );
-
+      //Getting the invitation for the user that we are trying to set the responce ; 
       invitations = await Model.findInvitationEvent({
         eventId: eventId,
         userId: isOrganizer ? body.userId : userId,
@@ -124,7 +124,7 @@ const setResponce = async (
       invitations.familyId !== null &&
       invitations.familyId === familyId;
 
-    const canRespondAsOrganizer = invitations.invited_by === userId;
+    const canRespondAsOrganizer = invitations.invitedBy === userId;
 
     if (!canRespondAsSelf && !canRespondAsFamily && !canRespondAsOrganizer) {
       throwForbiddenError("You are not allowed to respond to this invitation");
@@ -135,8 +135,8 @@ const setResponce = async (
     if (invitations && userId !== data.userId && familyId !== null) {
       params = {
         ...data,
-        category: invitations.category as string,
-        invitation_name: invitations.invitation_name,
+        category: invitations.category,
+        invitationName: invitations.invitationName,
       };
     } else {
       params = data;
@@ -145,8 +145,8 @@ const setResponce = async (
     const result = await Model.makeEventGuest({
       eventId: eventId,
       guestId: data?.userId!,
-      invited_by: Number(invitations?.invited_by!),
-      familyId: familyId,
+      invitedBy: Number(invitations?.invitedBy!),
+      familyId: invitations.familyId ? invitations.familyId : null,
       params,
     });
     return result;
@@ -217,9 +217,9 @@ const inviteGuest = async (
     const invitation = await Invitation.create({
       eventId: eventId,
       userId: guestUser.id!,
-      invitation_name: input.invitation_name || "FAMILY",
+      invitationName: input.invitation_name || "FAMILY",
       familyId: isFamily ? guestUser.familyId : undefined,
-      invited_by: userId,
+      invitedBy: userId,
       status: input.isDraft ? invitationStatus.draft : invitationStatus.pending,
       category: input.category,
     });
@@ -258,7 +258,8 @@ const getEventHotelManagement = async (eventId: number, userId: number) => {
       );
     }
     const event_hotel_management = await Model.EventHotelManagent(eventId);
-    return Resource.toRoomCollection(event_hotel_management)
+    const room_grouped = Resource.toRoomGroupCollection(event_hotel_management)
+    return room_grouped;
   }
   catch (err) {
     throw err;

@@ -2,6 +2,7 @@ import event from "@/modules/event/schema";
 import invitation from "./schema";
 import Family from "@/modules/family/repository";
 import User from "@/modules/user/repository";
+import { foodPreference } from "@/constant";
 
 const select = {
   id: invitation.id,
@@ -10,27 +11,33 @@ const select = {
   hasCheckedOut: invitation.hasCheckedOut,
   eventId: invitation.eventId,
   familyId: invitation.familyId,
-  invited_by: invitation.invited_by,
+  respondedBy: invitation.respondedBy,
+  respondedAt: invitation.respondedAt,
+  invitedBy: invitation.invitedBy,
   role: invitation.role,
   status: invitation.status,
   notes: invitation.notes,
   category: invitation.category,
   isArrivalPickupRequired: invitation.isArrivalPickupRequired,
   isDeparturePickupRequired: invitation.isDeparturePickupRequired,
-  arrival_date_time: invitation.arrival_date_time,
-  departure_date_time: invitation.departure_date_time,
+  organizerNote: invitation.organizerNote,
+  arrivalDatetime: invitation.arrivalDatetime,
+  departureDatetime: invitation.departureDatetime,
+  arrivalLocation: invitation.arrivalLocation,
+  departureLocation: invitation.departureLocation,
   isAccomodation: invitation.isAccomodation,
-  joined_at: invitation.joined_at,
-  assigned_room: invitation.assigned_room,
-  arrival_info: invitation.arrival_info,
-  departure_info: invitation.departure_info,
+  joinedAt: invitation.joinedAt,
+  assignedRoom: invitation.assignedRoom,
+  arrivalInfo: invitation.arrivalInfo,
+  departureInfo: invitation.departureInfo,
   createdAt: invitation.createdAt,
   updatedAt: invitation.updatedAt,
 };
+
 const selectInvitationEvent = {
   id: invitation.id,
-  event_detail: {
-    eventId: event.id,
+  event: {
+    id: event.id,
     title: event.title,
     startDateTime: event.startDateTime,
     endDateTime: event.endDateTime,
@@ -38,24 +45,24 @@ const selectInvitationEvent = {
     venue: event.venue,
     imageUrl: event.imageUrl,
   },
-  invited_by: invitation.invited_by,
+  invitedBy: invitation.invitedBy,
   familyId: invitation.familyId,
   userId: invitation.userId,
-  invitation_status: invitation.status,
-  organizer_note: invitation.organizer_note,
+  status: invitation.status,
+  organizerNote: invitation.organizerNote,
   role: invitation.category,
   category: invitation.category,
-  invitation_name: invitation.invitation_name,
+  invitationName: invitation.invitationName,
 };
 
 const selectInvitationResponse = {
-  user_detail: User.selectQuery,
-  event_guest: select,
-  family_name: Family.selectQuery.familyName,
+  user: User.selectQuery,
+  eventGuest: select,
+  familyName: Family.selectQuery.familyName,
 };
 const selectHotelManagement = {
-  user_detail: User.selectQuery,
-  user_room: select.assigned_room,
+  user: User.selectQuery,
+  room: select.assignedRoom,
   hasCheckedIn: select.hasCheckedIn,
   hasCheckedOut: select.hasCheckedOut,
   category: select.category,
@@ -64,13 +71,21 @@ const selectHotelManagement = {
 
 const selectTransportation = {
   id: invitation.id,
-  invitation_name: invitation.invitation_name,
+  user: {
+    name: User.selectQuery.username,
+    familyId: User.selectQuery.familyId,
+    foodPreference: User.selectQuery.foodPreference,
+    phone: User.selectQuery.phone,
+    email: User.selectQuery.email,
+  },
   isArrivalPickupRequired: invitation.isArrivalPickupRequired,
   isDeparturePickupRequired: invitation.isDeparturePickupRequired,
-  arrival_date_time: invitation.arrival_date_time,
-  departure_date_time: invitation.departure_date_time,
-  arrival_info: invitation.arrival_info,
-  departure_info: invitation.departure_info,
+  arrivalDatetime: invitation.arrivalDatetime,
+  departureDatetime: invitation.departureDatetime,
+  arrivalInfo: invitation.arrivalInfo,
+  arrivalLocation: invitation.arrivalLocation,
+  departureLocation: invitation.departureLocation,
+  departureInfo: invitation.departureInfo,
   isAccomodation: invitation.isAccomodation,
   eventId: invitation.eventId,
 };
