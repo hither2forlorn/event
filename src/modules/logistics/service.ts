@@ -1,5 +1,5 @@
 import Model from "./model";
-import { createVehicleValidation, assignVehicleValidation } from "./validators";
+import { createVehicleValidation, assignVehicleValidation, AssignVehicleType } from "./validators";
 import Resource from "./resource";
 import EventService from "@/modules/event/service";
 import InvitationModel from "@/modules/invitation/model";
@@ -55,7 +55,7 @@ const createVehicle = async (input: any, userId: number, eventId: number) => {
       return throwErrorOnValidation("Error while validating the data");
     }
     await EventService.checkAuthorized(eventId, userId);
-    const result = await Model.create_vehicle(validateData, eventId);
+    const result = await Model.createVehicle(validateData, eventId);
     return Resource.vehicleToJson(result);
   } catch (err: any) {
     logger.error("Error in createVehicle:", err);
@@ -83,7 +83,7 @@ const deleteVehicle = async (id: number, userId: number) => {
     if (!vehicle) throw new Error("Vehicle not found");
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
-    const data = await Model.delete_vehicle(id);
+    const data = await Model.deleteVehicle(id);
     return Resource.vehicleToJson(data);
   } catch (err: any) {
     logger.error("Error in deleteVehicle:", err);
@@ -91,7 +91,7 @@ const deleteVehicle = async (id: number, userId: number) => {
   }
 };
 
-const assignVehicle = async (input: any, userId: number) => {
+const assignVehicle = async (input: AssignVehicleType, userId: number) => {
   try {
     const parsedInput = assignVehicleValidation.safeParse(input);
     if (!parsedInput.success || !parsedInput.data) {
@@ -102,19 +102,19 @@ const assignVehicle = async (input: any, userId: number) => {
     if (!vehicle || !vehicle.eventId) throw new Error("Vehicle not found");
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
-    // TODO: Logical dilemma - Should we check if the invitation belongs to the same event?
+    const data = await Model.assignVehicle(parsedInput.data);
+console.log('The data in the issue is in the service for the assign vehicle', input);
+    const invitationUpdate: Record<string, string> = {};
+    if (parsedInput.data.isArrival) {
+      invitationUpdate.arrivalInfo = "assigned";
+    }
+    if (parsedInput.data.isDeparture) {
+      invitationUpdate.departureInfo = "assigned";
+    }
 
-    const assignmentPayload = {
-      ...parsedInput.data,
-      pickupLocation: "assigned",
-      dropoffLocation: "assigned",
-    };
-
-    const data = await Model.assign_vehicle(assignmentPayload);
-    await InvitationModel.update(
-      { arrival_info: "assigned", departure_info: "assigned" },
-      parsedInput.data.invitationId,
-    );
+    if (Object.keys(invitationUpdate).length > 0) {
+      await InvitationModel.update(invitationUpdate, parsedInput.data.invitationId);
+    }
 
     return Resource.assignmentToJson(data);
   } catch (err: any) {
@@ -129,7 +129,7 @@ const updateAssignment = async (vehicleId: number, invitationId: number, input: 
     if (!vehicle) throw new Error("Vehicle not found");
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
-    const data = await Model.update_assigned_vehicle(input, vehicleId, invitationId);
+    const data = await Model.updateAssignedVehicle(input, vehicleId, invitationId);
     return Resource.assignmentToJson(data);
   } catch (err: any) {
     logger.error("Error in updateAssignment:", err);
@@ -143,9 +143,9 @@ const removeAssignment = async (vehicleId: number, invitationId: number, userId:
     if (!vehicle) throw new Error("Vehicle not found");
     await EventService.checkAuthorized(vehicle.eventId, userId);
 
-    const data = await Model.remove_assigned_vehicle(vehicleId, invitationId);
+    const data = await Model.removeAssignedVehicle(vehicleId, invitationId);
     await InvitationModel.update(
-      { arrival_info: null, departure_info: null },
+      { arrivalInfo: null, departureInfo: null },
       invitationId,
     );
 

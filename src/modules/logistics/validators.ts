@@ -13,10 +13,13 @@ const createVehicleValidation = z.object({
 const assignVehicleValidation = z.object({
   vehicleId: z.number().nonnegative(),
   invitationId: z.number().nonnegative(),
-  pickupTime: dateSchema.optional(),
-  dropoffTime: dateSchema.optional(),
-  pickupLocation: z.string().optional(),
-  dropoffLocation: z.string().optional(),
+  fromTime: dateSchema.optional(),
+  toTime: dateSchema.optional(),
+  isDeparture:z.boolean().optional(), 
+  isArrival:z.boolean().optional() , 
+  fromLocation: z.string().optional(),
+  toLocation: z.string().optional(),
+ 
 })
 
 type CreateVehicleType = z.infer<typeof createVehicleValidation>

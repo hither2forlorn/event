@@ -1,7 +1,7 @@
 import { integer, serial, timestamp, varchar } from "drizzle-orm/pg-core"
 import event from "@/modules/event/schema"
-export const table_name = 'event_vehicle'
-export const attribute = {
+export const tableName = 'event_vehicle'
+export const attributes = {
   id: serial("id").notNull().unique(),
   vehicleName: varchar("vehicle_name", { length: 100 }).notNull(),
   eventId: integer("event_id").references(() => event.id, { onDelete: "cascade" }).notNull(),
