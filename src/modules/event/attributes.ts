@@ -33,7 +33,7 @@ const eventAttribute = {
   parentId: integer("parentid"),
   dressCode: varchar("dress_code"),
   budget: integer("budget"),
-  rsvp_deadline: varchar("rsvp_deadline"),
+  rsvpDeadline: varchar("rsvp_deadline"),
   visiblity: varchar("visiblity"),
   status: varchar("status", { length: 20 }),
   venue: varchar("venue", { length: 50 }),

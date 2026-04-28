@@ -159,7 +159,7 @@ class Event {
     const event_vendor = await db
       .select()
       .from(event_vendorTable)
-      .where(eq(event_vendorTable.event_id, eventId));
+      .where(eq(event_vendorTable.eventId, eventId));
     return event_vendor;
   }
 

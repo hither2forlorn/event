@@ -1,6 +1,5 @@
 import Model from "./model";
 import UserService from "@/modules/user/service";
-import TodoService from "@/modules/todo/service";
 import InvitationModel from "@/modules/invitation/model";
 import Resource from "./resource";
 import logger from "@/config/logger";
@@ -95,6 +94,7 @@ const find = async (id: number) => {
   try {
     console.log("finding the event with the id", id);
     const data = await Model.find({ id });
+    logger.debug(`Searching the event with the id ${id}`);
     if (!data) throw new Error("Event not found");
     return Resource.toJson(data);
   } catch (err: any) {
@@ -150,7 +150,7 @@ const update = async (id: number, input: updateEventType, userId?: number) => {
         startDateTime: new Date(input.startDateTime),
       }),
       ...(input.endDateTime && { endDateTime: new Date(input.endDateTime) }),
-      ...(rsvpDeadline && { rsvp_deadline: rsvpDeadline }),
+      ...(rsvpDeadline && { rsvpDeadline: rsvpDeadline }),
     };
 
     const data = await Model.update(eventData as any, id); //TODO:
