@@ -3,6 +3,7 @@ import {
   varchar,
   text,
   integer,
+  real,
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
@@ -20,6 +21,8 @@ export const businessesAttribute = {
   location: varchar("location", { length: 255 }),
   city: varchar("city", { length: 100 }),
   country: varchar("country", { length: 100 }),
+  latitude: real("latitude"),
+  longitude: real("longitude"),
   legal_document: varchar("legal_document", { length: 255 }),
   is_verified: boolean("is_verified").default(false),
   owner_id: integer("owner_id").notNull(),

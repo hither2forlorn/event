@@ -9,6 +9,8 @@ export interface BusinessColumn {
   email: string | null | undefined;
   city?: string | null;
   country?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   legal_document?: string | null;
   is_verified?: boolean | null;
   owner_id: number;
@@ -43,6 +45,8 @@ class Resource {
       email: row.email,
       city: row.city,
       country: row.country,
+      latitude: row.latitude,
+      longitude: row.longitude,
       is_verified: row.is_verified,
       owner_id: row.owner_id,
       description: row.description,

@@ -14,6 +14,8 @@ const businessSelectQuery = {
   location: schema.location,
   city: schema.city,
   country: schema.country,
+  latitude: schema.latitude,
+  longitude: schema.longitude,
   legal_document: schema.legal_document,
   is_verified: schema.is_verified,
   owner_id: schema.owner_id,
