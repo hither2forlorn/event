@@ -13,20 +13,20 @@ const schema = pgTable(tableName, businessesAttribute, (table) => [
   index('business_id').on(table.id)
 ]);
 const vendor_venue_schema = pgTable(vendorVenueTableName, venueAttribute, (table) => [
-  index("vendor_venues_business_id_idx").on(table.business_id),
+  index("vendor_venues_business_id_idx").on(table.businessId),
 ]);
 const vendor_services_schema = pgTable(vendorServiceTableName, vendorServicesAttribute, (table) => [
-  index("vendor_services_business_id_idx").on(table.business_id),
+  index("vendor_services_business_id_idx").on(table.businessId),
 ]);
 
 export const event_vendorTable = pgTable("event_vendor", {
   id: serial("id").primaryKey(),
-  event_id: integer("event_id")
+  eventId: integer("event_id")
     .notNull()
     .references(() => event.id),
-  vendor_buisness_id: integer("vendor_buisness_id").references(() => schema.id, { onDelete: "cascade" }),
-  acquired_by: integer("acquired_by"),
-  estimated_guest: integer("estimated_guest"),
+  vendorBusinessid: integer("vendor_buisness_id").references(() => schema.id, { onDelete: "cascade" }),
+  acquiredBy: integer("acquired_by"),
+  estimatedGuest: integer("estimated_guest"),
   status: varchar("status", { length: 15 }),
   notes: varchar("notes", { length: 200 }),
   createdAt: timestamp("create_at", { withTimezone: true }).defaultNow(),

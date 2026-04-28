@@ -1,7 +1,7 @@
 
 export interface BusinessColumn {
   id: number;
-  business_name: string;
+  businessName: string;
   category?: string | null;
   avatar?: string | null;
   cover?: string | null;
@@ -9,22 +9,22 @@ export interface BusinessColumn {
   email: string | null | undefined;
   city?: string | null;
   country?: string | null;
-  legal_document?: string | null;
-  is_verified?: boolean | null;
-  owner_id: number;
+  legalDocument?: string | null;
+  isVerified?: boolean | null;
+  ownerId: number;
   description?: string | null;
-  price_starting_from?: number | null;
-  years_of_experience?: number | null;
-  team_size?: number | null;
-  service_area?: string | null;
-  contact_person_name?: string | null;
-  contact_phone?: string | null;
-  website_url?: string | null;
-  instagram_url?: string | null;
-  whatsapp_number?: string | null;
-  provides_home_service?: boolean | null;
-  travel_policy?: string | null;
-  cancellation_policy?: string | null;
+  priceStartingFrom?: number | null;
+  yearsOfExperience?: number | null;
+  teamSize?: number | null;
+  serviceArea?: string | null;
+  contactPersonname?: string | null;
+  contactPhone?: string | null;
+  websiteUrl?: string | null;
+  instagramUrl?: string | null;
+  whatsappNumber?: string | null;
+  providesHomeservice?: boolean | null;
+  travelPolicy?: string | null;
+  cancellationPolicy?: string | null;
   createdAt?: Date | null;
   updatedAt?: Date | null;
 }
@@ -35,7 +35,7 @@ class Resource {
     if (!row) return null;
     return {
       id: row.id,
-      business_name: row.business_name,
+      businessName: row.businessName,
       category: row.category,
       avatar: row.avatar,
       cover: row.cover,
@@ -43,21 +43,21 @@ class Resource {
       email: row.email,
       city: row.city,
       country: row.country,
-      is_verified: row.is_verified,
-      owner_id: row.owner_id,
+      isVerified: row.isVerified,
+      ownerId: row.ownerId,
       description: row.description,
-      price_starting_from: row.price_starting_from,
-      years_of_experience: row.years_of_experience,
-      team_size: row.team_size,
-      service_area: row.service_area,
-      contact_person_name: row.contact_person_name,
-      contact_phone: row.contact_phone,
-      website_url: row.website_url,
-      instagram_url: row.instagram_url,
-      whatsapp_number: row.whatsapp_number,
-      provides_home_service: row.provides_home_service,
-      travel_policy: row.travel_policy,
-      cancellation_policy: row.cancellation_policy,
+      priceStartingFrom: row.priceStartingFrom,
+      yearsOfExperience: row.yearsOfExperience,
+      teamSize: row.teamSize,
+      serviceArea: row.serviceArea,
+      contactPersonname: row.contactPersonname,
+      contactPhone: row.contactPhone,
+      websiteUrl: row.websiteUrl,
+      instagramUrl: row.instagramUrl,
+      whatsappNumber: row.whatsappNumber,
+      providesHomeservice: row.providesHomeservice,
+      travelPolicy: row.travelPolicy,
+      cancellationPolicy: row.cancellationPolicy,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

@@ -1,7 +1,7 @@
 import db from "@/config/db";
 import businessSchema from "@/modules/businesses/schema";
 import eventSchema from "@/modules/event/schema";
-import { eq, or, and, sql, inArray } from "drizzle-orm";
+import { eq, and, sql, inArray } from "drizzle-orm";
 import EventRepository from "@/modules/event/repository";
 import schema, {
   vendor_venue_schema,
@@ -9,28 +9,32 @@ import schema, {
   event_vendorTable,
 } from "./schema";
 import repository from "./repository";
-import { CreateBusinessType, CreateVenueDetailType } from "./validators";
+import {
+  CreateBusinessType,
+  CreateVenueDetailType,
+  CreateVendorServiceDetailType,
+} from "./validators";
 import { VendorBusinessCategoryTypes } from "@/constant";
 import event from "@/modules/event/schema";
 
 class BusinessModel {
-  static async create(params: CreateBusinessType & { owner_id: number }) {
+  static async create(params: CreateBusinessType & { ownerId: number }) {
     const result = await db
       .insert(schema)
-      .values(params as any)
+      .values(params)
       .returning();
     return result[0] ?? null;
   }
   static async createVenueDetail(
-    params: CreateVenueDetailType & { business_id: number },
+    params: CreateVenueDetailType & { businessId: number },
   ) {
     const result = await db
       .insert(vendor_venue_schema)
-      .values(params as any)
+      .values(params)
       .returning();
     return result[0] ?? null;
   }
-  static async createvendorServices(params: any) {
+  static async createvendorServices(params: CreateVendorServiceDetailType) {
     const result = await db
       .insert(vendor_services_schema)
       .values(params)
@@ -58,7 +62,7 @@ class BusinessModel {
     const offset = (Number(page) - 1) * Number(limit);
     let condition = [];
     if (!!userId) {
-      condition.push(eq(schema.owner_id, userId));
+      condition.push(eq(schema.ownerId, userId));
     }
 
     const items = await db
@@ -91,22 +95,22 @@ class BusinessModel {
       const venues = await db
         .select(repository.venueSelectQuery)
         .from(vendor_venue_schema)
-        .leftJoin(schema, eq(vendor_venue_schema.business_id, schema.id))
-        .where(eq(vendor_venue_schema.business_id, id));
+        .leftJoin(schema, eq(vendor_venue_schema.businessId, schema.id))
+        .where(eq(vendor_venue_schema.businessId, id));
       return {
-        business_information: business[0],
-        venue_information: venues,
+        businessInformation: business[0],
+        venueInformation: venues,
       };
     } else {
       const services = await db
-        .select(repository.vendor_services_select_query)
+        .select(repository.vendorServiceselectQuery)
         .from(vendor_services_schema)
-        .leftJoin(schema, eq(vendor_services_schema.business_id, schema.id))
-        .where(eq(vendor_services_schema.business_id, id));
+        .leftJoin(schema, eq(vendor_services_schema.businessId, schema.id))
+        .where(eq(vendor_services_schema.businessId, id));
       return {
-        business_information: business[0],
-        services,
-        owner_id: business[0].owner_id,
+        businessInformation: business[0],
+        vendorServicesInformation: services,
+        ownerId: business[0].ownerId,
       };
     }
   }
@@ -133,7 +137,7 @@ class BusinessModel {
     const rows = await db
       .select(repository.venueSelectQuery)
       .from(vendor_venue_schema)
-      .leftJoin(schema, eq(vendor_venue_schema.business_id, schema.id))
+      .leftJoin(schema, eq(vendor_venue_schema.businessId, schema.id))
       .where(eq(vendor_venue_schema.id, businessId));
     console.log(
       "this is the rowz in the data that is in the mnodel for the finfing the thing in the backend in thei",
@@ -143,22 +147,21 @@ class BusinessModel {
   }
   static async listBusinessVendorService(businessId: number) {
     const rows = await db
-      .select(repository.vendor_services_select_query)
+      .select(repository.vendorServiceselectQuery)
       .from(vendor_services_schema)
-      .leftJoin(schema, eq(vendor_services_schema.business_id, schema.id))
-      .where(eq(vendor_services_schema.business_id, businessId));
+      .leftJoin(schema, eq(vendor_services_schema.businessId, schema.id))
+      .where(eq(vendor_services_schema.businessId, businessId));
     return rows;
   }
 
   static async findEventVendorLink(eventId: number, businessId: number) {
-    const eventVendor = event_vendorTable as any;
     const rows = await db
-      .select({ id: eventVendor.id })
+      .select({ id: event_vendorTable.id })
       .from(event_vendorTable)
       .where(
         and(
-          eq(eventVendor.event_id, eventId),
-          eq(eventVendor.vendor_buisness_id, businessId),
+          eq(event_vendorTable.eventId, eventId),
+          eq(event_vendorTable.vendorBusinessid, businessId),
         ),
       )
       .limit(1);
@@ -175,7 +178,13 @@ class BusinessModel {
   }) {
     const result = await db
       .insert(event_vendorTable)
-      .values(params)
+      .values({
+        eventId: params.event_id,
+        vendorBusinessid: params.vendor_buisness_id,
+        acquiredBy: params.acquired_by,
+        status: params.status,
+        notes: params.notes,
+      })
       .returning();
 
     return result[0] ?? null;
@@ -190,8 +199,8 @@ class BusinessModel {
       .set(params)
       .where(
         and(
-          eq(event_vendorTable.vendor_buisness_id, businessId),
-          eq(event_vendorTable.event_id, eventId),
+          eq(event_vendorTable.vendorBusinessid, businessId),
+          eq(event_vendorTable.eventId, eventId),
         ),
       )
       .returning();
@@ -199,16 +208,16 @@ class BusinessModel {
   }
   static async findEventVendor(eventId: number, businessId?: number) {
     let conditions = [];
-    conditions.push(eq(event_vendorTable.event_id, eventId));
+    conditions.push(eq(event_vendorTable.eventId, eventId));
     if (!!businessId) {
-      conditions.push(eq(event_vendorTable.vendor_buisness_id, businessId));
+      conditions.push(eq(event_vendorTable.vendorBusinessid, businessId));
     }
     const result = await db
       .select(repository.businessSelectQuery)
       .from(event_vendorTable)
       .innerJoin(
         businessSchema,
-        eq(event_vendorTable.vendor_buisness_id, businessSchema.id),
+        eq(event_vendorTable.vendorBusinessid, businessSchema.id),
       )
       .where(and(...conditions));
     if (result.length == 0) return null;
@@ -218,8 +227,8 @@ class BusinessModel {
     const result = await db
       .select(EventRepository.baseSelectQuery)
       .from(event_vendorTable)
-      .innerJoin(eventSchema, eq(event_vendorTable.event_id, eventSchema.id))
-      .where(eq(event_vendorTable.vendor_buisness_id, vendorId));
+      .innerJoin(eventSchema, eq(event_vendorTable.eventId, eventSchema.id))
+      .where(eq(event_vendorTable.vendorBusinessid, vendorId));
     if (!result || result.length == 0) {
       return null;
     }
@@ -228,17 +237,15 @@ class BusinessModel {
 
   static async getEventOfMyBusiness(businessIds: number[], status: string) {
     const whereCondition = [];
-    whereCondition.push(
-      inArray(event_vendorTable.vendor_buisness_id, businessIds),
-    );
+    whereCondition.push(inArray(event_vendorTable.vendorBusinessid, businessIds));
     if (status) {
       whereCondition.push(eq(event_vendorTable.status, status));
     }
     const result = await db
       .select(repository.eventVendorWithBusiness)
       .from(event_vendorTable)
-      .leftJoin(schema, eq(event_vendorTable.vendor_buisness_id, schema.id))
-      .leftJoin(event, eq(event_vendorTable.event_id, event.id))
+      .leftJoin(schema, eq(event_vendorTable.vendorBusinessid, schema.id))
+      .leftJoin(event, eq(event_vendorTable.eventId, event.id))
       .where(and(...whereCondition))
       .orderBy(event.startDateTime);
 
@@ -249,7 +256,7 @@ class BusinessModel {
     const result = await db
       .select(repository.businessSelectQuery)
       .from(schema)
-      .where(eq(schema.owner_id, userId));
+      .where(eq(schema.ownerId, userId));
 
     return result;
   }

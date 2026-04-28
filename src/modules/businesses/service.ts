@@ -23,14 +23,14 @@ const create = async (params: CreateBusinessType, ownerId: number) => {
     if (error || data == undefined) {
       return throwErrorOnValidation(error.message);
     }
-    const result = await Model.create({ ...data, owner_id: ownerId });
-    if (!result) {
+    const result = await Model.create({ ...data, ownerId: ownerId });
+    if (!result || !result.id) {
       return throwErrorOnValidation("Failed to create business");
     }
     if (result.category == VendorBusinessCategoryTypes.Venue) {
       const venueResult = await Model.createVenueDetail({
-        ...data,
-        business_id: result.id,
+        venueName: " Venue Name",
+        businessId: result.id
       });
       if (!venueResult) {
         return throwErrorOnValidation("Failed to create venue details");
@@ -38,7 +38,7 @@ const create = async (params: CreateBusinessType, ownerId: number) => {
     } else {
       const vendorServiceResult = await Model.createvendorServices({
         ...data,
-        business_id: result.id,
+        businessId: result.id,
       });
       if (!vendorServiceResult) {
         return throwErrorOnValidation(
@@ -58,13 +58,13 @@ const udpateVendorServiceDetail = async (
   ownerId: number,
 ) => {
   try {
-    const venue_service_data = await Model.listBusinessVendorService(vendorId);
-    if (venue_service_data.length == 0 || venue_service_data == undefined) {
+    const venueServiceData = await Model.listBusinessVendorService(vendorId);
+    if (venueServiceData.length == 0 || venueServiceData == undefined) {
       return throwErrorOnValidation(
         "Vendor attribute with the table was not found",
       );
     }
-    if (venue_service_data[0]?.owner_id != ownerId) {
+    if (venueServiceData[0]?.ownerId != ownerId) {
       return throwForbiddenError(
         "You are not authorized to update the business detail",
       );
@@ -88,12 +88,12 @@ const updateVendorVenueDetail = async (
       venueId,
       ownerId,
     );
-    const venue_service_data = await Model.listBusinessVenueDetail(venueId);
-    console.log(venue_service_data);
-    if (venue_service_data.length == 0 || venue_service_data == undefined) {
+    const venueServiceData = await Model.listBusinessVenueDetail(venueId);
+    console.log(venueServiceData);
+    if (venueServiceData.length == 0 || venueServiceData == undefined) {
       return throwErrorOnValidation("Venue details not found");
     }
-    if (venue_service_data[0]?.owner_id != ownerId) {
+    if (venueServiceData[0]?.ownerId != ownerId) {
       return throwForbiddenError(
         "You are not authorized to update the business detail",
       );
@@ -114,15 +114,15 @@ const createVendorDetail = async (
     if (error || data == undefined) {
       return throwErrorOnValidation(error.message);
     }
-    const business_detail = await find(params.businessesId);
+    const businessDetail = await find(params.businessId);
 
     if (
-      business_detail.business_information.category ==
+      businessDetail.businessInformation.category ==
       VendorBusinessCategoryTypes.Venue
     ) {
       return throwErrorOnValidation("Business is of type venue");
     }
-    if (business_detail.business_information.owner_id != userId) {
+    if (businessDetail.businessInformation.ownerId != userId) {
       return throwForbiddenError(
         "You are not authorized to add the business detail",
       );
@@ -138,7 +138,7 @@ const createVendorDetail = async (
 };
 
 const addVenueDetail = async (
-  params: CreateVenueDetailType & { business_id: number },
+  params: CreateVenueDetailType & { businessId: number },
   userId: number,
 ) => {
   try {
@@ -146,21 +146,21 @@ const addVenueDetail = async (
     if (error || data == undefined) {
       return throwErrorOnValidation(error.message);
     }
-    const business_detail = await find(params.business_id);
+    const businessDetail = await find(params.businessId);
     if (
-      business_detail.business_information.category !==
+      businessDetail.businessInformation.category !==
       VendorBusinessCategoryTypes.Venue
     ) {
       return throwErrorOnValidation("Business is not of type venue");
     }
-    if (business_detail.business_information.owner_id != userId) {
+    if (businessDetail.businessInformation.ownerId != userId) {
       return throwForbiddenError(
         "You are not authorized to add the venue detail",
       );
     }
     const result = await Model.createVenueDetail({
       ...data,
-      business_id: params.business_id,
+      businessId: params.businessId,
     });
     if (!result) {
       return throwErrorOnValidation("Failed to create venue details");
@@ -185,7 +185,7 @@ const getEventVendor = async (eventId: number, userId: number) => {
 const getVendorEvent = async (vendorId: number, userId: number) => {
   try {
     const vendor = await find(vendorId);
-    if (vendor.business_information.owner_id != userId) {
+    if (vendor.businessInformation.ownerId != userId) {
       throwForbiddenError(
         "You are not allowed to see the information of the list of the event in the user",
       );
@@ -224,7 +224,7 @@ const postEventVendor = async (
     await EventService.checkAuthorized(eventId, userId);
 
     const business = await find(data.vendorId);
-    if (!business?.business_information?.id) {
+    if (!business?.businessInformation.id) {
       return throwNotFoundError("Business not found");
     }
 
@@ -265,20 +265,20 @@ const updateEventVendor = async ({
   params: any;
 }) => {
   try {
-    const event_vendor = await findEventVendor({
+    const eventVendor = await findEventVendor({
       eventId: eventId,
       businessId: vendorId,
     });
     const event = await EventService.checkAuthorized(eventId, ownerId);
-    if (event_vendor?.owner_id != ownerId && !event.id) {
+    if (eventVendor?.ownerId != ownerId && !event) {
       throwForbiddenError(" You are not authorized to change in this field");
     }
-    const updated_data = await Model.updateEventVendor(
+    const updatedData = await Model.updateEventVendor(
       params,
       eventId,
       vendorId,
     );
-    return updated_data;
+    return updatedData;
   } catch (err) {
     throw err;
   }
@@ -302,9 +302,9 @@ const update = async (id: number, params: any, ownerId: number) => {
     if (error || data == undefined) {
       return throwErrorOnValidation(error.message);
     }
-    const business_data = await find(id);
+    const businessData = await find(id);
 
-    if (business_data.business_information.owner_id != ownerId) {
+    if (businessData.businessInformation.ownerId != ownerId) {
       return throwForbiddenError("User cannot update the business");
     }
     const result = await Model.update(id, data);
@@ -323,12 +323,12 @@ const updatebusinessInformation = async (
   ownerId: number,
 ) => {
   try {
-    const business_data = await find(id);
-    if (business_data.business_information.owner_id != ownerId) {
+    const businessData = await find(id);
+    if (businessData.businessInformation.ownerId != ownerId) {
       return throwForbiddenError("User cannot update the business");
     }
     if (
-      business_data.business_information.category ==
+      businessData.businessInformation.category ==
       VendorBusinessCategoryTypes.Venue
     ) {
       const result = await Model.updatevenueservice(id, params);
@@ -354,11 +354,12 @@ const remove = async (id: number, ownerId: number) => {
     if (!existingData) {
       return throwNotFoundError("Business with the information was not found");
     }
-    if (existingData.business_information.owner_id != ownerId) {
+    if (existingData.businessInformation.ownerId != ownerId) {
+
       return throwForbiddenError("User cannot delete the business");
     }
-    const remove_business = await Model.destroy(id);
-    return remove_business;
+    const removeBusiness = await Model.destroy(id);
+    return removeBusiness;
   } catch (err) {
     throw err;
   }

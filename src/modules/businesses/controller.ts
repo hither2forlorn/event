@@ -1,6 +1,6 @@
 import { type IAuthRequest } from "@/routes/index";
 import Service from "./service";
-import { throwErrorOnValidation, throwForbiddenError } from "@/utils/error";
+import { throwErrorOnValidation } from "@/utils/error";
 
 const list = async (req: IAuthRequest) => {
   try {
