@@ -8,7 +8,7 @@ import {
   date,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { budget_category, expense } from "./schema";
+import { budgetCategory, expense } from "./schema";
 
 export const paymentModeEnum = pgEnum("payment_mode", [
   "cash",
@@ -46,7 +46,7 @@ const expenseAttributes = {
   id: serial("id").primaryKey(),
   categoryId: integer("category_id")
     .notNull()
-    .references(() => budget_category.id, { onDelete: "cascade" }),
+    .references(() => budgetCategory.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
   businessId: integer("vendor_id").references(() => buisness.id),
   allocatedAmount: numeric("allocated_amount", {

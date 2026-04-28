@@ -12,13 +12,13 @@ import generalCategory from "@/modules/general-category/schema";
 import { event_member_schema } from "../../modules/event/schema";
 import { family } from "@/modules/family/schema";
 import event from "@/modules/event/schema";
-import { assigned_vehicle, vehicle_schema } from "@/modules/logistics/schema"
+import { assignedVehicle, vehicleSchema } from "@/modules/logistics/schema"
 import rsvp, { guest_category_schema } from "@/modules/invitation/schema";
 import { vwEventDetails, vw_event_user } from "./view";
 import catering, { menuSchema } from "@/modules/catering/schema";
 
 import {
-  budget_category,
+  budgetCategory,
   expense,
   payment,
 
@@ -29,8 +29,8 @@ export {
 
   event_vendorTable,
   admin,
-  vehicle_schema,
-  assigned_vehicle,
+  vehicleSchema,
+  assignedVehicle,
   vw_event_user,
   guest_category_schema,
   buisness,
@@ -45,7 +45,7 @@ export {
   event_member_schema,
   rsvp,
   family,
-  budget_category,
+  budgetCategory,
   expense,
   payment,
   paymentModeEnum,

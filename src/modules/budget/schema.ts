@@ -10,7 +10,7 @@ import {
   paymentStatusEnum,
 } from "./attribute";
 
-const budget_category = pgTable(
+const budgetCategory = pgTable(
   budgetCategoryTableName,
   budgetCateogryAttributes,
 );
@@ -20,7 +20,7 @@ const expense = pgTable(expenseTableName, expenseAttributes);
 const payment = pgTable(paymentTableName, paymentAttributes);
 
 export {
-  budget_category,
+  budgetCategory,
   expense,
   payment,
   paymentModeEnum,

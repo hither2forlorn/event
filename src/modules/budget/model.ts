@@ -1,5 +1,5 @@
 import { eq, sum } from "drizzle-orm";
-import { budget_category, expense, payment } from "./schema";
+import { budgetCategory, expense, payment } from "./schema";
 import event from "../event/schema";
 import db from "@/config/db";
 import {
@@ -15,8 +15,8 @@ class Budget {
   static async totalAllocatedAndRemainingBudget(eventId: number) {
     const result = await db
       .select(Repository.budgetCategorySelectQuery)
-      .from(budget_category)
-      .where(eq(budget_category.eventId, eventId));
+      .from(budgetCategory)
+      .where(eq(budgetCategory.eventId, eventId));
 
     const totalAllocated = result.reduce(
       (total, category) => total + Number(category.allocatedBudget),
@@ -38,7 +38,7 @@ class Budget {
     params: CreateBudgetCategoryInput & { eventId: number },
   ) {
     const result = await db
-      .insert(budget_category)
+      .insert(budgetCategory)
       .values({ ...params, allocatedBudget: params.allocatedBudget.toString() })
       .returning();
     return result[0];
@@ -47,9 +47,9 @@ class Budget {
   static async getBudgetCategoryById(categoryId: number) {
     const rows = await db
       .select(Repository.expenseWithCategorySelectQuery)
-      .from(budget_category)
-      .leftJoin(expense, eq(expense.categoryId, budget_category.id))
-      .where(eq(budget_category.id, categoryId));
+      .from(budgetCategory)
+      .leftJoin(expense, eq(expense.categoryId, budgetCategory.id))
+      .where(eq(budgetCategory.id, categoryId));
 
     if (rows.length === 0) return null;
 
@@ -92,8 +92,8 @@ class Budget {
   static async getAllBudgetCategories(eventId: number) {
     const result = await db
       .select(Repository.budgetCategorySelectQuery)
-      .from(budget_category)
-      .where(eq(budget_category.eventId, eventId));
+      .from(budgetCategory)
+      .where(eq(budgetCategory.eventId, eventId));
     return result;
   }
 
@@ -107,17 +107,17 @@ class Budget {
       updateData.allocatedBudget = params.allocatedBudget.toString();
 
     const result = await db
-      .update(budget_category)
+      .update(budgetCategory)
       .set(updateData)
-      .where(eq(budget_category.id, categoryId))
+      .where(eq(budgetCategory.id, categoryId))
       .returning();
     return result[0] || null;
   }
 
   static async deleteBudgetCategory(categoryId: number) {
     const result = await db
-      .delete(budget_category)
-      .where(eq(budget_category.id, categoryId))
+      .delete(budgetCategory)
+      .where(eq(budgetCategory.id, categoryId))
       .returning();
     return result[0] || null;
   }
@@ -323,12 +323,12 @@ class Budget {
   static async getBudgetSummary(eventId: number) {
     const rows = await db
       .select({
-        categoryId: budget_category.id,
-        categoryName: budget_category.name,
-        eventId: budget_category.eventId,
-        allocatedBudget: budget_category.allocatedBudget,
-        categoryCreatedAt: budget_category.createdAt,
-        categoryUpdatedAt: budget_category.updatedAt,
+        categoryId: budgetCategory.id,
+        categoryName: budgetCategory.name,
+        eventId: budgetCategory.eventId,
+        allocatedBudget: budgetCategory.allocatedBudget,
+        categoryCreatedAt: budgetCategory.createdAt,
+        categoryUpdatedAt: budgetCategory.updatedAt,
         expenseId: expense.id,
         expenseName: expense.name,
         allocatedAmount: expense.allocatedAmount,
@@ -338,10 +338,10 @@ class Budget {
         paymentStatus: payment.status,
         paymentExpenseId: payment.expenseId,
       })
-      .from(budget_category)
-      .leftJoin(expense, eq(expense.categoryId, budget_category.id))
+      .from(budgetCategory)
+      .leftJoin(expense, eq(expense.categoryId, budgetCategory.id))
       .leftJoin(payment, eq(payment.expenseId, expense.id))
-      .where(eq(budget_category.eventId, eventId));
+      .where(eq(budgetCategory.eventId, eventId));
 
     const categoryMap = new Map<number, any>();
     const expenseMap = new Map<number, any>();

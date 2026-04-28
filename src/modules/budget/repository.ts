@@ -1,12 +1,12 @@
-import { budget_category, expense, payment } from "./schema";
+import { budgetCategory, expense, payment } from "./schema";
 
 const budgetCategorySelectQuery = {
-  id: budget_category.id,
-  name: budget_category.name,
-  eventId: budget_category.eventId,
-  allocatedBudget: budget_category.allocatedBudget,
-  createdAt: budget_category.createdAt,
-  updatedAt: budget_category.updatedAt,
+  id: budgetCategory.id,
+  name: budgetCategory.name,
+  eventId: budgetCategory.eventId,
+  allocatedBudget: budgetCategory.allocatedBudget,
+  createdAt: budgetCategory.createdAt,
+  updatedAt: budgetCategory.updatedAt,
 };
 
 const expenseSelectQuery = {
@@ -35,12 +35,12 @@ const paymentSelectQuery = {
 };
 
 const expenseWithCategorySelectQuery = {
-  categoryId: budget_category.id,
-  categoryName: budget_category.name,
-  eventId: budget_category.eventId,
-  allocatedBudget: budget_category.allocatedBudget,
-  categoryCreatedAt: budget_category.createdAt,
-  categoryUpdatedAt: budget_category.updatedAt,
+  categoryId: budgetCategory.id,
+  categoryName: budgetCategory.name,
+  eventId: budgetCategory.eventId,
+  allocatedBudget: budgetCategory.allocatedBudget,
+  categoryCreatedAt: budgetCategory.createdAt,
+  categoryUpdatedAt: budgetCategory.updatedAt,
 
   expenseId: expense.id,
   expenseName: expense.name,
